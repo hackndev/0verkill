@@ -1,0 +1,195 @@
+<!doctype html public "-//W3C//DTD HTML 3.0//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-2">
+<title>0VERKILL - users documentation</title>
+</head>
+<body>
+
+<center><h1><a name="index">INDEX</a></h1></center>
+<ol>
+	<li><a href="#index">Index</a>
+	<li><a href="#running">Running</a>
+	<ol>
+		<li><a href="#server">Server</a>
+		<li><a href="#client">Client</a>
+		<li><a href="#x0verkill">Client Under X</a>
+		<li><a href="#testserver">Testing Program</a>
+	</ol>
+	<li><a href="#controls">Game controls</a>
+	<ol>
+		<li><a href="#keyoverview">Key Overview</a>
+		<li><a href="#motion">Motion</a>
+		<li><a href="#chat">Chat</a>
+		<li><a href="#shooting">Weapons and Shooting</a>
+		<li><a href="#other">Other Commands</a>
+	</ol>
+</ol>
+
+
+<center><h1><a name="running">RUNNING</a></h1></center>
+
+<p><h2><a name="server">Running server</a></h2>
+<p>First thing to start 0verkill is run the server - type <i>server</i>. Server
+takes options <i>-p</i> and <i>-n</i>. As usual, option <i>-h</i> prints help.
+
+<p> Option <i>-p</i> takes one argument: port number. Server needs UDP port
+which runs game on. Default port number is <i>6666</i>, this port is used when
+you don't specify the <i>-p</i> option.
+
+<p> Option <i>-n</i> tells the server to ignore terminate requests from
+clients. By deafult it can be terminated by clients (simple pressing F12 on
+a client). If you run e.g. a public gaming server and you don't want clients to
+terminate the server, give the <i>-n</i> option to the server. Then only person
+sitting on the server will be able to terminate it. 
+
+<p>To stop server, press <i>CTRL-C</i> or send abort <i>SIGINT</i> signal to
+the server using <i>kill</i>. All signals are properly handled, so server shuts
+down all clients before he ends.
+
+<p>Server prints messages tou output during the game. More important are
+printed to stderr, the less important to stdout. So if you wanna log them you
+can simply the important or both redirect to a file.
+
+<p><h2><a name="client">Running Client</a></h2>
+<p>After running server you can run unlimited number of clients to connect the
+game. To run client simply type <i>0verkill</i>. Client automatically
+determines size of your screen, if you want to set screen dimension manually
+give the client option <i>-s</i> with argument <i>&lt;horizontal
+size&gt;x&lt;vertical size&gt;</i> (both in characters). For example:
+<b>0verkill -s 132x43</b>
+
+<p>When you run the client, menu screen appears. In the menu you can set server
+address, port, your name and your color. 
+
+<p>Change color with arrows or <i>PLUS</i> and <i>MINUS</i> (either normal or
+numeric). 
+
+<p>To select port, address and name, press appropriate highlighted letter.
+After pressing it dialog line appears at the bottom of the screen. Use letters
+and <i>BACKSPACE</i> to edit, <i>ENTER</i> to confirm and <i>ESCAPE</i> to
+cancel.
+
+<p>All values will be stored for next time in your home directory in file
+<i>&quot;.0verkill&quot;</i>
+
+<p>When you set all necessary, press <i>ENTER</i> to join the game.
+
+<p><h2><a name="x0verkill">Client Under X</a></h2>
+
+<p>If you want to run 0verkill under X window system type <i>x0verkill</i>. It
+has two more options against <i>0verkill</i>. First you can set display typing
+option <i>--display</i> or briefly <i>-d</i>. Using the second option
+<i>--font</i> or <i>-f</i> you can set font used for displaying.
+
+<p><h2><a name="testserver">Testing Program</a></h2>
+
+<p>There's <i>test_server</i> program in the distribution. It avoids testing
+remote server if it's up and how many players there is. To use it simply type
+<i>test_server -a &lt;server address&gt; -p &lt;port number &gt;</i>.
+
+<center><h1><a name="controls">GAME CONTROLS</a></h1></center>
+
+
+<p><h2><a name="keyoverview">Key Overview</a></h2>
+<table border="4" cellspacing="0" cellpadding="5" align="center">
+<tr><td>LEFT, RIGHT&nbsp;&nbsp;</td><td>move</td></tr>
+<tr><td>SHIFT&nbsp;&nbsp;</td><td>run</td></tr>
+<tr><td>CAPSLOCK, A&nbsp&nbsp;</td><td>autorun</td></tr>
+<tr><td>UP&nbsp;&nbsp;</td><td>jump</td></tr>
+<tr><td>DOWN&nbsp;&nbsp;</td><td>creep</td></tr>
+<tr><td>C&nbsp;&nbsp;</td><td>toggle creep</td></tr>
+<tr><td>D&nbsp;&nbsp;</td><td>climb down ladders</td></tr>
+<tr><td>CTRL, Z&nbsp;&nbsp;</td><td>fire</td></tr>
+<tr><td>1, 2, 3, 4, 5&nbsp;&nbsp;</td><td>change weapon</td></tr>
+<tr><td>ENTER&nbsp;&nbsp;</td><td>chat</td></tr>
+<tr><td>SPACE&nbsp;&nbsp;</td><td>respawn dead player</td></tr>
+<tr><td>R&nbsp&nbsp;</td><td>redraw screen</td></tr>
+<tr><td>H&nbsp&nbsp;</td><td>toggle help window</td></tr>
+<tr><td>TAB&nbsp&nbsp;</td><td>toggle list of top players</td></tr>
+<tr><td>F10, Q&nbsp;&nbsp;</td><td>exit</td></tr>
+<tr><td>F12&nbsp;&nbsp;</td><td>abort</td></tr>
+</table>
+
+
+<p><h2><a name="motion">Motion</a></h2>
+<p> As usual <i>LEFT</i> and <i>RIGHT</i> arrows move the hero. 
+
+<p> To jump press <i>UP</i> arrow.  If you wanna jump aside
+press direction and jump key together.  During jump or fall you can control
+horizontal motion of the hero. 
+
+<p> To speed up horizontal motion hold <i>SHIFT</i>. You can also toggle
+autorun pressing <i>CAPSLOCK</i> or <i>A</i> key.
+
+<p> Hero can also creep. To creep press direction and <i>DOWN</i> key together.
+Releasing <i>DOWN</i> key hero stands up. You can also use the <i>C</i>
+key to toggle creeping. During creeping hero can't shoot, jump and walk up
+stairs.
+
+<p> When you press the <i>D</i> key hero can climb down ladders and fall down platforms.
+
+
+<p><h2><a name="chat">Chat</a></h2>
+<p> To enter chat press ENTER. At the bottom of the screen appears line with
+<i>&quot;&gt;&quot;</i> at beginning. Now you can type text. To send it press ENTER again. To
+cancel press ESCAPE.
+
+<p>During chat all non alphanumeric keys control the game.
+
+
+<p><h2><a name="shooting">Weapons and Shooting</a></h2>
+<p>There are five different weapons in the game:
+<ol>
+	<li>Browning
+	<li>Shotgun
+	<li>UZI
+	<li>Sniper rifle
+	<li>Grenades
+</ol>
+Pressing key with same number as weapon you select the weapon.
+
+<p>At the beginning you have only Browning. To use other weapons you must
+collect it first. When you find a gun it has some small basic ammunition. If
+you have already the gun, basic ammo adds to your ammo. To eke the ammo
+you must find it too. Ammo is usually some box with some writing on itself.
+
+<p>After taking a weapon or after running out of ammo best weapon is
+selected automatically. Automatic weapon selecting selects weapons in this order: 
+<ul>
+	<li>UZI
+	<li>Rifle
+	<li>Shotgun
+	<li>Browning
+	<li>Grenades
+</ul>
+Order is from most prefered to the least prefered. If you wanna another order
+you must use maunal selecting.
+
+<p>To shoot press <i>CONTROL</i> or <i>Z</i>.
+
+<p><b>Hint:</b>You can throw grenades upward. Take grenades, press fire and
+then jump. Hero locks grenade off and throws it upward. Thereby you can play
+basketball with grenades :-)
+
+<p>When somebody kills you or you commit a suicide press <i>SPACE</i> to enter
+the game again.
+
+<p><h2><a name="other">Other Commands</a></h2>
+
+<p>To redraw screen press the <i>R</i> key. It's useful especially when you're
+playing and somebody talks you :-)
+
+<p><i>H</i> key toggles help window. <i>TAB</i> toggles top players list.
+
+<p>To leave the game press <i>F10</i> or <i>Q</i> key. 
+
+<p>If you want to abort the game absolutely, press <i>F12</i> key. This shuts
+down the server and all clients.
+
+<p><b>Attention:</b> in both cases you won't be asked for confirmation. So
+think better of it before you press the keys.
+
+
+</body>
+</html>

@@ -1,0 +1,36 @@
+How to run it
+=============
+
+If you want to run 0verkill with 3D support, add "-3" option behind "0verkill"
+or "x0verkill" command. The screen will be divided into two parts or in
+x0verkill there will be two windows.
+
+
+3D looking
+==========
+
+Crosseyed viewing
+-----------------
+
+Put the window 0verkill to the left and 0verkill3d to the right. They must be
+in the same height and near to each other (the nearer the better). Then cross
+your eyes as if you were looking onto something that is very near. You will
+see many images and adjust your eyes until the left and right window fit
+exactly onto each other (when both window titles join into one). Then you will
+see 3d image.
+
+Parallel viewing
+----------------
+
+Parallel viewing is possible only when your windows are less distant than your
+eyes. Parallel viewing makes better 3d feeling. Put the 0verkill3d vindow left
+and 0verkill right, also in the same distance. Then look into very deep into
+the monitor until both images form one 3d image.
+
+
+Notice
+======
+
+This is rather experimental feature, I don't think it's possible to play the
+game in 3D mode for longer time because of eye-straining. Especially when
+you're not well trained. Nobody is able to stare at a 3D picture for hours :-)

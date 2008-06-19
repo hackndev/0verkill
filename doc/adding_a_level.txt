@@ -1,0 +1,23 @@
+How to add a level
+------------------
+Let's suppose you want to add level with name "new_level". This is a cookbook
+how to create it.
+
+1) Edit data/level.dat file and append a new line with string "new_level".
+   Remember number of the added line (starting from 0). Let's suppose it's X.
+
+2) Touch files:
+	data/new_level.sp
+	data/new_level.dn
+	data/new_level.st
+
+3) Add all graphics you want to the data/new_level.sp file.
+
+4) Run "editor -lX", where X is from (1). Edit the level. Don't forget to
+create some birthplaces.
+
+5) If you want to create some cool new graphics, run 
+   "avi grx/graphics_file.avi". Then add it to the data/new_level.sp
+
+6) When the level is done, run "server -lX", where X is again from (1). And
+   play!

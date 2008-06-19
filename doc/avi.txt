@@ -1,0 +1,43 @@
+User's manual for the avi program
+---------------------------------
+
+avi is an editor for *.avi files (Ascii VIdeo).
+Start it as avi filename.avi. If filename.avi doesn't exist, empty avi
+is created on the startup. If exists, the avi is loaded.
+
+avi starts in command mode. press enter to switch between command and
+drawing mode.
+
+Drawing mode
+------------
+Pressing keys
+`1234567890-=\qwertyuiop[]asdfghjkl;'zxcvbnm,./~!@#$%^
+&*()_+|QWERTYUIOP{}ASDFGHJKL:"ZXCVBNM<>? and space draws appropriate
+character under the cursor. Pressing arrows moves the cursor around.
+Pressing enter switches into command mode. F1 toggles help window.
+
+Command mode
+------------
+Enter switches into drawing mode. 0123456789abcdef changes the colour
+under the cursor. Colour 0 means transparency. Changing colour to 0 and
+then to a different colour preserver the char under the cursor.
+
+F1 or h toggles help window
+[ and ] copies the previous (next) position into the actual
++ and - increases / decreases actual position
+, and . shifts the content of the actual position left (right).
+q ends the editor and saves the avi into the file specified on the command
+line.
+'g' starts animation according to 's' field in the avi and the animation
+must be stopped by pressing 'h' prior to further editation. The editation
+continues at that position at which the animation has been stopped.
+
+Arrows move the cursor around.
+
+Hold key
+--------
+The <tab> key toggles hold mode. In hold mode you can draw/set attribute while
+moving. While you move around with the arrow keys you automatically draw (set
+attribute) the last drawn character (last color).
+
+When <enter> is pressed, hold mode is turned off.

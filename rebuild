@@ -1,0 +1,7 @@
+#!/bin/bash
+./purge
+aclocal
+autoheader
+autoconf
+./configure --with-x
+make

@@ -1,0 +1,1940 @@
+<!doctype html public "-//W3C//DTD HTML 4.0//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-2">
+<title>0VERKILL - programmer's doc</title>
+</head>
+<body>
+
+<p><center><h1><a name="content"><b>CONTENT</b></a></h1></center>
+<p>
+<ol>
+	<li><a href="#content">Content</a>
+	<li><a href="#files">Files</a>
+	<ol>
+		<li><a href="#banner.dat">Banner.dat</a>
+		<li><a href="#avi">Avi Files</a>
+		<li><a href="#sprites.dat">Sprites.dat</a>
+		<li><a href="#room.dat">Room.dat</a>
+		<li><a href="#dynamic.dat">Dynamic.dat</a>
+		<li><a href="#cfg">Configure file</a>
+		<li><a href="#necessary_grx">Necessary Graphics Files</a>
+		<li><a href="#heroes">Heroes And Corpses</a>
+	</ol>
+	<li><a href="#data">Data</a>
+	<ol>
+		<li><a href="#colors">Colors</a>
+		<li><a href="#math">Fixpoints</a>
+		<li><a href="#constants">Constants</a>
+		<li><a href="#weapons">Weapons</a>
+		<li><a href="#sprites">Sprites</a>
+		<li><a href="#static_map">Static Level Map</a>
+	</ol>
+	<li><a href="#objects">Objects</a>
+	<ol>
+		<li><a href="#object_type">Types</a>
+		<li><a href="#object_status">Status</a>
+		<li><a href="#object_data">Object Data</a>
+		<li><a href="#respawn">Respawning</a>
+		<li><a href="#collisions">Object Collisions</a>
+	</ol>
+	<li><a href="#networking">Networking</a>
+	<ol>
+		<li><a href="#description">General Description</a>
+		<li><a href="#server">Server</a>
+		<li><a href="#client">Client</a>
+		<li><a href="#prediction">Motion Prediction</a>
+		<li><a href="#packets">Packets</a>
+		<li><a href="#data_storage">Data Storage Conventions</a>
+		<li><a href="#compatibility_check">Version Compatibility Check</a>
+		<li><a href="#chunked_packets">Chunked Packets</a>
+		<li><a href="#packet_list">Packet Overview</a>
+	</ol>
+	<li><a href="#io">IO</a>
+	<ol>
+		<li><a href="#kbd">Keyboard</a>
+		<li><a href="#console">Console</a>
+		<li><a href="#xsupport">X Support</a>
+		<li><a href="#screenbuffer">Screenbuffer</a>
+	</ol>
+</ol>
+
+
+<p><center><h1><a name="files"><b>FILES</b></a></h1></center>
+
+<p><h2><a name="banner.dat">Banner.dat</a></h2>
+
+<p>Content of this file is cyclicaly scrolled at the bottom of initial screen.
+This file contains lines of ascii text. Each line is scrolled over the screen
+and when last letter of the line disappears at the left, first letter of a new
+line appears at the right. So if you want uninterrupted stream of text, you
+must write it into one line. Vice versa if you want text with intervals write
+it into several lines.
+
+
+<p><h2><a name="avi">Avi Files</a></h2>
+
+<p><i>AVI</i> is a shortcut of &quot;ascii video&quot;. These files contain
+animated graphics in human readable form.
+
+<p>Avi files are divided into lines. Each line begins with initial character
+and ends with linefeed, empty lines are ignored. Initial characters are: <i>p,
+a, l, s, #</i>. File contains consecutive animation positions. Last line is
+list of positions.
+
+<p><i>#</i> is a comment. Lines beginning with hash are ignored.
+
+<p><i>p</i> is offset of current animation position. This line initiates each
+position. <i>p</i> letter is followed by comma separated pair of numbers. First
+number is horizontal offset, second is vertical offset. Number can be both
+positive and negative. Positive means move image right/down, negative move
+image left/up.
+
+<p><i>l</i> is textual part of image scanline. This line contains ascii
+characters. It must be followed with attribute line. Number of image lines is
+not restricted.
+
+<p><i>a</i> is attribute part of image scanline. Line can contain digits <i>0,
+1, 2, 3, 4, 5, 6, 7, 8, 9</i>, small letters <i>a, b, c, d, e, f</i> and
+spaces. Digits 1-9 and letters a-f are colors, space and zero are transparency.
+Pixel is transparent apart from it's textual value (if it has transparent
+attribute).
+
+<p>
+<table border="4" align="center">
+<caption><a name="colors"><em>Colors:</em></a></caption>
+<tr><td align="center"><b>number</b></td><td align="center"><b>name</b></td></tr>
+<tr><td align="center">0</td><td>transparent</td></tr>
+<tr><td align="center">1</td><td>red</td></tr>
+<tr><td align="center">2</td><td>green</td></tr>
+<tr><td align="center">3</td><td>brown</td></tr>
+<tr><td align="center">4</td><td>blue</td></tr>
+<tr><td align="center">5</td><td>violet</td></tr>
+<tr><td align="center">6</td><td>cyan</td></tr>
+<tr><td align="center">7</td><td>light gray</td></tr>
+<tr><td align="center">8</td><td>dark gray</td></tr>
+<tr><td align="center">9</td><td>light red</td></tr>
+<tr><td align="center">a</td><td>light green</td></tr>
+<tr><td align="center">b</td><td>yellow</td></tr>
+<tr><td align="center">c</td><td>light blue</td></tr>
+<tr><td align="center">d</td><td>magenta</td></tr>
+<tr><td align="center">e</td><td>light cyan</td></tr>
+<tr><td align="center">f</td><td>white</td></tr>
+</table>
+
+<p><i>s</i> list of animation positions. Positions are numbered beginning with
+zero and comma separated. All animations are cyclical. So if you want have
+animation with positions 5, 3, 1, 7, 2, 5, 3, 5, 0, 6, 4 you simply write
+<i>s5,3,1,7,2,5,3,5,0,6,4</i>. Of course there can be only numbers of positions
+previously defined.
+
+<p>Typical avi file contains p-line followed with several couples l-line,
+a-line. Then p-line, several couples l-line, a-line ... And last line is
+s-line.
+
+<p><h2><a name="sprites.dat">Sprites.dat</a></h2>
+
+<p>This is a list of sprites used in the game. There is name, whitespace
+and then filename (or path) on each line of the file. Names can't contain
+spaces. Sprites are used in <b><a href="#dynamic.dat">dynamic.dat</a></b> and
+<b><a href="#room.dat">room.dat</a></b>. In these files sprites are refered to
+with their names.
+
+<p><h2><a name="room.dat">Room.dat</a></h2>
+
+<p>This file contains description of playing area. It's divided into lines.
+Each line means one object. Line has several parts separated with whitespace.
+
+<p>Line begins with name of image, name must be defined in <b><a href="#sprites.dat">sprites.dat</a></b>
+file. Then follows (after whitespace) one letter meaning type. Then there are
+two numbers (whitespace separated) meaning x and y coordinates of upper left
+corner of the object. Coordinates can be positive or zero.
+
+<p>
+<table border="4" align="center">
+<caption><em>Type letters</em></caption>
+<tr><td align="center"><b>LETTER</b></td><td align="center"><b>NAME</b></td><td align="center"><b>DESCRIPTION</b></td></tr>
+<tr><td align="center">w</td><td>wall</td><td>hero stops at it</td></tr>
+<tr><td align="center">b</td><td>background</td><td>hero can go freely through</td></tr>
+<tr><td align="center">f</td><td>foreground</td><td>same as background, but hero is behind</td></tr>
+<tr><td align="center">j</td><td>jump</td><td>you can go through and stand on it
+<br>(like in Jet Set Willy on ZX Spectrum)</td></tr>
+<tr><td align="center">i</td><td>jump-fore</td><td>same as jump, but hero is behind</td></tr>
+</table>
+
+<p>Defined type is applied only on non-transparent pixels of a sprite.
+Transparent parts of sprite have no type - they don't restrict player's motion.
+
+<p>Sprites can overlap. Later sprite (in file) does over older one. The older
+one is visible through transparent pixels of the later one.
+
+<p><h2><a name="dynamic.dat">Dynamic.dat</a></h2>
+
+<p>Structure of this file is same as structure of <b><a href="#room.dat">room.dat</a></b>
+file. This file defines dynamic objects as medikits, ammo, guns and all
+animating objects.
+
+<p>One and only difference against <b><a href="#room.dat">room.dat</a></b> file are object types.
+<p>
+<table border="4" cellspacing="0" cellpadding="6" align="center">
+<caption><em>Object types in room.dat file</em></caption>
+<tr><td align="center"><b>LETTER</b></td><td align="center"><b>NAME</b></td><td align="center"><b>DESCRIPTION</b></td></tr>
+<tr><td align="center">1</td><td>ammo nr. 1</td><td>Browning cartridges</td></tr>
+<tr><td align="center">2</td><td>ammo nr. 2</td><td>shotgun shells</td></tr>
+<tr><td align="center">3</td><td>ammo nr. 3</td><td>UZI cartridges</td></tr>
+<tr><td align="center">4</td><td>ammo nr. 4</td><td>sniper rifle cartridges</td></tr>
+<tr><td align="center">5</td><td>ammo nr. 5</td><td>grenades</td></tr>
+<tr><td align="center">N</td><td>nothing</td><td>absolutely indiferent type, only animates</td></tr>
+<tr><td align="center">U</td><td>UZI</td><td>UZI submachine gun</td></tr>
+<tr><td align="center">R</td><td>rifle</td><td>sniper rifle</td></tr>
+<tr><td align="center">S</td><td>shotgun</td><td>shotgun</td></tr>
+<tr><td align="center">M</td><td>medikit</td><td>medikit, nothing more nothing less</td></tr>
+<tr><td align="center">A</td><td>armor</td><td>armor, what else?</td></tr>
+<tr><td align="center">I</td><td>invisibility</td><td>makes player invisible for a time</td></tr>
+</table>
+
+<p>All weapons are supplied with some basic ammo. There aren't any differences
+among medikits (all heal the same) and among ammo (every shotgun ammo adds the same, 
+every grenade ammo adds the same, ...) though they can look different.
+
+<p>To alias new letter (e.g. <em>X</em>) with object type (e.g. <em>T_X</em>) edit <a
+href="../data.c"><b>data.c</b></a> file, <i>_convert_type()</i> function.
+This function contains switch of letters so add a new line <em>case 'X': return T_X;</em>
+
+<p><h2><a name="cfg">Configure File</a></h2>
+
+<p>When you run 0verkill client for the first time, <b>.0verkill</b> file
+appears in your home directory. This file contains address of the server, your
+color and name. Everytime you run 0verkill, these values will be taken as
+default.
+
+<p>Configure file is readable for humans. It's each item is on separate line.
+There's <i>server address</i> on first line, second line contains <i>player's
+name</i> and on third line <i>nuber of player's color</i> is. It's number from
+1 to 30.
+
+<p><h2><a name="necessary_grx">Necessary Graphics Files</a></h2>
+
+<p>There are several graphics files necessary to run the game (like heroes,
+corpses, bullets and so on). They must appear in <a
+href="#sprites.dat"><b>sprites.dat</b></a> file. Here's list of their names:
+
+<p><ul>
+	<li><em>title</em> - 0verkill caption on initial screen
+	<li><em>bulge</em> - goggling skull on initial screen
+	<li><em>hit</em> - blood splash when hero is hit
+	<li><em>bullet</em>
+	<li><em>slug</em> - shotgun slug
+	<li><em>shell</em>
+	<li><em>sshell</em> - shotgun shell
+	<li><em>grenade</em>
+	<li><em>mess1</em> - oily patch left on ground from player
+	<li><em>mess2</em>...<em>mess4</em> - various bits and pieces of player
+	<li><em>shrapnel0</em>...<em>shrapnel9</em> - various grenade shrapnels
+	<li><em>hero1</em>...<em>hero15</em> - male hero (colors 1-15)
+	<li><em>hero16</em>...<em>hero30</em> - female hero (colors 1-15)
+	<li><em>corpse1</em>...<em>corpse15</em> - male corpse (colors 1-15)
+	<li><em>corpse16</em>...<em>corpse30</em> - female corpse (colors 1-15)
+</ul>
+
+<p><h2><a name="heroes">Heroes And Corpses</a></h2>
+
+<p>Avi files containing hero's animations have own special structures. They
+stand <a href="#avi">avi file</a> structure but each animation position (as
+written on the <i>s line</i>) have own meaning. Here it is:
+
+<p><table border="4" align="center">
+<caption><em>Hero avi file</em></caption>
+<tr><td align="center"><b>position</b></td><td align="center"><b>description</b></td></tr>
+<tr><td align="right">0</td><td>standing, looking to the left</td></tr>
+<tr><td align="right">1-8</td><td>walking to the left</td></tr>
+<tr><td align="right">9</td><td>looking face toward me</td></tr>
+<tr><td align="right">10</td><td>standing, looking to the right</td></tr>
+<tr><td align="right">11-18</td><td>walking to the right</td></tr>
+<tr><td align="right">19</td><td>looking back toward me (not used)</td></tr>
+<tr><td align="right">20</td><td>standing, aiming to the left</td></tr>
+<tr><td align="right">21-28</td><td>walking and aiming to the left</td></tr>
+<tr><td align="right">29</td><td>standing and shooting to the left</td></tr>
+<tr><td align="right">30-37</td><td>walking and shooting to the left</td></tr>
+<tr><td align="right">38</td><td>standing, aiming to the right</td></tr>
+<tr><td align="right">39-46</td><td>walking and aiming to the right</td></tr>
+<tr><td align="right">47</td><td>standing and shooting to the right</td></tr>
+<tr><td align="right">48-55</td><td>walking and shooting to the right</td></tr>
+<tr><td align="right">56-63</td><td>creeping to the left</td></tr>
+<tr><td align="right">64-71</td><td>creeping to the right</td></tr>
+<tr><td align="right">72</td><td>creeping toward me</td></tr>
+<tr><td align="right">73</td><td>looking to the left, locking grenade off</td></tr>
+<tr><td align="right">74-75</td><td>throwing grenade to the left</td></tr>
+<tr><td align="right">76</td><td>looking to the right, locking grenade off</td></tr>
+<tr><td align="right">77-78</td><td>throwing grenade to the right</td></tr>
+</table>
+
+<p>Heros are in male and female version, each in 15 different colors. Not to
+have to edit all 30 files when something changes there are only two files
+<a href="../grx/hero_univ.avi"><b>hero_univ.avi</b></a> and 
+<a href="../grx/girl_univ.avi"><b>girl_univ.avi</b></a> containing heroes, but
+instead of color which changes there are letters <b>G</b> (this letter isn't in
+any pixel part). The same is with corpses (files 
+<a href="../grx/corpse_univ.avi"><b>corpse_univ.avi</b></a> and
+<a href="../grx/corpse_girl_univ.avi"><b>corpse_girl_univ.avi</b></a>).
+And there's a shell script <a href="../grx/make_hero"><b>make_hero</b></a>
+generating all 30 files. Script simply substitues <b>G</b> letter with digits
+<b>1</b>...<b>F</b>.
+
+
+<p><center><h1><a name="data"><b>DATA</b></a></h1></center>
+
+<p><h2><a name="math">Fixpoints</a></h2>
+
+<p>Coordinates and velocities of all objects in the game are stored in fixpoint
+numbers. Floats are inappropriate because two float numbers can't be compared,
+fixpoint arithmetics is faster than float arithmetics and such accuracy is
+idle.
+
+<p>Fixpoints and all necessary fixpoint arithmetics functions are defined in
+file <a href="../math.h"><b>math.h</b></a>. Fixpoints are stored in 32-bit
+integers. Original number is multiplied with 1024 and then stored in
+integer. To get integer from fixpoint (or vice versa) you make only one shift.
+
+<p>Fixpoint type is called <i>my_double</i>.Precision of fixpoint arithmetics
+is defined with <i>PREC</i> - it's number of bits you have to shift integer to
+the left to get fixpoint.
+
+<p>There're macros <i>float2double</i>, <i>int2double</i> to convert float
+(integer) number to fixpoint and <i>double2int</i> to convert fixpoint back to
+integer.
+
+<p><a href="../math.h"><b>math.h</b></a> file contains these fixpoint
+arithmetical functions (they're macros, but I'll write them as functions for
+better understanding):
+
+<p>
+<ul>
+	<p><li><i>my_double max(my_double,my_double)</i> - maximum of 2 fixpoints
+	<p><li><i>my_double min(my_double,my_double)</i> - minimum of 2 fixpoints
+	<p><li><i>my_double my_abs(my_double)</i> - absolute value of fixpoint
+	<p><li><i>int round_up(my_double)</i> - round up fixpoint
+	<p><li><i>my_double add_int(my_double,int)</i> - add integer to fixpoint
+	<p><li><i>my_double sub_int(my_double,int)</i> - subtract integer from fixpoint
+	<p><li><i>my_double sub_from_int(int,my_double)</i> - subtract fixpoint from integer
+	<p><li><i>my_double mul_int(my_double,int)</i> - multiply fixpoint with integer
+	<p><li><i>my_double mul(my_double,my_double)</i> - multiply 2 fixpoints
+</ul>
+
+<p>Addition and subtraction isn't anything abnormal - it's like addition and
+substraction of two integers. There's no function for division because division
+is slow and is not used in the game.
+
+<p><h2><a name="constants">Constants</a></h2>
+
+<p>All game constants are in file <a href="../cfg.h"><b>cfg.h</b></a>.
+Now I'll describe most important of them:
+
+<p>
+<ul>
+	<p><li><i>VERSION_MAJOR and VERSION_MINOR</i> - current program
+	version, it's used for version compatibility checking.
+	<p><li><i>MIN_CLIENT_VERSION_MINOR and MIN_SERVER_VERSION_MINOR</i> -
+	lowest client's/server's minor version number to be avoided to play the
+	game. See <a href="#compatibility_check"><b>Version Compatibility
+	Check</b></a> section.
+	<p><li><i>DEFAULT_FONT_NAME</i> - default font for X display
+	<p><li><i>SPRITES_FILE</i> - path to <a
+	href="#sprites.dat"><b>sprites.dat</b></a> file
+	<p><li><i>DATA_FILE</i> - path to <a
+	href="#room.dat"><b>room.dat</b></a> file
+	<p><li><i>DYNAMIC_DATA_FILE</i> - path to <a
+	href="#dynamic.dat"><b>dynamic.dat</b></a> file
+	<p><li><i>BANNER_FILE</i> - path to <a
+	href="#banner.dat"><b>banner.dat</b></a> file
+	<p><li><i>CFG_FILE</i> - path to <a
+	href="#cfg">0verkill configure file</a> in player's home directory
+	<p><li><a name="area_x"><i>AREA_X</i></a> - horizontal size of level
+	<p><li><a name="area_y"><i>AREA_Y</i></a> - vertical size of level
+	<p><li><i>MAX_DUMB_TIME</i> - time (in microseconds) after which are
+	not responding client's kicked out of the game
+	<p><li><i>FPS</i> - server's timer frequency
+	<p><li><i>CLIENT_FPS</i> - client's timer frequency (frames per second)
+	<p><li><i>PERIOD</i> - period (in microseconds) to <i>FPS</i>
+	<p><li><i>CLIENT_PERIOD</i> - period (in microseconds) to <i>CLIENT_FPS</i>
+	<p><li><i>MENU_PERIOD</i> - refresh period of initial screen
+	<p><li><i>PLAYER_WIDTH and PLAYER_HEIGHT</i> - dimensions of player
+	<p><li><i>CREEP_WIDTH and CREEP_HEIGHT</i> - dimensions of creeping player
+	<p><li><i>CORPSE_WIDTH and CORPSE_HEIGHT</i> - dimensions of player's corpse
+	<p><li><i>CREEP_YOFFSET</i> - vertical offset of creeping player to
+	standing position (in my_double)
+	<p><li><i>WALK_ACCEL</i> - player's horizontal acceleration
+	<p><li><i>MAX_SPEED_WALK_FAST</i> - maximal horizontal speed of running
+	player
+	<p><li><i>MAX_SPEED_CREEP</i> - maximal horizontal speed of creeping
+	player
+	<p><li><i>FALL_ACCEL</i> - vertical acceleration of falling objects
+	<p><li><i>MAX_X_SPEED</i> - maximal horizontal speed of player
+	<p><li><i>MAX_Y_SPEED</i> - maximal vertical speed of objects
+	<p><li><i>PLAYER_SLOW_DOWN_X</i> - player's horizontal slow down when
+	walking on ground
+	<p><li><i>MIN_X_SPEED</i> - objects stop when their horizontal velocity
+	is lower than this
+	<p><li><i>MIN_Y_SPEED</i> - similar to previous
+	<p><li><i>SPEED_JUMP</i> - initial vertical speed of jumping player
+	<p><li><a name="overkill"><i>OVERKILL</i></a> - when player's damage is less than minus this
+	value player melts down
+	<p><li><i>HOLD_GUN_AFTER_SHOOT</i> - how long player holds gun after
+	shot (higher number=hold longer), this constant is added to hero's time 
+	to live during shooting
+	<p><li><i>FIRE_YOFFSET</i> - vertical distance between player's gun
+	(where bullets goes out from) and player's upper left corner
+	<p><li><i>GRENADE_FIRE_YOFFSET</i> - vertical distance between created
+	grenade and player's upper left corner
+	<p><li><i>FIRE_IMPACT</i> - acceleration shot gives to shootin' player
+	and bullet gives to victim
+	<p><li><i>SHRAPNEL_IMPACT</i> - acceleration shrapnel gives to victim
+	<p><li><a name="grenade_delay"><i>GRENADE_DELAY</i></a> - time between grenade locking off and
+	grenade throwing
+	<p><li><i>MEDIKIT_HEALTH_ADD</i> - number of health points medikit adds
+	<p><li><i>MAX_AMMO</i> - maximal ammo for each weapon
+</ul>
+
+<p><h2><a name="weapons">Weapons</a></h2>
+
+<p>Weapons in the game have lot of properties. For example name, cadence, basic
+ammo, rebound, ... Weapon attributes are defined in <i>weapon</i> table in file
+<a href="../data.c"><b>data.c</b></a> (definition of this type is in <a
+href="../data.h"><b>data.h</b></a>). Weapon is definite determined with it's
+number (weapon type) - so table is indexed with weapon type. To change weapon
+properties simply increase <i>ARMS</i> constant and add new line to the table -
+nothing else is needed.
+
+<p><table border="4" align="center">
+<caption><em>Weapon properties</em></caption>
+<tr><td align="center"><b>name</b></td><td align="center"><b>type</b></td><td
+align="center"><b>description</b></td></tr>
+<tr><td><i>name</i></td><td>string</td><td>weapon name, it's displayed in status bar</td></tr>
+<tr><td><a name="w_cadence"><i>cadence</i></a></td><td>unsigned char</td><td>lower number=higher cadence</td></tr>
+<tr><td><a name="w_ttl"><i>ttl</i></a></td><td>16-bit int</td><td>length of bullet's live</td></tr>
+<tr><td><a name="w_speed"><i>speed</i></a></td><td>fixpoint</td><td>horizontal speed of bullet</td></tr>
+<tr><td><i>impact</i></td><td>fixpoint</td><td>acceleration bullet gives to
+shooting player and to victim</td></tr>
+<tr><td><a name="w_lethalness"><i>lethalness</i></a></td><td>unsigned char</td><td>number of health points
+bullet recovers from victim</td></tr>
+<tr><td><a name="w_armor_damage"><i>armor_damage</i></a></td><td>unsigned char</td><td>number of armor points
+bullet takes away from victim</td></tr>
+<tr><td><i>basic_ammo</i></td><td>unsigned char</td><td>ammo player gets when
+takes the weapon</td></tr>
+<tr><td><i>add_ammo</i></td><td>unsigned char</td><td>ammo player gets taking
+ammo box for this weapon type</td></tr>
+<tr><td><i>max_ammo</i></td><td>unsigned char</td><td>maximal ammo player can have for this weapon</td></tr>
+<tr><td><a name="w_shell_xspeed"><i>shell_xspeed</i></a></td><td>fixpoint</td><td>horizontal speed of shell flying away</td></tr>
+<tr><td><a name="w_shell_yspeed"><i>shell_yspeed</i></a></td><td>fixpoint</td><td>vertical speed of shell flying away</td></tr>
+</table>
+
+<p>When player fires server creates new object &quot;bullet&quot; and object
+&quot;shell&quot;. Bullet has vertical velocity zero, horizontal velocity is <a
+href="#w_speed"><i>speed</i></a>. <a href="#w_ttl"><i>Time to live</i></a>
+gives striking distance. Bullet's sprite is stored in <i>bullet_sprite</i>
+variable, shell's sprite is in <i>shell_sprite</i> (both are global variables in <a
+href="../server.c"><b>server.c</b></a> source, they're initialized during start of
+the game). 
+
+<p>Server sets shooting flag (bit 4 in hero's <a
+href="#object_status"><i>status</i></a>) at hero's object and hero's <i>time to
+live</i> is set to <a href=#w_cadence">weapon <i>cadence</i></a>. When shooting
+flag is up player can't shoot again. When hero's time to live decreases to zero
+shooting flag is shut down. When client gets update of a hero with wielding gun
+flag (bit 5 in <a href="#object_status"><i>status</i></a>) he sets time to live to
+weapon <a href="#w_cadence"><i>cadence</i></a>. Animation of shooting player is
+displayed only when hero's time to live==weapon cadence. It's here not to display
+shooting player everytime client gets status update.
+
+<p>Shotgun shooting is a bit different. Server creates shell too but it's
+sprite is in <i>shotgun_shell_sprite</i> and creates not one bullet but six
+slugs (<i>slug_sprite</i>). Their vertical velocities are not zero - they're
+given in sources. Thus every shotgun shot creates the same slugs with the same
+velocities.
+
+<p>Grenade throwing is absolute different because grenades have timeout and
+grenade isn't created when fire is pressed because hero must lock it off first.
+So when player fires his hero's <i>time to live</i> is set to grenade <a
+href="#w_cadence">cadence</a> and bit
+9 in his hero's <a href="#object_status">status</a> is set to 1. When ttl is
+lower than <a href="#grenade_delay"><i>GRENADE_DELAY</i></a> server creates
+grenade object with initial velocity grenade <a
+href="#w_shell_xspeed"><i>shell_xspeed</i></a> and
+<a href="#w_shell_yspeed"><i>shell_yspeed</i></a> and initial <a
+href="#w_ttl"><i>time to live</i></a>. Then when grenade's ttl lowers to
+zero grenade explodes: server deletes grenade and creates shrapnels instead.
+
+<p>When player is hit his health is lowered by <a
+href="#w_lethalness"><i>lethalness of the weapon</i></a>. Damage decreases
+(linearly) with bullet/slug/shrapnel time to live. It also depends on place on
+hero's body where bullet crashes into. It's linear interpolated too - head hit
+damages twice as legs hit.
+
+<p>If player's health lowers below zero player is dead. If healt lowers below
+minus <a href="#overkill"><i>OVERKILL</i></a> player melts down
+(<i>create_mess</i> function is called), otherwise corpse is created
+(<i>create_corpse</i> function).
+
+<p>To find out whose bullet or slug or shrapnel killed a player object
+bullet/slug/shrapnel contains owner's hero object number in <a
+href="#object_data"><i>data</i></a> item. It could contain a pointer to player
+but player could shoot and immediately leave the game (player will be removed
+from server's data structures) and bullet could kill someone and consequently
+server would crash on sigsegv because the pointer would be invalid.
+
+<p>When grenade shrapnel hits corpse or mess (object with <a
+href="#object_type">type</a> <i>T_CORPSE_TYPE</i>) blood gushes and raw meat
+flies - function <i>create_mess</i> is called and original object (corpse) is
+deleted. It offers great fun!
+
+<p>Not to load network so much server doesn't send bullet, shells, slugs
+and shrapnels (objects with <a href="#object_type">type</a> <i>T_SHELL</i>,
+<i>T_BULLET</i> or <i>T_SHRAPNEL</i>) updates. Clients compute them
+theirselves. It's because bullets and shells appear in the game very often and
+their updates would load network hard. It may be a bit unaccurate (clients
+could see reality a bit different) but it's worth network discharge.
+
+<p><h2><a name="sprites">Sprites</a></h2>
+
+<p>In this section I'll describe how sprites are stored in memory. Data
+structures I'm gonna describe can be found in <a
+href="../sprite.h"><b>sprite.h</b></a> file.
+
+<p>First I'll describe data types. Sprite=animation, animation is set of
+(one or more) ascii-art pictures with given order, picture is set of scan-lines
+(not explicit with same length), each line is set of pixels, pixel have textual
+part and attribute part. This is a philosophy of sprites storage in memory.
+
+<p>There are three structures for each described part of sprite: sprite
+(<i>struct sprite</i>), animation position (<i>struct pos</i>) and scan-line
+(<i>struct line</i>).
+
+<p><ul>
+	<li><i>struct sprite</i> - contains array of positions, number of
+	members of the array, order of positions - array of indexes into
+	position array and number of members of last
+	<li><i>struct pos</i> - contains offset (horizontal and vertical) of
+	the image, number of lines and array of lines
+	<li><i>struct line</i> - contains length of line (number of pixels),
+	array of pixels and array of attributes (both the same length)
+</ul>
+
+<p>For better understanding see <a href="../sprite.h"><b>sprite.h</b></a> file.
+
+<p>All sprites are stored in <i>sprites</i> variable - field of <i>struct
+sprite</i>. Sprite names are stored in <i>sprite_names</i> variable (field of
+strings). Sprites are searched through their names using <i>find_sprite()</i>
+function. (All this is described in <a href="../data.c"><b>data.c</b></a> and
+<a href="../data.h"><b>data.h</b></a> files.)
+
+<p>Avi files are loaded from <a href="#sprites.dat"><b>sprites.dat</b></a>
+using <i>load_sprite()</i> function. This function makes everything needed:
+fills <i>sprites</i> variable and <i>sprite_names</i> variable too.
+
+
+<p>Game expects both client and server have the same <a
+href="#sprites.dat"><b>sprites.dat</b></a> file. This is very important
+presumption - files shall not be changed. At this time there's no check that
+files are same. Because both client and server use the same function for
+loading sprites sprites are stored with the same order into memory. So to
+determine sprite over the network sprite number (index in <i>sprites</i> array)
+is enough.
+
+
+<p><h2><a name="static_map">Static Level Map</a></h2>
+
+<p>Game is compact of static map and dynamic objects. Static map is a rectangle
+of pixels filled with walls, empty space, background, ... .  Level dimensions
+are <a href="#area_x"><i>AREA_X</i></a> and <a href="#area_y"><i>AREA_Y</i></a>.
+
+Description of static map is in <a href="#room.dat"><b>room.dat</b></a> file. Each pixel of
+the level contains textual information (letter of the pixel) and attribute.
+Map is stored in <i>area</i> (textual data) and <i>area_a</i> (attributes)
+variables. Both are one dimensional arrays of chars. Lower 4 bits of attribute
+are color of the pixel, higher 4 bits are pixel type. Type can be:
+<p><ul>
+
+<li><em>TYPE_BACKGROUND</em> - it's behind objects
+<li><em>TYPE_FOREGROUND</em> - it's in front of objects
+<li><em>TYPE_WALL</em> - objects stop at it
+<li><em>TYPE_JUMP</em> - player can go through but can stand on it
+<li><em>TYPE_JUMP_FOREGROUND</em> - same as <em>TYPE_JUMP</em>, but it's in
+front of player
+</ul>
+
+<p>These types are defined in <a href="../data.h"><b>data.h</b></a> file.
+
+<p><center><h1><a name="objects"><b>OBJECTS</b></a></h1></center>
+
+<p>Objects is everything that moves, animates or can be picked up. Game without
+static map are objects. The only thing that happens in the game is object
+moving, updating, creating and deleting. Nothing more. Heroes are objects,
+shooting is new objects creating, ...
+
+<p>Object have own unique <i>ID</i>, it's 24 bits long, to flow over ID there
+would have to be over 16 millions of objects - it would be really heavy game ;-).
+
+<p>Object is represented in <i>struct it</i> structure (data definition is in <a
+href="../data.h"><b>data.h</b></a> file), objects are stored in bidirectional list
+(<i>struct object_list</i>). This data type was chosen because we want to create
+and delete objects and we also want to have access to each object. Because
+searching objects through their IDs is necessary objects are hashed (<a
+href="../hash.h"><b>hash.h</b></a>, <a href="../hash.c"><b>hash.c</b></a> sources)
+by their IDs. Hash table contains pointers to the list. Hash table 32k entries -
+table ss about 120k large.
+
+<p><table border="4" align="center">
+<caption><em>struct it</em></caption>
+<tr><td align="center"><b>Item</b></td><td align="center"><b>Type</b></td><td align="center"><b>Description</b></td></tr>
+<tr><td valign="top"><i>x</i></td><td valign="top">fixpoint</td><td
+valign="top">horizontal coordinate</td></tr>
+<tr><td valign="top"><i>y</i></td><td valign="top">fixpoint</td><td
+valign="top">vertical coordinate</td></tr>
+<tr><td valign="top"><i>xspeed</i></td><td valign="top">fixpoint</td><td
+valign="top">horizontal velocity</td></tr>
+<tr><td valign="top"><i>yspeed</i></td><td valign="top">fixpoint</td><td
+valign="top">vertical velocity</td></tr>
+<tr><td valign="top"><i>type</i></td><td valign="top">unsigned char</td><td
+valign="top"><a href="#object_type">object type</a></td></tr>
+<tr><td valign="top"><i>id</i></td><td valign="top">24 bit int</td><td
+valign="top">unique ID</td></tr>
+<tr><td valign="top"><i>ttl</i></td><td valign="top">16 bit int</td><td
+valign="top">time to live - some kind of counter<br>when non zero it's decreased
+in every game tick<br>when reaches zero some kind of action happens (in
+<i>update_game</i> function)</td></tr>
+<tr><td valign="top"><i>sprite</i></td><td valign="top">16 bit int</td><td
+valign="top">sprite number (index in array of sprites)</td></tr>
+<tr><td valign="top"><i>anim_pos</i></td><td valign="top">16 bit unsigned int</td><td
+valign="top">current animation position</td></tr>
+<tr><td valign="top"><i>status</i></td><td valign="top">16 bit int</td><td
+valign="top"><a href="#object_status">object status</a></td></tr>
+<tr><td valign="top"><a name="last_updated"><i>last_updated</i></a></td><td valign="top">unsigned long
+long</td><td valign="top">time of last update<br>client uses this to determine if
+object update (from server) isn't old<br>server uses at with <a
+href="#respawn">respawning objects</a></td></tr>
+<tr><td valign="top"><i>data</i></td><td valign="top">void *</td><td
+valign="top"><a href="#object_data">aditional data</a></td></tr>
+</table>
+
+<p>There are functions for creating and deleting objects: <i>new_obj()</i> and
+<i>delete_obj()</i>. They add/remove object to/from object list and hash table.
+<i>new_object</i> functino also initializes object's data with given values.
+There's function <i>find_in_table()</i> to find object with given ID, this
+function returns poniter to the list of all objects.
+
+<p><h2><a name="object_type">Object Types</a></h2>
+
+<p>Object <i>type</i> gives information about what the object is, e.g medikit,
+hero, grenade, shotgun, corpse, ... Object types differ in attributes.  Attributes
+are stored in <i>obj_attr</i> table (in <a href="../data.c"><b>data.c</b></a>,
+type is defined in <a href="../data.h"><b>data.h</b></a>), they say for example if
+it falls, how much it bounces and so on.
+
+<p>Here is list of object types:
+
+<p>
+<ul>
+	<li><i>T_PLAYER</i> - hero
+	<li><i>T_BULLET</i>
+	<li><i>T_CORPSE</i>
+	<li><i>T_MEDIKIT</i>
+	<li><i>T_SHOTGUN</i>
+	<li><i>T_UZI</i>
+	<li><i>T_RIFLE</i>
+	<li><i>T_SHELL</i>
+	<li><i>T_AMMO_GUN</i>
+	<li><i>T_AMMO_SHOTGUN</i>
+	<li><i>T_AMMO_UZI</i>
+	<li><i>T_AMMO_RIFLE</i>
+	<li><i>T_NOTHING</i> - this type is indifferent to all and is here only
+	to animate (this type are e.g. burning barrels)
+	<li><i>T_MESS</i> - blood and guts from melt down player
+	<li><i>T_GRENADE</i>
+	<li><i>T_AMMO_GRENADE</i>
+	<li><i>T_SHRAPNEL</i> - grenade shrapnel
+	<li><i>T_ARMOR</i>
+	<li><i>T_INVISIBILITY</i> - invisibility dope
+	<li><i>T_NOISE</i> - noise when player's respawning
+	<li><i>T_NOTHING_FORE</i> -  as <i>T_NOTHING</i> but in foreground
+</ul>
+
+<p>Similar to weapon attributes object attributes table is indexed through object
+type too.
+
+<p><table border="4" align="center">
+<caption><em>Object attributes:</em></caption>
+<tr><td align="center"><b>Name</b></td><td align="center"><b>Type</b></td><td align="center"><b>Description</b></td></tr>
+<tr><td valign="top"><i>fall</i></td><td valign="top">unsigned char</td><td>possible values: 0 or 1<br>says
+if object can fall or not</td></tr>
+<tr><td valign="top"><i>bounce_x</i></td><td valign="top">fixpoint</td><td>horizontal bounce slow down<br>speed is
+multiplied with this constant</td></tr>
+<tr><td valign="top"><i>bounce_y</i></td><td valign="top">fixpoint</td><td>vertical bounce slow down</td></tr>
+<tr><td valign="top"><i>slow_down_x</i></td><td valign="top">fixpoint</td><td>horizontal slow down when not falling</td></tr>
+<tr><td valign="top"><i>maintainer</i></td><td valign="top">unsigned char</td><td>who updates the object<br>bit 0 =
+client updates<br>bit 1 = server updates<br>bit 2 = server sends updates to
+clients</td></tr>
+<tr><td valign="top"><i>foreground</i></td><td valign="top">unsigned char</td><td>possible values: 0 or 1<br>defines if the object is in foreground</td></tr>
+</table>
+
+<p>To add new object type increase <i>N_TYPES</i> constant, add new type constant
+with number <i>N_TYPES</i>-1 (both in <a href="../data.h"><b>data.h</b></a> file)
+and add new line describing object's attributes into <i>obj_attr</i> table (in <a
+href="../data.c"><b>data.c</b></a> file). Now you can use new object type in the
+game.
+
+<p><h2><a name="object_status">Object Status</a></h2>
+
+<p><table border="4" align="center">
+<caption><em>Object status:</em></caption>
+<tr><td align="center"><b>Bit</b></td><td align="center"><b>Description</b></td></tr>
+<tr><td align="right" valign="top">0</td><td>player walks</td></tr>
+<tr><td align="right" valign="top">1,2</td><td>player is
+looking<br>01=left<br>10=right<br>00=center<br>(left digit is bit 1)</td></tr>
+<tr><td align="right" valign="top">3</td><td>object falls</td></tr>
+<tr><td align="right" valign="top">4</td><td>player's shooting</td></tr>
+<tr><td align="right" valign="top">5</td><td>player's wielding gun</td></tr>
+<tr><td align="right" valign="top">6</td><td>object is hidden</td></tr>
+<tr><td align="right" valign="top">7</td><td>player is hit (blood gushes)</td></tr>
+<tr><td align="right" valign="top">8</td><td>player's creeping</td></tr>
+<tr><td align="right" valign="top">9</td><td>player's throwing grenade</td></tr>
+<tr><td align="right" valign="top">10</td><td>player is dead</td></tr>
+<tr><td align="right" valign="top">11</td><td>player falls down ladders etc.</td></tr>
+<tr><td align="right" valign="top">12</td><td>player's just respawning</td></tr>
+</table>
+
+<p>Only heroes use all status bits, other objects use only bits 3 and 6. Bullets (object
+with type <i>T_BULLET</i>) use status for absolute different purpose. Server
+stores type of weapon in the status. It's a little cheat because bullets don't
+fall and can't be hidden thus status would be unused. And bullet must remember type of gun it was
+shot off.
+
+<p><h2><a name="object_data">Object Data</a></h2>
+
+<p><i>data</i> item in <i>struct it</i> is used in several ways:
+
+<ul>
+	<p><li><b>client, hero object</b> - when player was hit it contains
+	information about where to draw blood splash, otherwise contains zero
+	<br>bits 0-7 are horizontal offset<br>bits 8-15 are vertical
+	offset<br>bits 16-23 is direction (0=left,1=right)<br><b>It won't work on
+	platforms with 16-bit void* !</b>
+
+	<p><li><b>server, hero object</b> - pointer to player structure of the
+	hero owner (<i>struct player*</i>)
+
+	<p><li><b>server, bullet, shrapnel, grenade</b> - ID of owner of the
+	bullet/grenade/shrapnel<br>when grenade explodes, owner of grenade moves
+	to shrapnels<br>If there was pointer to owner and owner leaved it would
+	cause crash.
+</ul>
+
+<p><h2><a name="respawn">Respawning</a></h2>
+
+<p>Some objects (ammo, weapons, medikits, ...) a while after picking up appear
+again in the game. It's called respawning. 
+
+<p>Server have time queue (<i>time_queue</i> variable) - time queue is a
+bidirectional list of objects waiting for respawning. Objects in queue have
+respawning time, it's stored in <a href="#last_updated"><i>last_updated</i></a>
+variable. Respawning time is time in microseconds since 1970 (at server's machine)
+when object's gonna appear in the game. List is sorted by respawn time (object
+with lowest time comes first) - that's why it's called queue.
+
+<p>When the object is picked up, it's not deleted, but moved to time queue
+(<i>add_to_timeq()</i> function). Queue is updated every game tick calling
+<i>update_timeq()</i> function. This function removes from queue and adds to the
+game objects with time older than current time.
+
+<p>When server moves object to the queue it sets flag <i>hidden</i> to the
+object and sends status update to all clients. So clients have the object in
+the game but it's invisible. When object gets back into the game <i>hidden</i>
+flag is switched off. When new player enters the game server sends all objects
+in the queue to the client.
+
+<p><h2><a name="collisions">Object Collisions</a></h2>
+
+<p>Server computes collisions among objects (<i>dynamic_collision()</i> function
+in <a href="../server.c"><b>server.c</b></a> file).
+<b>Corpses</b>, <b>grenades</b> <b>shells</b> doesn't collide. <b>Weapons</b>,
+<b>ammo</b>, <b>armor</b> and <b>medikits</b> collide with players. <b>Bullets</b> collide with
+players, <b>shrapnels</b> collide with players and corpses.
+
+<p><center><h1><a name="networking"><b>NETWORKING</b></a></h1></center>
+
+<p><h2><a name="description">General Description</a></h2>
+
+<p>0verkill is a client-server game. In the game there's one server and
+unlimited number of clients. They communicate through UDP sockets. Server runs
+on an IP address and socket that are well known by the others.
+
+<p>Clients initiate connection with server. Each client has it's IP address and
+port. They are not so essential because server gets it with each packet. They
+don't have to be known by players.
+
+<p>Server and clients are numbered with IDs. Server's ID is always 0.
+Client's are numbered from 1. ID numbers are sent with packets too - to
+correctly determine sender and recipient.
+
+<p>Both server and client have their clock, game is updated (recomputed) every
+tick. 
+
+<p><h2><a name="server">Server</a></h2>
+
+<p>Server has entire information about the game. State of game on the server is
+one and only true. Clients can have a bit different informations (due to
+network inconsistency), but the server has absolute truth. 
+
+<p>When everything's OK and server gets client's request he creates a new
+player, new hero object and sends all objects to the client. Now client's in
+the game and can control his hero.
+
+<p>As I've said server has own clock. In every tick server reads data on
+input - requests from clients (<i>read_data()</i> function), updates players
+(<i>update_players()</i> function )and updates objects in the game
+(<i>update_game</i> function).
+
+<p>Server has in each client's record time when last keyboard update came.
+Clients should send keyboard update every tick. But when client is more than 30
+seconds dumb he's kicked out of the game. 
+
+<p>This kickout wasn't implemented in earlier server's versions. So when client
+wanted to enter the game he sent request - it came to the server, server sent
+client "OK you're in the game" and created a new player. But due to a network
+error client didn't get it and though he he wasn't accepted and there was a
+dumb player in the game.
+
+<p><h2><a name="client">Client</a></h2>
+
+<p>The only person client's communicating with is server. If there's a packet
+not only for server but for other players too, client sends it to server and
+server resends it farther. So networking topology is star - server's in the center.
+
+<p>As it was said clients have own ID. At the beginning when clients wants to
+enter the game he doesn't have any. So server sends information about player's
+acceptance to client's address but puts zero as recipient's ID to the packet
+and client expects recipient's ID to be zero. Then client reads his ID from the
+packet and hence expects all packet to have recipient's ID his ID.
+
+
+<p>Client in every tick reads data from the socket - game updates from the
+server, chat messages from clients ... (<i>read_data()</i> function), updates
+game - recomputes objects (<i>update_game()</i> function), draws view on the
+screen (<i>draw_scene()</i>), reads keyboard and sends keyboard status to the
+server (<i>send_keyboard()</i>).
+
+<p>Earlier client versions were sending keyboard update only when something
+changed. It loaded network a little bit less but on slow lines (e.g. 28.8k
+modem) motion was jerky. The line wasn't able to transmit all the packets so
+when keyboard update didn't come server though client didn't press any key
+so he didn't move the player.
+
+<p>You may think sending keyboard status even if nothing's pressed loads
+network too much, but during game you almost always hold any key. So it isn't
+so dramatic.
+
+<p><h3><a name="prediction">Motion Prediction</a></h3>
+
+<p>Clients have motion prediction to achieve smoother game. In every tick
+client updates his objects himself. Client knows velocities - he can recompute
+positions, he also knows which object slows down with friction - he can update
+velocities. Clients don't compute object collisions, it's server's job.
+
+<p>When client gets update of an object (packet contains object ID, current
+position, velocity, time, status and ttl) he copies velocity, status and ttl.
+And sets object's position to position in packet plus velocity multiplied with
+time difference among time in packet and current client's game time.
+
+<p><h2><a name="packets">Packets</a></h2>
+
+<p>Packet contain not only data but also sender's and recipient's ID and
+CRC check.
+
+<p><table border="4" align="center">
+<caption><em>Packet structure:</em></caption>
+<tr><td align="center"><b>OFFSET<br>(bytes)</b></td><td align="center"><b>LENGTH<br>(bytes)</b></td><td align="center"><b>CONTENT</b></td></tr>
+<tr><td align="right">0</td><td align="right">4</td><td>CRC check</td></tr>
+<tr><td align="right">4</td><td align="right">4</td><td>sender's ID</td></tr>
+<tr><td align="right">8</td><td align="right">4</td><td>recipient's ID</td></tr>
+<tr><td align="right">12</td><td align="right">n</td><td>own data</td></tr>
+</table>
+
+<p>CRC is 32-bit CRC checksum of own data (not sender's or recipient's ID !) as
+described in <b>ISO 3309</b> standard.
+
+<p>There are two routines in file <a href="../net.c"><b>net.c</b></a> for
+packet transmitting: <i>send_packet()</i> and <i>recv_packet()</i>. These functions
+are wraparound of <i>sendto()</i> and <i>recvfrom()</i> functions. They add crc
+check and sender's and recipient's ID to data and transmit it through network.
+They behave as there wasn't any additional information with data.
+<i>recv_packet()</i> returns number of received data bytes (not crc nor IDs) on
+success.
+
+<p><h2><a name="data_storage">Data Storage Conventions</a></h2>
+
+<p>In this section I'll describe conventions used to store some data types in
+packets. I'll use following data types: <b>byte</b>, <b>int</b>,
+<b>fixpoint</b>, <b>time</b> and <b>string</b>.
+
+<p>
+<ul>
+	<li><u>Byte:</u> is always one 8 bits long. There's no problem with
+	storing byte into packet.
+	
+	<li><u>Int:</u> Can be 16 or 32 bits long, it can be both signed or
+	unsigned.  Apart from sign first byte of int comes always first in a
+	packet, then second, third and fourth (it comes last). There are
+	functions <i>put_int()</i> (<i>put_int16()</i>) and <i>get_int()</i>
+	(<i>get_int16()</i>) for simple manipulation with ints.
+	
+	<li><u>Fixpoint:</u> is number in fix-point arithmetics. 0verkill uses
+	fixpoints for inner data representation too (type is called
+	<i>my_double</i>). Fixpoints are stored in 32 bit integers, thus
+	conventions arethe same as of integers. There are functions
+	<i>get_float()</i> and <i>put_float()</i> for easier manipulation.
+
+	<li><u>Time:</u> This type stores time in the game - in microseconds
+	since 1970. It's unsigned long long. It's stored alike <b>int</b>.
+	First byte first, eight byte last. There are functions
+	<i>get_long_long()</i> and <i>put_long_long()</i> for manipulation.
+
+	<li><u>String:</u> is sequence of bytes. It's always terminated with
+	null character.
+</ul>
+
+<p>Data in packet always start with one byte head. Head informs about type of following
+data. Here is overview of packets. Packet heads are defined in file <a
+href="../net.h"><b>net.h</b></a>
+
+<p><h2><a name="compatibility_check">Version Compatibility Check</a></h2>
+
+<p>Since version 0.12 0verkill contains improved version compatibility check.
+It guarantees that client and server with improper version numbers can't
+play the game.
+
+<p>Client sends his major and minor version number to server in the
+<a href="#p_new_player"><i>P_NEW_PLAYER</i></a> packet. Server checks its
+version with client's version and accepts or denies the client.
+
+<p>If server accepts the client server sends his version number in the <a
+href="#p_player_accepted"><i>P_PLAYER_ACCEPTED</i></a> packet. Now client
+checks versions and continues or sends quit to the server.
+
+<p>Now how check works. It is the same for both client and server only in one
+case server is denied and in second case client's denied, so I won't describe
+it extra for server and extra for client. I'll use &quot;check fails&quot;
+phrase - it means this combination of client and server won't work together. 
+<p>
+<ol>
+	<p><li>When version number is not contained in the packet (old version not
+	supporting the check) check fails. 
+
+	<p><li>If major versions differ check fails.
+
+	<p><li>Now minor version number check. File <a
+	href="../cfg.h"><b>cfg.h</b></a> contains constants
+	<i>MIN_CLIENT_VERSION_MINOR</i> and <i>MIN_SERVER_VERSION_MINOR</i>.
+	First constant defines lowest minor version number server accepts. The
+	second is lowest server minor version client is willing to connect to.
+
+</ol>
+
+<p><h2><a name="chunked_packets">Chunked Packets</a></h2>
+
+<p> To decrease network load, server sends most frequent packets in chunks.
+Packet created in one server's tick are stored in server's memory (separately
+for each client).  When total size of packets exceeds <i>MAX_PACKET_SIZE</i> or
+when tick ends server sends a chunk packet (with head <i>P_CHUNK</i>)
+containing all the data from the buffer to the client. 
+
+<p> This mechanism doesn't work at clients.
+
+<p>Chunked packets are:
+<p>
+<ul>
+	<li>object updates (including status and other updates)
+	<li>message
+	<li>player update
+	<li>grenade explosion packet
+	<li>player hit packet
+</ul>
+
+<p>And these packets aren't chunked:
+<p><ul>
+	<li>info
+	<li>end of the game
+	<li>new player packet
+	<li>delete player packet
+</ul>
+
+<p><table border="4" align="center">
+<caption><a name="packet_list"><em>Packet Overview:</em></a></caption>
+<tr>
+	<td align="center"><b>HEAD</b></td>
+	<td align="center"><b>SENDER</b></td>
+	<td align="center"><b>DESCRIPTION</b></td>
+	<td align="center"><b>OFFSET<br>(bytes)</b></td>
+	<td align="center"><b>LENGTH<br>(bytes)</b></td>
+	<td align="center"><b>TYPE</b></td>
+	<td align="center"><b>DESCRIPTION</b></td>
+</tr>
+<tr>
+	<td valign="top" rowspan="5"><a
+	name="p_new_player"><i>P_NEW_PLAYER</i></a></td>
+	<td align="center" valign="top" rowspan="5">client</td>
+	<td valign="top" rowspan="5">New player wants to enter the game</td>
+	<td align="right" valign="top">1</td>
+	<td align="right" valign="top">1</td>
+	<td valign="top">byte</td>
+	<td>0; to recognize old clients, they had color here and it was never 0</td>
+</tr>
+<tr>
+	<td align="right" valign="top">2</td>
+	<td align="right" valign="top">1</td>
+	<td valign="top">byte</td>
+	<td>client's major version number</td>
+</tr>
+<tr>
+	<td align="right" valign="top">3</td>
+	<td align="right" valign="top">1</td>
+	<td valign="top">byte</td>
+	<td>client's minor version number</td>
+</tr>
+<tr>
+	<td align="right" valign="top">4</td>
+	<td align="right" valign="top">1</td>
+	<td valign="top">byte</td>
+	<td>player's color (number from 1 to 30)</td>
+</tr>
+<tr>
+	<td align="right" valign="top">5</td>
+	<td align="right" valign="top">n</td>
+	<td valign="top">string</td>
+	<td>player's name</td>
+</tr>
+<tr>
+	<td valign="top" rowspan="2"><a
+	name="p_change_level"><i>P_CHANGE_LEVEL</i></a></td>
+	<td align="center" valign="top" rowspan="2">server</td>
+	<td valign="top" rowspan="2">Server is changing the level</td>
+	<td align="right" valign="top">1</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">int</td>
+	<td>level number (line number in the level.dat file - counted from 0)</td>
+</tr>
+<tr>
+	<td align="right" valign="top">5</td>
+	<td align="right" valign="top">33</td>
+	<td valign="top">string</td>
+	<td>level MD5 checksum in hexadecimal notation</td>
+</tr>
+<tr>
+	<td valign="top"><a
+	name="p_level_accepted"><i>P_LEVEL_ACCEPTED</i></a></td>
+	<td align="center" valign="top">client</td>
+	<td valign="top">Client changes to this level</td>
+	<td align="right" valign="top">1</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">int</td>
+	<td>level number (line number in the level.dat file - counted from 0)</td>
+</tr>
+<tr>
+	<td valign="top" rowspan="11"><a name="p_player_accepted"><i>P_PLAYER_ACCEPTED</i></a></td>
+	<td align="center" valign="top" rowspan="11">server</td>
+	<td valign="top" rowspan="11">Player was accepted</td>
+	<td align="right" valign="top">1</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">int</td>
+	<td>hero object ID</td>
+</tr>
+<tr>
+	<td align="right" valign="top">5</td>
+	<td align="right" valign="top">2</td>
+	<td valign="top">int</td>
+	<td>hero sprite number</td>
+</tr>
+<tr>
+	<td align="right" valign="top">7</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">fixpoint</td>
+	<td>x coordinate</td>
+</tr>
+<tr>
+	<td align="right" valign="top">11</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">fixpoint</td>
+	<td>y coordinate</td>
+</tr>
+<tr>
+	<td align="right" valign="top">15</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">fixpoint</td>
+	<td>horizontal speed</td>
+</tr>
+<tr>
+	<td align="right" valign="top">19</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">fixpoint</td>
+	<td>vertical speed</td>
+</tr>
+<tr>
+	<td align="right" valign="top">23</td>
+	<td align="right" valign="top">2</td>
+	<td valign="top">int</td>
+	<td>status</td>
+</tr>
+<tr>
+	<td align="right" valign="top">25</td>
+	<td align="right" valign="top">8</td>
+	<td valign="top">time</td>
+	<td>game start time</td>
+</tr>
+<tr>
+	<td align="right" valign="top">33</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">int</td>
+	<td>player's ID</td>
+</tr>
+<tr>
+	<td align="right" valign="top">37</td>
+	<td align="right" valign="top">1</td>
+	<td valign="top">byte</td>
+	<td>server major version number (since version 0.12)</td>
+</tr>
+<tr>
+	<td align="right" valign="top">38</td>
+	<td align="right" valign="top">1</td>
+	<td valign="top">byte</td>
+	<td>server minor version number (since version 0.12)</td>
+</tr>
+<tr>
+	<td valign="top"><i>P_PLAYER_REFUSED</i></td>
+	<td align="center" valign="top">server</td>
+	<td valign="top">Player was refused.</td>
+	<td align="right" valign="top">1</td>
+	<td align="right" valign="top">1</td>
+	<td valign="top">byte</td>
+	<td>error:<br>E_PLAYER_REFUSED or<br>E_INCOMPATIBLE_VERSION)</td>
+</tr>
+<tr>
+	<td valign="top" rowspan="2"><i>P_END</i></td>
+	<td align="center" valign="top">server</td>
+	<td valign="top">Server's shutting down, client's should end.</td>
+	<td align="right" valign="top">1</td>
+	<td align="right" valign="top">n</td>
+	<td valign="top">string</td>
+	<td>Name of player who ended the game</td>
+</tr>
+<tr>
+	<td align="center" valign="top">client</td>
+	<td valign="top">Player's ending the game.</td>
+</tr>
+<tr>
+	<td valign="top" rowspan="9"><i>P_NEW_OBJ</i></td>
+	<td align="center" valign="top" rowspan="9">server</td>
+	<td valign="top" rowspan="9">New object</td>
+	<td align="right" valign="top">1</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">int</td>
+	<td>object ID</td>
+</tr>
+<tr>
+	<td align="right" valign="top">5</td>
+	<td align="right" valign="top">2</td>
+	<td valign="top">int</td>
+	<td>sprite number</td>
+</tr>
+<tr>
+	<td align="right" valign="top">7</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">fixpoint</td>
+	<td>x coordinate</td>
+</tr>
+<tr>
+	<td align="right" valign="top">11</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">fixpoint</td>
+	<td>y coordinate</td>
+</tr>
+<tr>
+	<td align="right" valign="top">15</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">fixpoint</td>
+	<td>horizontal speed</td>
+</tr>
+<tr>
+	<td align="right" valign="top">19</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">fixpoint</td>
+	<td>vertical speed</td>
+</tr>
+<tr>
+	<td align="right" valign="top">23</td>
+	<td align="right" valign="top">2</td>
+	<td valign="top">int</td>
+	<td>status</td>
+</tr>
+<tr>
+	<td align="right" valign="top">25</td>
+	<td align="right" valign="top">1</td>
+	<td valign="top">byte</td>
+	<td>type</td>
+</tr>
+<tr>
+	<td align="right" valign="top">26</td>
+	<td align="right" valign="top">2</td>
+	<td valign="top">int</td>
+	<td>time to live</td>
+</tr>
+<tr>
+	<td valign="top" rowspan="2"><i>P_UPDATE_STATUS</i></td>
+	<td align="center" valign="top" rowspan="2">server</td>
+	<td valign="top" rowspan="2">Update status of an object</td>
+	<td align="right" valign="top">1</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">int</td>
+	<td>object ID</td>
+</tr>
+<tr>
+	<td align="right" valign="top">5</td>
+	<td align="right" valign="top">2</td>
+	<td valign="top">int</td>
+	<td>object status</td>
+</tr>
+<tr>
+	<td valign="top" rowspan="8"><i>P_UPDATE_OBJECT</i></td>
+	<td align="center" valign="top" rowspan="8">server</td>
+	<td valign="top" rowspan="8">Object update</td>
+	<td align="right" valign="top">1</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">int</td>
+	<td>object ID</td>
+</tr>
+<tr>
+	<td align="right" valign="top">5</td>
+	<td align="right" valign="top">1</td>
+	<td valign="top">int</td>
+	<td>8-bit counter, increased with each update</td>
+</tr>
+<tr>
+	<td align="right" valign="top">6</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">fixpoint</td>
+	<td>x coordinate</td>
+</tr>
+<tr>
+	<td align="right" valign="top">10</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">fixpoint</td>
+	<td>y coordinate</td>
+</tr>
+<tr>
+	<td align="right" valign="top">14</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">fixpoint</td>
+	<td>horizontal speed</td>
+</tr>
+<tr>
+	<td align="right" valign="top">18</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">fixpoint</td>
+	<td>vertical speed</td>
+</tr>
+<tr>
+	<td align="right" valign="top">22</td>
+	<td align="right" valign="top">2</td>
+	<td valign="top">int</td>
+	<td>status</td>
+</tr>
+<tr>
+	<td align="right" valign="top">24</td>
+	<td align="right" valign="top">2</td>
+	<td valign="top">int</td>
+	<td>time to live</td>
+</tr>
+<tr>
+	<td valign="top" rowspan="6"><i>P_UPDATE_OBJECT_POS</i></td>
+	<td align="center" valign="top" rowspan="6">server</td>
+	<td valign="top" rowspan="6">Update of position and speed of an object</td>
+	<td align="right" valign="top">1</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">int</td>
+	<td>object ID</td>
+</tr>
+<tr>
+	<td align="right" valign="top">5</td>
+	<td align="right" valign="top">1</td>
+	<td valign="top">int</td>
+	<td>8-bit counter, increased with each update</td>
+</tr>
+<tr>
+	<td align="right" valign="top">6</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">fixpoint</td>
+	<td>x coordinate</td>
+</tr>
+<tr>
+	<td align="right" valign="top">10</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">fixpoint</td>
+	<td>y coordinate</td>
+</tr>
+<tr>
+	<td align="right" valign="top">14</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">fixpoint</td>
+	<td>horizontal speed</td>
+</tr>
+<tr>
+	<td align="right" valign="top">18</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">fixpoint</td>
+	<td>vertical speed</td>
+</tr>
+<tr>
+	<td valign="top" rowspan="4"><i>P_UPDATE_OBJECT_SPEED</i></td>
+	<td align="center" valign="top" rowspan="4">server</td>
+	<td valign="top" rowspan="4">Speed update of an object</td>
+	<td align="right" valign="top">1</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">int</td>
+	<td>object ID</td>
+</tr>
+<tr>
+	<td align="right" valign="top">5</td>
+	<td align="right" valign="top">1</td>
+	<td valign="top">int</td>
+	<td>8-bit counter, increased with each update</td>
+</tr>
+<tr>
+	<td align="right" valign="top">6</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">fixpoint</td>
+	<td>horizontal speed</td>
+</tr>
+<tr>
+	<td align="right" valign="top">10</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">fixpoint</td>
+	<td>vertical speed</td>
+</tr>
+<tr>
+	<td valign="top" rowspan="4"><i>P_UPDATE_OBJECT_COORDS</i></td>
+	<td align="center" valign="top" rowspan="4">server</td>
+	<td valign="top" rowspan="4">Position update of an object</td>
+	<td align="right" valign="top">1</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">int</td>
+	<td>object ID</td>
+</tr>
+<tr>
+	<td align="right" valign="top">5</td>
+	<td align="right" valign="top">1</td>
+	<td valign="top">int</td>
+	<td>8-bit counter, increased with each update</td>
+</tr>
+<tr>
+	<td align="right" valign="top">6</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">fixpoint</td>
+	<td>x coordinate</td>
+</tr>
+<tr>
+	<td align="right" valign="top">10</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">fixpoint</td>
+	<td>y coordinate</td>
+</tr>
+<tr>
+	<td valign="top" rowspan="5"><i>P_UPDATE_OBJECT_SPEED_STATUS</i></td>
+	<td align="center" valign="top" rowspan="5">server</td>
+	<td valign="top" rowspan="5">Speed and status update of an object</td>
+	<td align="right" valign="top">1</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">int</td>
+	<td>object ID</td>
+</tr>
+<tr>
+	<td align="right" valign="top">5</td>
+	<td align="right" valign="top">1</td>
+	<td valign="top">int</td>
+	<td>8-bit counter, increased with each update</td>
+</tr>
+<tr>
+	<td align="right" valign="top">6</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">fixpoint</td>
+	<td>horizontal speed</td>
+</tr>
+<tr>
+	<td align="right" valign="top">10</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">fixpoint</td>
+	<td>vertical speed</td>
+</tr>
+<tr>
+	<td align="right" valign="top">14</td>
+	<td align="right" valign="top">2</td>
+	<td valign="top">int</td>
+	<td>status</td>
+</tr>
+<tr>
+	<td valign="top" rowspan="5"><i>P_UPDATE_OBJECT_COORDS_STATUS</i></td>
+	<td align="center" valign="top" rowspan="5">server</td>
+	<td valign="top" rowspan="5">Position and status update of an object</td>
+	<td align="right" valign="top">1</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">int</td>
+	<td>object ID</td>
+</tr>
+<tr>
+	<td align="right" valign="top">5</td>
+	<td align="right" valign="top">1</td>
+	<td valign="top">int</td>
+	<td>8-bit counter, increased with each update</td>
+</tr>
+<tr>
+	<td align="right" valign="top">6</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">fixpoint</td>
+	<td>x coordinate</td>
+</tr>
+<tr>
+	<td align="right" valign="top">10</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">fixpoint</td>
+	<td>y coordinate</td>
+</tr>
+<tr>
+	<td align="right" valign="top">14</td>
+	<td align="right" valign="top">2</td>
+	<td valign="top">int</td>
+	<td>status</td>
+</tr>
+<tr>
+	<td valign="top" rowspan="6"><i>P_UPDATE_OBJECT_SPEED_STATUS_TTL</i></td>
+	<td align="center" valign="top" rowspan="6">server</td>
+	<td valign="top" rowspan="6">Speed, status and ttl update of an object</td>
+	<td align="right" valign="top">1</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">int</td>
+	<td>object ID</td>
+</tr>
+<tr>
+	<td align="right" valign="top">5</td>
+	<td align="right" valign="top">1</td>
+	<td valign="top">int</td>
+	<td>8-bit counter, increased with each update</td>
+</tr>
+<tr>
+	<td align="right" valign="top">6</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">fixpoint</td>
+	<td>horizontal speed</td>
+</tr>
+<tr>
+	<td align="right" valign="top">10</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">fixpoint</td>
+	<td>vertical speed</td>
+</tr>
+<tr>
+	<td align="right" valign="top">14</td>
+	<td align="right" valign="top">2</td>
+	<td valign="top">int</td>
+	<td>status</td>
+</tr>
+<tr>
+	<td align="right" valign="top">16</td>
+	<td align="right" valign="top">2</td>
+	<td valign="top">int</td>
+	<td>time to live</td>
+</tr>
+<tr>
+	<td valign="top" rowspan="6"><i>P_UPDATE_OBJECT_COORDS_STATUS_TTL</i></td>
+	<td align="center" valign="top" rowspan="6">server</td>
+	<td valign="top" rowspan="6">Position, status and ttl update of an object</td>
+	<td align="right" valign="top">1</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">int</td>
+	<td>object ID</td>
+</tr>
+<tr>
+	<td align="right" valign="top">5</td>
+	<td align="right" valign="top">1</td>
+	<td valign="top">int</td>
+	<td>8-bit counter, increased with each update</td>
+</tr>
+<tr>
+	<td align="right" valign="top">6</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">fixpoint</td>
+	<td>x coordinate</td>
+</tr>
+<tr>
+	<td align="right" valign="top">10</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">fixpoint</td>
+	<td>y coordinate</td>
+</tr>
+<tr>
+	<td align="right" valign="top">14</td>
+	<td align="right" valign="top">2</td>
+	<td valign="top">int</td>
+	<td>status</td>
+</tr>
+<tr>
+	<td align="right" valign="top">16</td>
+	<td align="right" valign="top">2</td>
+	<td valign="top">int</td>
+	<td>time to live</td>
+</tr>
+<tr>
+	<td valign="top"><i>P_QUIT_REQUEST</i></td>
+	<td align="center" valign="top">client</td>
+	<td valign="top">Client's leaving the game</td>
+</tr>
+<tr>
+	<td valign="top"><i>P_DELETE_OBJECT</i></td>
+	<td align="center" valign="top">server</td>
+	<td valign="top">This object's no longer in the game</td>
+	<td align="right" valign="top">1</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">int</td>
+	<td>object ID</td>
+</tr>
+<tr>
+	<td valign="top"><i>P_PLAYER_DELETED</i></td>
+	<td align="center" valign="top">server</td>
+	<td valign="top">Answer to P_QUIT_REQUEST<br>player was deleted, client
+	can end</td>
+</tr>
+<tr>
+	<td valign="top" rowspan="2"><i>P_MESSAGE</i></td>
+	<td align="center" valign="top">server</td>
+	<td valign="top">Chat message or message from server</td>
+	<td align="right" valign="top">1</td>
+	<td align="right" valign="top">n</td>
+	<td valign="top">string</td>
+	<td>message</td>
+</tr>
+<tr>
+	<td align="center" valign="top">client</td>
+	<td valign="top">Chat message from client. Server adds player's name
+	and broadcasts to all players</td>
+	<td align="right" valign="top">1</td>
+	<td align="right" valign="top">n</td>
+	<td valign="top">string</td>
+	<td>message</td>
+</tr>
+<tr>
+	<td valign="top" rowspan="11"><i>P_UPDATE_PLAYER</i></td>
+	<td align="center" valign="top" rowspan="11">server</td>
+	<td valign="top" rowspan="11">Player update</td>
+	<td align="right" valign="top">1</td>
+	<td align="right" valign="top">1</td>
+	<td valign="top">byte</td>
+	<td>health</td>
+</tr>
+<tr>
+	<td align="right" valign="top">2</td>
+	<td align="right" valign="top">1</td>
+	<td valign="top">byte</td>
+	<td>armor</td>
+</tr>
+<tr>
+	<td align="right" valign="top">3</td>
+	<td align="right" valign="top">2</td>
+	<td valign="top">int</td>
+	<td>gun ammo</td>
+</tr>
+<tr>
+	<td align="right" valign="top">5</td>
+	<td align="right" valign="top">2</td>
+	<td valign="top">int</td>
+	<td>shotgun ammo</td>
+</tr>
+<tr>
+	<td align="right" valign="top">7</td>
+	<td align="right" valign="top">2</td>
+	<td valign="top">int</td>
+	<td>UZI ammo</td>
+</tr>
+<tr>
+	<td align="right" valign="top">9</td>
+	<td align="right" valign="top">2</td>
+	<td valign="top">int</td>
+	<td>rifle ammo</td>
+</tr>
+<tr>
+	<td align="right" valign="top">11</td>
+	<td align="right" valign="top">2</td>
+	<td valign="top">int</td>
+	<td>grenades</td>
+</tr>
+<tr>
+	<td align="right" valign="top">13</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">int</td>
+	<td>frags</td>
+</tr>
+<tr>
+	<td align="right" valign="top">17</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">int</td>
+	<td>deaths</td>
+</tr>
+<tr>
+	<td align="right" valign="top">21</td>
+	<td align="right" valign="top">1</td>
+	<td valign="top">byte</td>
+	<td>number of current weapon</td>
+</tr>
+<tr>
+	<td align="right" valign="top">22</td>
+	<td align="right" valign="top">1</td>
+	<td valign="top">byte</td>
+	<td>player's weapons<br>0.bit=gun, 1.bit=shotgun, 2.bit=uzi,
+	3.bit=rifle, 4.bit=grenades</td>
+</tr>
+<tr>
+	<td valign="top" rowspan="2"><i>P_EXPLODE_GRENADE</i></td>
+	<td align="center" valign="top" rowspan="2">server</td>
+	<td valign="top" rowspan="2">Grenade is exploding (client should create
+	shrapnels)</td>
+	<td align="right" valign="top">1</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">int</td>
+	<td>ID of first shrapnel, other shrapnels have increasing ID</td>
+</tr>
+<tr>
+	<td align="right" valign="top">5</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">int</td>
+	<td>grenade ID (gives coordinates of explosion too, grenade should be
+	deleted)</td>
+</tr>
+<tr>
+	<td valign="top" rowspan="4"><i>P_HIT</i></td>
+	<td align="center" valign="top" rowspan="4">server</td>
+	<td valign="top" rowspan="4">Player was hit; clients should draw blood
+	splash</td>
+	<td align="right" valign="top">1</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">int</td>
+	<td>object ID</td>
+</tr>
+<tr>
+	<td align="right" valign="top">5</td>
+	<td align="right" valign="top">1</td>
+	<td valign="top">byte</td>
+	<td>direction: 0=left, 1=right</td>
+</tr>
+<tr>
+	<td align="right" valign="top">6</td>
+	<td align="right" valign="top">1</td>
+	<td valign="top">byte</td>
+	<td>horizontal offset (in pixels)</td>
+</tr>
+<tr>
+	<td align="right" valign="top">7</td>
+	<td align="right" valign="top">1</td>
+	<td valign="top">byte</td>
+	<td>vertical offset (in pixels)</td>
+</tr>
+<tr>
+	<td valign="top" rowspan="2"><i>P_KEYBOARD</i></td>
+	<td align="center" valign="top" rowspan="2">client</td>
+	<td valign="top" rowspan="2">Player holds these keys pressed</td>
+	<td align="right" valign="top">1</td>
+	<td align="right" valign="top">1</td>
+	<td valign="top">byte</td>
+	<td>keys: 0.bit=right, 1.bit=left, 2.bit=jump, 3.bit=creep, 4.bit=speed
+	up, 5.bit=fire, 6.bit=climb down ladders</td>
+</tr>
+<tr>
+	<td align="right" valign="top">2</td>
+	<td align="right" valign="top">1</td>
+	<td valign="top">byte</td>
+	<td>change weapon key: 0=none or 1-5</td>
+</tr>
+<tr>
+	<td valign="top" rowspan="12"><i>P_INFO</i></td>
+	<td align="center" valign="top" rowspan="11">server</td>
+	<td valign="top" rowspan="11">Info on players</td>
+	<td align="right" valign="top">1</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">int</td>
+	<td>number of active players</td>
+</tr>
+<tr>
+	<td align="right" valign="top">5</td>
+	<td align="right" valign="top">1</td>
+	<td valign="top">byte</td>
+	<td>number of players in top list</td>
+</tr>
+<tr>
+	<td align="right" valign="top">6</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">int</td>
+	<td>frags of player #1</td>
+</tr>
+<tr>
+	<td align="right" valign="top">10</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">int</td>
+	<td>deaths of player #1</td>
+</tr>
+<tr>
+	<td align="right" valign="top">14</td>
+	<td align="right" valign="top">1</td>
+	<td valign="top">byte</td>
+	<td>color of player #1 (number from 1 to 30)</td>
+</tr>
+<tr>
+	<td align="right" valign="top">15</td>
+	<td align="right" valign="top">n</td>
+	<td valign="top">string</td>
+	<td>name of player #1</td>
+</tr>
+<tr>
+	<td align="right" valign="top">15+n</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">int</td>
+	<td>frags of player #2</td>
+</tr>
+<tr>
+	<td align="right" valign="top">19+n</td>
+	<td align="right" valign="top">4</td>
+	<td valign="top">int</td>
+	<td>deaths of player #2</td>
+</tr>
+<tr>
+	<td align="right" valign="top">23+n</td>
+	<td align="right" valign="top">1</td>
+	<td valign="top">byte</td>
+	<td>color of player #2 (number from 1 to 30)</td>
+</tr>
+<tr>
+	<td align="right" valign="top">24+n</td>
+	<td align="right" valign="top">m</td>
+	<td valign="top">string</td>
+	<td>name of player #2</td>
+</tr>
+<tr>
+	<td align="right" valign="top"></td>
+	<td align="right" valign="top"></td>
+	<td valign="top"></td>
+	<td>and so on...</td>
+</tr>
+<tr>
+	<td align="center" valign="top">client,<br>someone else</td>
+	<td valign="top">Send me how many players are in the game</td>
+</tr>
+<tr>
+	<td valign="top"><i>P_REENTER_GAME</i></td>
+	<td align="center" valign="top">client</td>
+	<td valign="top">Client wants to be born again. This packet is sent when player presses space</td>
+</tr>
+<tr>
+	<td valign="top"><i>P_BELL</i></td>
+	<td align="center" valign="top">server</td>
+	<td valign="top">Client should ring the bell (sent e.g. when new player enters the game)</td>
+</tr>
+<tr>
+	<td valign="top"><i>P_CHUNK</i></td>
+	<td align="center" valign="top">server</td>
+	<td valign="top">Several packed chunked into one</td>
+	<td align="right" valign="top">1</td>
+	<td align="right" valign="top">n</td>
+	<td valign="top">byte</td>
+	<td>content of packets (stored packet by packet, byte by byte)</td>
+</tr>
+</table>
+
+<p><center><h1><a name="io"><b>IO</b></a></h1></center>
+
+<p>0verkill has own routines for controlling screen and keyboard. They can also
+be used as stand-alone library. Output routines are in
+<a href="../console.c"><b>console.c</b></a>,
+<a href="../console.h"><b>console.h</b></a> files. Keyboard controlling
+routines in
+<a href="../kbd.c"><b>kbd.c</b></a> and
+<a href="../kbd.h"><b>kbd.h</b></a> files.
+
+<p>If you want to use it stand-alone, include 
+<a href="../console.h"><b>console.h</b></a> file in your source.
+
+<p><h2><a name="kbd">Keyboard</a></h2>
+
+<p>Keyboard has two modes. Standard and raw mode. In <b>standard mode</b> keyboard
+sends periodically information about key currently pressed. That has one
+disadvantage - you can't press more than one at once. During game like 0verkill
+it's quite essential disadvantage (you often need e.g. walk and shoot
+together).
+
+<p>Keyboard in <b>raw mode</b> sends information which key was pressed and which was
+released. But not all keyboads can be switched into this mode (when you're
+playing over telnet or in X).  So I implemented both keyboards and if it's
+possible raw keyboard is used otherwise standard is used.
+
+<p>If you want to use keyboard you must initialize it first. To initialize
+keyboard function <i>kbd_init()</i> is called. This function tries to switch
+keyboard to raw mode or it it isn't possible it leaves it in standard mode. 
+Global variable <i>keyboard_type</i> contains information about keyboard mode.
+It can be <i>KBD_RAW</i> or <i>KBD_STD</i>. Each function contains switch of
+keyboard_type and for each value one branch.
+
+<p>To shut down keyboard call <i>kbd_close()</i> - it returns keyboard into
+original mode.
+
+<p>Interface and data storage is raw mode orientated. There are two key tables
+one for current keyboard state (<i>keyboard</i>) and one for previous one
+(<i>old_keyboard</i>). Each table cell says if appropriate key is pressed or
+not. 
+
+<p>Keyboard must be updated calling <i>kbd_update()</i> function. This
+function copies keyboard table into old table, reads keys from input and fills
+key table. It also handles virtual terminal switching and other events like
+ctrl-c pressing. 
+<hr>
+<center>
+<b>!!! WHEN KBD_UPDATE ISN'T CALLED YOU CAN'T SWITCH VIRTUAL TERMINAL!!!
+<br>!!! NOR BREAK THE PROGRAM !!!</b>
+</center>
+<hr>
+
+<p>Function <b>kbd_wait_for_key</b> waits until any key is pressed.
+
+<p>There are two functions <i>kbd_is_pressed()</i> and <i>kbd_was_pressed()</i>
+for testing which key is actually pressed or which was pressed and not released
+since. Both functions have key as an argument. Key can be either character
+constant for a letter or a number or several other characters or a constant
+from <a href="../kbd.h"><b>kbd.h</b></a>. They return 1 if key was pressed and
+0 otherwise.
+
+<p>Standard keyboard has the same interface but functions are more simple and
+it doesn't handle virtual terminal switch nor break.
+
+<p><h2><a name="console">Console</a></h2>
+
+<p>File <a href="../console.c"><b>console.c</b></a> contains all necessary
+functions to handle console. Console is driven with ANSI terminal sequencies.
+Console is accessed through standard output. Output is buffered with functions
+<i>fputc()</i>, <i>fprintf()</i>, <i>fwrite()</i>. There is also my own buffering in
+the code, but it's commented out. It uses own buffer for output and writes to
+stdout using function <i>write()</i>. But built in buffering seems to be more
+effective.
+
+<p>This driver includes keyboard driver (which was described before) too. It
+wraps its functions into own functions.
+
+<p>To initialize console driver call <i>c_init()</i> function. It automatically
+initializes keyboard too. To shut it down call <i>c_shutdown()</i> function.
+
+<p>Because all functions for writing to console (cleaning, setting colors,
+writing text, ...) are buffered you must call <i>c_refresh()</i> function to
+changes take effect.
+
+<p>I'm gonna speak about coordinates on screen. Coordinates start in upper left
+corner of the screen, x coordinate goes to right, y coordinate goes down - both
+in positive direction. Upper left corner of the screen has coordinates [0,0].
+
+<p>I'm going to speak about colors too. 0verkill uses only foreground color and
+background color is always black. It's due to author's obsession that other
+background color will be ugly (or is it laziness? ;-) ) There are several
+functions for setting color - for setting separate highlight, separate color
+and to set both. It's speed optimalization - to write minimum of characters to
+stdout, because kernel has very sloooooooooooooow console driver.
+
+<p>And now description of functions:
+
+<p><ul>
+
+	<p><li><i>void c_cls(void)</i> - it may be unexpected, but this function clears
+	the screen
+
+	<p><li><i>void c_clear(int x1,int y1,int x2,int y2)</i> - clears block
+	on screen, [x1,y1] is upper left corner, [x2,y2] is lower right corner,
+	both corners are cleared too.
+
+	<p><li><i>void c_print(char *)</i> - prints string with current color
+	on current cursor position 
+
+	<p><li><i>void c_putc(char)</i> - writes character with current color
+	to current cursor position 
+
+	<p><li><i>void c_cursor(int)</i> - sets cursor shape, argument values
+	are <i>C_NORMAL</i> or <i>C_HIDE</i>
+
+	<p><li><i>void c_goto(int x,int y)</i> - sets cursor position to [x,y]
+
+	<p><li><i>void c_bell(void)</i> - rings the bell
+
+	<p><li><a name="c_setcolor"><i>void c_setcolor(unsigned char)</i></a> - sets 4-bit color: lower
+	three bits are color, fourth bit (not bit 4) is highlight
+
+	<p><li><a name="c_setcolor_3b"><i>void c_setcolor_3b(unsigned char)</i></a> - sets 3-bit color,
+	without highlight, highlight is the same as was set last time
+
+	<p><li><a name="c_sethlt"><i>void c_sethlt(unsinged char)</i></a> - sets separate highlight
+
+	<p><li><i>void c_refresh(void)</i> - calling this function all changes
+	take effect
+
+	<p><li><i>void c_get_size(int *x,int *y)</i> - gets screen dimensions
+</ul>
+
+<p>As I've said before there are wrapped keyboard functions too. They have the
+same arguments, return the same value and do the same as functions in <a
+href="../kbd.h"><b>kbd.h</b></a>. They are: <i>c_pressed</i>,
+<i>c_was_pressed</i>, <i>c_wait_for_key</i> and <i>c_update_kbd</i>.
+
+<p><h2><a name="xsupport">X Support</a></h2>
+
+<p>Since version <i>0.11</i> 0verkill has full support for X window system.
+
+<p>Functions for displaying under X are in <a
+href="../xinterface.c"><b>xinterface.c</b></a> file and functions driving X
+keyboard are in <a href="../xkbd.c"><b>xkbd.c</b></a>. All functions in these
+files use the same interface (defined in <a
+href="../console.h"><b>console.h</b></a> and <a
+href="../kbd.h"><b>kbd.h</b></a>) as console variants.
+
+<p>Game is displayed in single window, created in <i>c_init()</i> function.
+This function also initiates connection with the X server.
+
+<p>X interface has several global variables and constants which can affect layout. They are
+defined in <a href="../x.h"><b>x.h</b></a> file. Most important are
+<i>x_font_name</i> which says name of the font used for displaying and
+<i>x_display_name</i> which determines X display.
+
+<p>Events comming from X server are caught in <i>kbd_update()</i> function.
+Interesting events are <i>KeyPress</i>, <i>KeyRelease</i> and
+<i>ConfigureNotify</i> and <i>Expose</i>. Last two ones raise <i>SIGWINCH</i>
+signal. Consequently picture is redrawn.
+
+
+<p><h2><a name="screenbuffer">Screenbuffer</a></h2>
+
+<p>0verkill uses screenbuffer for displaying on the screen. Screenbuffer is
+array of size <i>SCREEN_X</i> and <i>SCREEN_Y</i>, it's stored in <i>screen</i>
+(textual part) and <i>screen_a</i> (attributes) variables. Whole scene is
+displayed into screenbuffer and then screenbuffer is flushed to stdout
+(<i>blit_screen()</i> function).
+
+<p>To achieve highest displaying speed attribute setting is high optimized.
+Number of characters written to stdout is minimized. Attributes are set only
+when necessary - when previous pixel color is different than color of currently
+drawn pixel. 
+
+<p>There are three color setting functions: 
+<a href="#c_setcolor"><i>c_setcolor()</i></a>,
+<a href="#c_setcolor_3b"><i>c_setcolor_3b()</i></a> and
+<a href="#c_sethlt"><i>c_sethlt()</i></a>. When attributes differ only in
+highlight <a href="#c_sethlt"><i>c_sethlt()</i></a> function is called. When
+highlight doesn't change <a href="#c_setcolor_3b"><i>c_setcolor_3b()</i></a> is
+called. In other cases the <a href="#c_setcolor"><i>c_setcolor()</i></a> is
+called.
+
+</body>
+</html>

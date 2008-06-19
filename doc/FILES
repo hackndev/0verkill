@@ -1,0 +1,60 @@
+DIRECTORIES:
+------------
+data/		Game data - room description and other.
+doc/		Documentation.
+grx/		Graphics.
+
+
+SOURCE FILES:
+-------------
+avi.c		AVI editor
+avihelp.c	AVI editor help
+blit.c		Screenbuffer.
+blit.h		Screenbuffer interface.
+cfg.h		Configure file. You don't have to edit it.
+client.c	Client.
+console.c	Low level console controlling functions, drawing characters,
+		cursor position setting, color setting, ...
+console.h	Header file for previous.
+crc32.c		CRC32 routine by Mark Adler.
+crc32.h		CRC32 header file.
+data.c		Game data loading routines, auxillary functions, weapon 
+		parameters and object attributes.
+data.h		Object types, data definitions.
+editor.c	Simple level editor.
+getopt.c	Getopt function (for system without it).
+hash.c		Hash function. It hashes object ids.
+hash.h		Header for previous.
+help.c		Help printing routine.
+help.h		Header for previous.
+icon.h		Icon
+kbd.c		Keyboard controlling routines. Standard and raw keyboard.
+kbd.h		Header file for it.
+math.h		My mathematical functions for fix-point arithmetics.
+net.c		Functions for send and receive UDP packets with CRC32.
+net.h		Packet heads.
+server.c	Server.
+server.h	Player structure definition.
+sprite.c	Screen buffer, put image, sprite loader.
+sprite.h	Sprite structures definitions.
+test_server.c	Server testing program. Tests remote server if it's up and how many players there are.
+time.c		Time getting and synchronization routines.
+time.h		Header for previous.
+winconsole.c	Console for Windows.
+winkbd.c	Keyboard for Windows.
+x.h		Constants and global variables for X support.
+xinterface.c	Low level functions for X display control. It's an alternative 
+		to console.c.
+xkbd.c		X keyboard functions - alternative to kbd.c.
+
+
+BUILD FILES:
+------------
+Makefile.in	makefile input for configure script
+acconfig.h	macro definitions for autoheader
+aclocal.m4	M4 macros for autoheader
+config.h.in	input for configure script
+configure	configure script
+configure.in	source of the configure script (for autoconf)
+clean_forte	removes everything unnecessary
+rebuild		completely rebuilds 0verkill

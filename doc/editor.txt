@@ -1,0 +1,15 @@
+0verkill level editor
+---------------------
+
+
+Keys:
+
+arrows		move around the screen
+a, z, o, p	move the screen
+q		quit WITHOUT SAVE and WITHOUT CONFIRMATION
+s		save level
+l, r, u, d	shift current object one pixel left, right, up, down
+L, R, U, D	shift current object left, right, up, down
+x		delete object
+n		new object
++, -		next/previous bitmap

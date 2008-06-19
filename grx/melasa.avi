@@ -1,0 +1,267 @@
+#0
+p5,0
+l.-----.
+afffffff
+l|<>X<>|
+af33333f
+l|brown|
+afbbbbbf
+l|SUGAR|
+afcccccf
+l|<>X<>|
+af33333f
+l|_____|
+afffffff
+#1
+p5,0
+l.-----.
+afffffff
+l|<>X<>|
+af33333f
+l|brown|:
+afbbbbbf3
+l|SUGAR|:
+afcccccf3
+l|<>X<>|:
+af33333f3
+l|_____|
+afffffff
+#2
+p5,0
+l.-----.
+afffffff
+l|<>X<>|
+af33333f
+l|brown|:
+afbbbbbf3
+l|SUGAR|:
+afcccccf3
+l|<>X<>|:.
+af33333f33
+l|____.::::.
+afffff333333
+#3
+p5,0
+l.-----.
+afffffff
+l|<>X<>|
+af33333f
+l|brown|:
+afbbbbbf3
+l|SUGAR|:.
+afcccccf33
+l|<>X<>.:::.
+af3333333333
+l|___.:::::::.
+affff333333333
+#4
+p0,0
+l     .-----.
+a     fffffff
+l     |<>X<>|
+a     f33333f
+l     |brown|.
+a     fbbbbbf3
+l     |SUGAR|::.
+a     fcccccf333
+l     |<>X<.:::::.
+a     f33333333333
+lo  o |__.:::::::::.
+a8  8 fff33333333333
+#5
+p0,0
+l     .-----.
+a     fffffff
+l     |<>X<>|
+a     f33333f
+l     |brown|
+a     fbbbbbf
+l     |SUGAR.::.
+a     fccccc3333
+lo  o |<>X.::::::.
+a8  8 f33333333333
+l **  |_.::::::::::.
+a cc  ff333333333333
+#6
+p0,0
+l     .-----.
+a     fffffff
+l     |<>X<>|
+a     f33333f
+l     |brown|
+a     fbbbbbf
+lo  o |SUGAR.::.
+a8  8 fccccc3333
+l oo  |<>X.::::::.
+a cc  f33333333333
+l=<>= |_.::::::::::.
+a7887 ff333333333333
+#7
+p0,0
+l     .-----.
+a     fffffff
+l     |<>X<>|
+a     f33333f
+l oo  |brown|
+a 88  fbbbbbf
+l.'*\ |SUGAR.::.
+a88c8 fccccc3333
+l|===*|<>X.::::::.
+a8878df33333333333
+l|||_ |_.::::::::::
+a8888 ff33333333333
+#8
+p0,0
+l     .-----.
+a     fffffff
+l     |<>X<>|
+a     f33333f
+l   oo|brown|
+a   88fbbbbbf
+l  /'*\SUGAR.::.
+a  88c8ccccc3333
+l.'====*>X.::::::.
+a888878d3333333333
+l|||\\|_.::::::::::
+a88888ff33333333333
+#9
+p0,0
+l     .-----.
+a     fffffff
+l     |<>X<>|
+a     f33333f
+l    _|boown|
+a    8fb88bbf
+l  ,~~~-'*\R|..
+a  888888c8cf33
+l /______=#*::::.
+a 888888877d33333
+l||| _|//_::::::::.
+a888 8f88f333333333
+#10
+p0,0
+l     .-----.
+a     fffffff
+l     |<>X<>|
+a     f33333f
+l   __|boown|
+a   88fb88bbf
+l /~~~~-'0\R|
+a 8888888c8cf
+l|'______=-*..:..
+a8888888877d33333
+l|\\=\|_\\.:::::::.
+a88888ff88333333333
+#11
+p0,0
+l     .-----.
+a     fffffff
+l     |<>X<>|
+a     f33333f
+l     |__owoo
+a     f88bb88
+l   /~~~~~-'*\
+a   88888888c8
+l  ('~______=#*.
+a  88888888877d3
+l/\///=>__//.::::.
+a8888888ff88333333
+#12
+p0,0
+l     .-----.
+a     fffffff
+l     |<>X<>|
+a     f33333f
+l     |__own|
+a     f88bbbf
+l    /~~~~-.oo
+a    888888888
+l   |~______ 0\
+a   888888887c8
+l/\///=>___\\=-*.
+a8888888fff8877d3
+#13
+p0,0
+l     .-----.
+a     fffffff
+l     |<>X<>|
+a     f33333f
+l     |__owno  o
+a     f88bbb8  8
+l    /~~~~-.'**
+a    88888888cc
+l   |~______=<>=
+a   888888887887
+l/\/'\\=\__\\
+a88888888ff88
+#14
+p0,0
+l     .-----.
+a     fffffff
+l     |<>X<>|
+a     f33333f
+l     |brown|
+a     fbbbbbf
+l _  .--oGAo|
+a 8  8888cc8f
+l( \(    **>|
+a8 888888cc3f
+l )  \  =<>=|
+a 8  8887887f
+#15
+p1,0
+l    .-----.
+a    fffffff
+l    |<>X<>|
+a    f33333f
+l __ |brown|
+a 88 fbbbbbf
+l(  )|SUGAR|
+a8  8fcccccf
+l  ( |_oX<o|
+a  88f88338f
+l   \/  **_|
+a   8887ccff
+#16
+p4,0
+l .-----.
+a fffffff
+l.|<>X<>|
+a8f33333f
+l \brown|
+a 8bbbbbf
+l |)UGAR|
+a f8ccccf
+l (<>X<>|
+a 833333f
+l |\_o__o
+a f8f8ff8
+#17
+p5,0
+l.-----.
+afffffff
+l|<>X<>|
+af33333f
+l|brown|
+afbbbbbf
+l|S.GAR|
+afc8cccf
+l|<>)<>|
+af33833f
+l|_(___|
+aff8ffff
+#18
+p5,0
+l.-----.
+afffffff
+l|<>X<>|
+af33333f
+l|brown|
+afbbbbbf
+l|SUGAR|
+afcccccf
+l|(>X<>|
+af83333f
+l|_)___|
+aff8ffff
+s0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,2,2,2,2,2,2,3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,6,6,6,6,6,6,6,6,6,6,6,6,7,7,7,7,7,7,8,8,8,8,8,8,9,9,9,9,9,9,10,10,10,10,10,10,10,10,10,11,11,11,11,11,11,11,11,11,12,12,12,12,12,12,12,12,12,13,13,13,13,13,13,13,13,13,13,13,13,14,14,14,14,14,14,15,15,15,15,15,15,16,16,16,16,16,16,17,17,17,17,17,17,18,18,18,18,18,18,0

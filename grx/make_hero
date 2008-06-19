@@ -1,0 +1,8 @@
+#!/bin/bash
+for NUM in 1 2 3 4 5 6 7 8 9 A B C D E F; do
+ echo "Creating hero #$NUM"
+ cat hero_univ.avi | sed -e 's/G/'$NUM'/g' > hero$NUM.avi
+ cat girl_univ.avi | sed -e 's/G/'$NUM'/g' > girl$NUM.avi
+ cat corpse_univ.avi | sed -e 's/G/'$NUM'/g' > corpse$NUM.avi
+ cat corpse_girl_univ.avi | sed -e 's/G/'$NUM'/g' > corpse_girl_$NUM.avi
+done

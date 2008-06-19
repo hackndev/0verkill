@@ -1,0 +1,47 @@
+LEVEL CHANGING
+--------------
+
+Users
+-----
+The client negotiates the level automatically. To server the level number type
+server -l <level number>. To edit particular level type editor -l <level number>
+
+Levels are numbered as they appear in the level.dat file (beginning from 0).
+For example if you have such level.dat file:
+
+level1
+level2
+level3
+
+-l0 means "level1", -l1 is "level2", -l2 is "level3"
+
+
+Communication
+-------------
+Server sends P_CHANGE_LEVEL message. The message contains new level number
+(line number in level.dat file counted from 0) and MD5 checksum of the level
+(in hexadecimal notation in null-terminated string). How to compute the
+checksum read further. Client receives the message and sends P_LEVEL_ACCEPTED
+(with the level number). If the client can't change the level (doesn't have the
+data/has wrong MD5 checksum), it sends the P_QUIT_REQUEST.
+
+When the client sends the P_LEVEL_ACCEPTED message, it loads the new level.
+
+Server changes the level after receiving the signal from user. It sends periodically the P_CHANGE_LEVEL message until all clients
+reply. Server doesn't send player updates to clients that haven't replied to the level change.
+
+MD5 sum
+-------
+0verkill is using md5 routines from libmd-0.3.
+
+The MD5 sum from the level is computed this way: MD5 sum is computed from every
+file using MD5File, results (32 characters long strings) are concatenated and
+from this string MD5 sum is computed using MD5Data function. This is the final MD5.
+
+Files are sorted in this order: (<level> is the level name - e.g. "level2")
+
+level.dat
+<level>.sp
+<level>.st
+<level>.dn
+all graphic files in order they appear in the <level>.sp file

@@ -1,0 +1,118 @@
+* 16.12.2001 15:25 version 0.16 released
+	- some minor level changes
+	- new level (danger, it's very lethal ;-) )
+	- level negotiation
+	- fixed bug with -s option
+	- lot of cool new graphics
+	- optional 3D view
+	- killing objects
+	- fixed segfault in avi editor, when can't write to a file
+	- optimized output files from the avi editor
+	- improved avi editor (status bar, hold key)
+	- anti-memory leak mechanism (by default turned off for higher performance)
+	- fixed several bugs in image loader
+
+* 25.1.2001 19:54 version 0.15 released
+	- several bugfixes
+	- full Windows support
+
+* 18.12.2000 18:31 version 0.15pre3 released
+	- X keyboard repaired
+	- 0verkill now runs on these unixes: Linux, FreeBSD, NetBSD, SunOS,
+	  IRIX
+	- bell notification when new player enters the game
+	- experimental reaperbots
+
+* 12.12.2000 18:08 version 0.15pre2 released
+	- OS/2 port
+	- Windows port
+	- network performance boosted
+	- several bugfixes
+
+* 23.11.2000 21:50 version 0.15pre1 released
+	- several segfault due to network inconsistency fixed
+	- server CPU saving added
+
+* 30.10.2000 20:52 version 0.14 released
+	- IP address of incoming player in the log
+	- new icon
+	- key for climbing down ladders
+
+* 12.10.2000 23:14 version 0.13 released
+	- enhanced weapon switching
+	- graphics editor
+	- new graphics
+	- configure script
+	- port bug fixed (0verkill now runs default on REAL port 6666)
+	- timestamps in server's log
+
+* 21.9.2000 15:56 version 0.12 released
+	- players now can see own death
+	- improved version compatibility check
+	- invisibility (a large toadstool on the graveyard ;-) )
+	- effects during respawning
+	- players respawn on random places in the game
+
+* 19.9.2000 11:10 version 0.11 released
+        - THIS VERSION IS INCOMPATIBLE WITH PREVIOUS ONES !!!
+	- armor
+	- complete X support
+	
+* 1.9.2000 23:52 version 0.10 released
+	- help screen
+	- programmer documentation
+	- configure file loader bug fixed
+	- top players list
+	- bug "scrambled picture on xterm" fixed
+
+* 19.8.2000 01:31 version 0.9 released
+	- remote server testing program written
+	- automatic inactive players disconnecting
+	- key for toggle creep
+	
+* 15.8.2000 22:25 version 0.8 released
+	- automatic keyboard type detection, no config.h editing needed
+	- user friendly command line on both client and server
+	- important server messages are written to stderr, the less important to stdout
+	
+* 13.8.2000 23:58 version 0.7 released
+        - THIS VERSION IS INCOMPATIBLE WITH PREVIOUS ONES !!!
+	  you can't run server version 0.7 with previous version client 
+	  and vice-versa
+	- "standing in floor during creeping" and "superjump" bugs fixed
+	- "Unknown packet: X" bug removed
+	- motion sending completely rewritten, now runs on 28.8 modem 
+	  almost smoothly
+	- girl's creeping animation fixed
+	- redraw screen key added (read documentation)
+	- server now reports number of playing clients
+	- small debugging
+	- version compatibility authentification added
+	- automatic weapon switching on new ammo removed
+	- grenade melts down corpses
+
+* 4.8.2000 19:30 version 0.6 released
+	- female hero by Vince Weaver added
+
+* 29.7.2000 17:03 version 0.5 released
+	- at last GRENADES
+	- some new snapshots, small level changes, new graphics
+	- users documentation
+
+* 26.7.2000 21:13 version 0.4 released
+	- signal SIGWINCH handler added
+	- autorun
+
+* 25.7.2000 22:39 version 0.3 released
+	- huge optimalization of output routine => FASTER GAME
+	- objects in foreground
+	- new graphics, some small level changes
+	- own output buffering added
+
+* 24.7.2000 18:24 version 0.2 released
+	- small animation bug fixed
+	- improved sending packets, CRC32 added
+	- better image loader, now doesn't catch sigsegv on syntax error in
+	  file 
+
+* 23.7.2000 21:15 version 0.1 - first 0verkill release

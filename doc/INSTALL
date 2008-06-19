@@ -1,0 +1,62 @@
+If you have OS/2, please read README.OS2 instead of this file.
+
+Requirements
+------------
+
+To run 0verkill you must have:
+
+    * Linux computer
+    * GNU make
+    * GCC
+    * text mode or Xwindow system with libX11 and libXpm
+
+
+Installation and running
+------------------------
+
+    * download the source code from http://artax.karlin.mff.cuni.cz/~brain/0verkill/release/0verkill.tgz
+
+    * type "tar xvfz 0verkill.tgz"
+   
+    * enter the 0verkill directory
+   
+    * type "configure" or "configure --with-x" if you have Xwindow
+   
+    * if you want to disable 3D support (it's enabled by default), edit cfg.h
+      file and comment out line "#define TRI_D" (just at the beginning of the
+      file)
+
+    * then type "make" to compile binaries
+   
+    * type "server" to start server, or "server -p <port number>" to determine 
+      port number (default port is 6666)
+     
+    * to join the game type "0verkill" or "0verkill -s <xsize>x<ysize>" to 
+      explicitely set picture size (in characters)
+     
+    * if you're running X type "x0verkill" or
+      "x0verkill [-d <display>] [-f <font>]" 
+
+    * if you want to see the game in 3D, supply "-3" option on the command
+      line. To learn more about 3D 0verkill, read "3d.txt" file in the "doc"
+      directory.
+   
+    * select server address and port, your color and name
+   
+    * to learn which keys to use for playing press the H key (it toggles help -
+      even in the game) 
+
+    * press ENTER and enjoy!
+
+    * if you want to rebuild 0verkill completely, run the "rebuild" script
+
+
+Problems and Solutions
+----------------------
+    
+    * when x0verkill writes "Can't load font ..." and you want to set your own
+      default font (not to write "-f <font>" argument everytime you run
+      x0verkill) edit cfg.h file and change DEFAULT_FONT_NAME to your font name
+
+    * if keyboard response is bad in X make you're probably running 0verkill
+      instead of x0verkill

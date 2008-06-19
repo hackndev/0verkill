@@ -1,0 +1,29 @@
+		       0verkill for OS/2
+		     =====================
+
+To run 0verkill in OS/2 you need EMX runtime.
+
+0verkill must run in full screen session, not in vio window.
+Don't run 0verkill in xterm or telnet session.
+
+
+To complile 0verkill on OS/2 you need EMX, bash and GNU unix utilities.
+
+Before running configure set paths to your programs
+SET HOSTTYPE=i586
+SET MACHTYPE=i586-pc-os2
+SET CONFIG_SHELL=d:/prg/gnu/bin/bash.exe
+SET CC=d:/prg/emx/bin/gcc.exe
+SET MAKE=d:/prg/emx/bin/make.exe
+SET EMXOPT=-h100
+
+If you have autoconf for OS/2, you can use it to generate configure file,
+but it's not necessary.
+
+Run ./configure and make in bash to compile 0verkill.
+
+If you have X11 for OS/2, you can run "./configure --with-x" to build also
+X version of 0verkill.
+
+
+OS/2 port done by Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>

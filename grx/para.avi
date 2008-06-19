@@ -1,0 +1,131 @@
+#0
+p0,-1
+l  . X:. . f; :
+a  f fff f ff f
+l=x. :. . .  .  Z
+afff ff f f  f  f
+l   :. l:  x. >
+a   ff ff  ff f
+#1
+p0,-1
+l   , . X:. .   X
+a   f f fff f   f
+l-=;:x.  . . fsf .
+affffff  f f fff f
+l    ` :. l:   x
+a    f ff ff   f
+#2
+p0,-1
+l  . . , . X:. .   X
+a  f f f f fff f   f
+l<XF-=;:x.  . . fsf .
+afffffffff  f f fff f
+l  ` '  ` :. l:   x
+a  f f  f ff ff   f
+#3
+p0,-1
+l    . . , . X .
+a    f f f f f f
+l= <>F-=;:x.  w . oxt
+af fffffffff  f f fff
+l    X t  j :d l:
+a    f f  f ff ff
+#4
+p0,-2
+l       , W W F S
+a       f f f f f
+l    .W.RS FFXT.R
+a    fffff ffffff
+l= S>R-STExRR=wT.Aoxt
+af ffffffffffffffffff
+l    X tSWWGTdWl:e W
+a    f fffffffffff f
+l         ` ` ' ;s w
+a         f f f ff f
+#5
+p0,-2
+l     T ST ,ZW FSFTSF
+a     f ff fff ffffff
+l  ,W'BWWW.RS FFXT.R
+a  ffffffffff ffffff
+lXFRTTF>R-STExRR=wT.Aoxt
+afffffffffffffffffffffff
+l  `TTU X tSWWGTdWl:e%W
+a  ffff f fffffffffffff
+l    &    T S`X`d'@;s2w
+a    f    f fffffffffff
+#6
+p0,-4
+l                      Y
+a                      f
+l           ETT TTTT    D F
+a           fff ffff    f f
+l    T ETT TE ,ZW FSFTSF H D N
+a    f fff ff fff ffffff f f f
+l WT W,T'BWWW.TSTFFXT.R  HD G
+a ff ffffffffffffffffff  ff f
+lST XFRTTF>R-STExRR=wT.Aoxt H M
+aff fffffffffffffffffffffff f f
+l   TW`TTUQR tSWWGTdWl:e%W T MM
+a   ffffffff fffffffffffff f ff
+l       & ET T S`X`d'@;s2wS E
+a       f ff f ffffffffffff f
+l          EWESSDHYG T MM M MM
+a          fffffffff f ff f ff
+l                 IOORDD DST
+a                 ffffff fff
+l                       MMM
+a                       fff
+#7
+p0,-4
+l                         Y
+a                         f
+l              ETT TTTT
+a              fff ffff
+l       T ETT TE ,ZW FSF SF H
+a       f fff ff fff fff ff f
+l    WT W,T BWWW TSTFF T.R  HD
+a    ff fff ffff fffff fff  ff
+l.  ST XF T F R-STE RR= T.Ao t H
+af  ff ff f f fffff fff ffff f f
+l      TW`TTUQR tSW GTdWl:e%W T
+a      ffffffff fff fffffffff f
+l          & ET T S`X d' ;s wS
+a          f ff f fff ff ff ff
+l             EWESSDHYG T MM
+a             fffffffff f ff
+l                    IOORDD  ST
+a                    ffffff  ff
+l                          MMM
+a                          fff
+#8
+p0,-3
+l                 E T T  T
+a                 f f f  f
+l            E T T    W F F SF
+a            f f f    f f f ff
+l   ,      W,       T  F       H
+a   f      ff       f  f       f
+l-=fX   T      F  - T   R= T  o
+affff   f      f  f f   ff f  f
+l   `          U R t     d  :
+a   f          f f f     f  f
+l             & ET T S`  d'  s
+a             f ff f ff  ff  f
+l                E E S   G T M
+a                f f f   f f f
+l                       IO
+a                       ff
+#9
+p0,-2
+l               E        W F
+a               f        f f
+l ,    ,  '
+a f    f  f
+l=.'-=f  F        F        R
+affffff  f        f        f
+l `    `  .       U   t
+a f    f  f       f   f
+l                       S
+a                       f
+s0,0,0,0,0,1,1,1,1,1,1,2,2,2,2,2,2,3,3,3,3,3,3,0,0,0,0,0,1,1,1,1,1,1,1,2,2,2,2,2,2,3,3,3,3,3,0,0,0,0,0,0,1,1,1,1,1,2,2,2,2,2,2,3,3,3,3,3,3,0,0,0,0,0,0,1,1,1,1,1,2,2,2,2,2,2,3,3,3,3,3,0,0,0,0,0,0,1,1,1,1,2,2,2,2,2,2,2,3,3,3,3,3,3,4,4,4,4,4,5,5,5,5,5,6,6,6,6,6,6,7,7,7,7,7,7,7,7,7,7,8,8,8,8,8,8,8,8,8,9,9,9,9,9,9

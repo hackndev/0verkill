@@ -1,0 +1,9 @@
+Reaperbot for 0verkill
+----------------------
+
+Each bot is a standalone program communicating with the server over the net.
+Bots don't have very high IQ at this moment. They move accidentally around and
+when they see player, they haunt him and shoot. If you want to improve them
+I'll appreciate it.
+
+To run reaperbot, type: bot -a <server address> [ -p <port> ]

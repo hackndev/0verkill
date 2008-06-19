@@ -1,0 +1,25 @@
+#0
+p-1,-1
+l +-------------------+
+a0ccccccccccccccccccccc
+l |     .             |
+a0c77777b7777777777777c
+l | P R U H O N I C E |
+a0c7bbbbbbbbbbbbbbbbb7c
+l |                   |
+a0c7777777777777777777c
+l |  _____________|\  |
+a0c77bbbbbbbbbbbbbbb77c
+l | |_____________  > |
+a0c7bbbbbbbbbbbbbbbbb7c
+l |  D1    Exit 6 |/  |
+a0c77bbbbbbbbbbbb7bb77c
+l +-------------------+
+a0ccccccccccccccccccccc
+l  ||               ||
+a008800000000000000088
+l  ||               ||
+a008800000000000000088
+l  ||               ||
+a008800000000000000088
+s0

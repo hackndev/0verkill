@@ -1,0 +1,5 @@
+#!/bin/bash
+rm -f config.status config.cache config.log config.h Makefile
+rm -f *.o
+rm -f 0verkill avi editor server test_server x0verkill xeditor bot xavi
+
