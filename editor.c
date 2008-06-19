@@ -265,14 +265,14 @@ void save_data(void)
 {
 	FILE *data, *dynamic;
 	struct object_list *p;
-	static unsigned char txt[1024];
-	unsigned char *LEVEL=load_level(level_number);
+	static char txt[1024];
+	char *LEVEL=load_level(level_number);
 
 	snprintf(txt,1024,"%s%s%s",DATA_PATH,LEVEL,STATIC_DATA_SUFFIX);
 	data=fopen(txt,"w");
 	if (!data)
 	{
-		unsigned char msg[256];
+		char msg[256];
 		snprintf(msg,256,"Can't create file \"%s\"\n",txt);
 		ERROR(msg);
 		EXIT(1);
@@ -283,7 +283,7 @@ void save_data(void)
 	dynamic=fopen(txt,"w");
 	if (!dynamic)
 	{
-		unsigned char msg[256];
+		char msg[256];
 		snprintf(msg,256,"Can't create file \"%s\"\n",txt);
 		ERROR(msg);
 		EXIT(1);
@@ -357,9 +357,9 @@ int main(int argc, char**argv)
 	unsigned char cur_type='w';
 	
 	struct it* obj=0;
-	unsigned char txt[256];
+	char txt[256];
 	unsigned long_long last_time;
-	unsigned char *LEVEL;
+	char *LEVEL;
 
 	set_sigint();
 

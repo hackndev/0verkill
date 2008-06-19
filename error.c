@@ -120,7 +120,7 @@ void check_memory_leaks(void)
 #endif
 }
 
-void er(int b, unsigned char *m, va_list l)
+void er(int b, char *m, va_list l)
 {
 	if (b) fprintf(stderr, "%c", (char)7);
 	vfprintf(stderr, m, l);
@@ -128,7 +128,7 @@ void er(int b, unsigned char *m, va_list l)
 	sleep(1);
 }
 
-void error(unsigned char *m, ...)
+void error(char *m, ...)
 {
 	va_list l;
 	va_start(l, m);
@@ -138,9 +138,9 @@ void error(unsigned char *m, ...)
 int errline;
 unsigned char *errfile;
 
-unsigned char errbuf[4096];
+char errbuf[4096];
 
-void int_error(unsigned char *m, ...)
+void int_error(char *m, ...)
 {
 	va_list l;
 	va_start(l, m);
@@ -150,7 +150,7 @@ void int_error(unsigned char *m, ...)
 	force_dump();
 }
 
-void debug_msg(unsigned char *m, ...)
+void debug_msg(char *m, ...)
 {
 	va_list l;
 	va_start(l, m);

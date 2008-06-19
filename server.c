@@ -68,7 +68,7 @@ int nonquitable=0;  /* 1=clients can't abort game pressing F12 (request is ignor
 unsigned long_long last_tick;
 unsigned long_long last_player_left=0,last_packet_came=0;
 
-unsigned char *level_checksum=0;   /* MD5 sum of the level */
+char *level_checksum=0;   /* MD5 sum of the level */
 
 unsigned char weapons_order[ARMS]={4,0,3,1,2};
 
@@ -329,14 +329,14 @@ Cleanup:
 
 
 /* load dynamic data */
-void load_dynamic(unsigned char * filename)
+void load_dynamic(char * filename)
 {
 	FILE * stream;
-	static unsigned char line[1024];
+	static char line[1024];
 	char *p,*q,*name;
 	int n,x,y,t;
 
-	if (!(stream=fopen(filename,"rb"))){unsigned char msg[256];snprintf(msg,256,"Can't open file \"%s\"!\n",filename);ERROR(msg);EXIT(1);}
+	if (!(stream=fopen(filename,"rb"))){char msg[256];snprintf(msg,256,"Can't open file \"%s\"!\n",filename);ERROR(msg);EXIT(1);}
 	while(fgets(line,1024,stream))
 	{
 		p=line;
@@ -345,7 +345,7 @@ void load_dynamic(unsigned char * filename)
 		if (!(*p))continue;
 		*p=0;p++;
 		_skip_ws(&p);
-		if ((t=_convert_type(*p))<0){unsigned char msg[256];snprintf(msg,256,"Unknown object type '%c'.\n",*p);ERROR(msg);EXIT(1);}
+		if ((t=_convert_type(*p))<0){char msg[256];snprintf(msg,256,"Unknown object type '%c'.\n",*p);ERROR(msg);EXIT(1);}
 		p++;
 		_skip_ws(&p);
 		x=strtol(p,&q,0);
@@ -360,7 +360,7 @@ void load_dynamic(unsigned char * filename)
 			birthplace[n_birthplaces-1].y=y;
 			continue;
 		}
-		if (find_sprite(name,&n)){unsigned char msg[256];snprintf(msg,256,"Unknown bitmap name \"%s\"!\n",name);ERROR(msg);EXIT(1);}
+		if (find_sprite(name,&n)){char msg[256];snprintf(msg,256,"Unknown bitmap name \"%s\"!\n",name);ERROR(msg);EXIT(1);}
 		new_obj(id,t,0,n,0,0,int2double(x),int2double(y),0,0,0);
 		id++;
 	}
@@ -369,7 +369,7 @@ void load_dynamic(unsigned char * filename)
 }
 
 
-void print_ip(unsigned char * txt,struct in_addr ip)
+void print_ip(char * txt,struct in_addr ip)
 {
 	unsigned int a;
 
@@ -380,11 +380,11 @@ void print_ip(unsigned char * txt,struct in_addr ip)
 
 
 /* write a message to stdout or stderr */
-void message(unsigned char *msg,int output)
+void message(char *msg,int output)
 {
 	time_t t;
 	struct tm tm;
-	static unsigned char timestamp[64];
+	static char timestamp[64];
 
 #ifdef WIN32
 	if ( !consoleApp )
@@ -473,7 +473,7 @@ void init_socket(void)
 
 	if (bind(fd,(struct sockaddr*)&server,sizeof(server)))
 	{
-		unsigned char msg[256];
+		char msg[256];
 		snprintf(msg,256,"Error: Can't bind socket to port %d!\n",port);
 		ERROR(msg);
 		EXIT(1);
@@ -495,7 +495,7 @@ void find_birthplace(int *x,int *y)
 /* if there's not such color, returns -1 */
 int select_hero(int num)
 {
-	static unsigned char txt[32];
+	static char txt[32];
 	int a;
 
 	sprintf(txt,"hero%d",num);
@@ -529,7 +529,7 @@ void init_player(struct player* p,my_double x,my_double y)
 
 /* completely add player to server's database */
 /* player starts on x,y coordinates */
-int add_player(unsigned char color, unsigned char *name,struct sockaddr_in *address,int x, int y)
+int add_player(unsigned char color, char *name,struct sockaddr_in *address,int x, int y)
 {
 	int h;
 #define cp last_player->next
@@ -899,22 +899,22 @@ void send_info(struct sockaddr *addr,int id)
 
 /* send message to a player */
 /* name is name of player who sent the message (chat), NULL means it's from server */
-void send_message(struct player* player,unsigned char *name,unsigned char *msg)
+void send_message(struct player* player, char *name, char *msg)
 {
-	static unsigned char packet[256];
+	static char packet[256];
 	int len;
 
 	packet[0]=P_MESSAGE;
 	if (!name){snprintf(packet+1,256,"%s",msg);len=strlen(msg)+1+1;}
 	else {snprintf(packet+1,256,"%s> %s",name,msg);len=strlen(name)+strlen(msg)+1+3;}
-	send_chunk_packet_to_player(packet,len,player);
+	send_chunk_packet_to_player((unsigned char *)packet,len,player);
 }
 
 
 /* similar to send_message but sends to all except one or two players */
-void sendall_message(unsigned char *name,unsigned char *msg,struct player *not1,struct player* not2)
+void sendall_message(char *name, char *msg,struct player *not1,struct player* not2)
 {
-	static unsigned char packet[256];
+	static char packet[256];
 	int len;
 	struct player_list* p;
 
@@ -923,7 +923,7 @@ void sendall_message(unsigned char *name,unsigned char *msg,struct player *not1,
 	else {snprintf(packet+1,255,"%s> %s",name,msg);len=strlen(name)+strlen(msg)+1+3;}
 	for (p=&players;p->next;p=p->next)
 		if ((!not1||(&(p->next->member))!=not1)&&(!not2||(&(p->next->member))!=not2))
- 			send_chunk_packet_to_player(packet,len,&(p->next->member));
+ 			send_chunk_packet_to_player((unsigned char *)packet,len,&(p->next->member));
 }
 
 
@@ -1176,8 +1176,8 @@ void create_noise(int x,int y,struct player *p)
 /* read packet from socket */
 void read_data(void)
 {
-	unsigned char txt[256];
-	unsigned char txt1[256];
+	char txt[256];
+	char txt1[256];
 	fd_set rfds;
 	struct timeval tv;
 	struct sockaddr_in client;
@@ -1229,7 +1229,7 @@ void read_data(void)
 					break;
 				}
 				find_birthplace(&x,&y);
-				if (add_player(packet[4],packet+5,&client,x,y)) /* failed to add player */
+				if (add_player(packet[4],(char *)packet+5,&client,x,y)) /* failed to add player */
 				{
 					message("Player refused.\n",2);
 					packet[0]=P_PLAYER_REFUSED;
@@ -1346,7 +1346,7 @@ void read_data(void)
 			if (l<2)break;   /* invalid packet */
 			q=find_player(&client,s);
 			if (!q)break;
-			sendall_message(q->member.name,packet+1,0,0);
+			sendall_message(q->member.name,(char *)packet+1,0,0);
 			snprintf(txt,256,"%s> %s\n",q->member.name,packet+1);
 			message(txt,1);
 			break;
@@ -1387,7 +1387,7 @@ int collision(int x1,int y1,int t1,int s1,struct pos* p1,int x2,int y2,int t2,in
 void create_corpse(int x,int y,int num)
 {
 	struct it *o;
-	static unsigned char txt[32];
+	static char txt[32];
 	int a;
 	int xoffs=num>15?-15:-5;
 	int yoffs=num>15?-1:0;
@@ -1464,7 +1464,7 @@ int dynamic_collision(struct it *obj)
 {
 	struct it *p;
 	struct player_list *pl;
-	unsigned char txt[256];
+	char txt[256];
 	struct it *o;
 	my_double b;
 	int a,c,s;
@@ -1489,7 +1489,7 @@ int dynamic_collision(struct it *obj)
 			{
 				case T_AMMO_GRENADE:
 				{
-					unsigned char txt[256];
+					char txt[256];
 					if (p->type!=T_PLAYER)break;
 					if (((struct player*)(p->data))->ammo[WEAPON_GRENADE]==MAX_AMMO(WEAPON_GRENADE))break;
 					((struct player*)(p->data))->ammo[WEAPON_GRENADE]+=weapon[WEAPON_GRENADE].add_ammo;
@@ -1508,7 +1508,7 @@ int dynamic_collision(struct it *obj)
 
 				case T_AMMO_GUN:
 				{
-					unsigned char txt[256];
+					char txt[256];
 					if (p->type!=T_PLAYER)break;
 					if (((struct player*)(p->data))->ammo[0]==MAX_AMMO(0))break;
 
@@ -1532,7 +1532,7 @@ int dynamic_collision(struct it *obj)
 
 				case T_AMMO_SHOTGUN:
 				{
-					unsigned char txt[256];
+					char txt[256];
 					if (p->type!=T_PLAYER)break;
 					if (((struct player*)(p->data))->ammo[1]==MAX_AMMO(1))break;
 
@@ -1556,7 +1556,7 @@ int dynamic_collision(struct it *obj)
 
 				case T_AMMO_RIFLE:
 				{
-					unsigned char txt[256];
+					char txt[256];
 					if (p->type!=T_PLAYER)break;
 					if (((struct player*)(p->data))->ammo[3]==MAX_AMMO(3))break;
 
@@ -1580,7 +1580,7 @@ int dynamic_collision(struct it *obj)
 
 				case T_AMMO_UZI:
 				{
-					unsigned char txt[256];
+					char txt[256];
 					if (p->type!=T_PLAYER)break;
 					if (((struct player*)(p->data))->ammo[2]==MAX_AMMO(2))break;
 
@@ -1604,7 +1604,7 @@ int dynamic_collision(struct it *obj)
 
 				case T_UZI:
 				{
-					unsigned char txt[256];
+					char txt[256];
 					if (p->type!=T_PLAYER)break;
 					if ((((struct player*)(p->data))->ammo[2]==MAX_AMMO(2))&&((((struct player *)(p->data))->weapons)&4))break;
 
@@ -1629,7 +1629,7 @@ int dynamic_collision(struct it *obj)
 
 				case T_RIFLE:
 				{
-					unsigned char txt[256];
+					char txt[256];
 					if (p->type!=T_PLAYER)break;
 					if ((((struct player*)(p->data))->ammo[3]==MAX_AMMO(3))&&((((struct player *)(p->data))->weapons)&8))break;
 
@@ -1654,7 +1654,7 @@ int dynamic_collision(struct it *obj)
 
 				case T_SHOTGUN:
 				{
-					unsigned char txt[256];
+					char txt[256];
 					if (p->type!=T_PLAYER)break;
 					if ((((struct player*)(p->data))->ammo[1]==MAX_AMMO(1))&&((((struct player *)(p->data))->weapons)&2))break;
 
@@ -1679,7 +1679,7 @@ int dynamic_collision(struct it *obj)
 
 				case T_INVISIBILITY:
 				{
-					unsigned char txt[256];
+					char txt[256];
 					if (p->type!=T_PLAYER)break;
 
 					((struct player*)(p->data))->invisibility_counter=INVISIBILITY_DURATION;
@@ -1696,7 +1696,7 @@ int dynamic_collision(struct it *obj)
 
 				case T_ARMOR:
 				{
-					unsigned char txt[256];
+					char txt[256];
 					if (p->type!=T_PLAYER)break;
 					if (((struct player*)(p->data))->armor>=100)break; /* he has 100% armor */
 					((struct player*)(p->data))->armor+=ARMOR_ADD;
@@ -1713,7 +1713,7 @@ int dynamic_collision(struct it *obj)
 
 				case T_MEDIKIT:
 				{
-					unsigned char txt[256];
+					char txt[256];
 					if (p->type!=T_PLAYER)break;
 					if (((struct player*)(p->data))->health>=100)break; /* he's healthy */
 					((struct player*)(p->data))->health+=MEDIKIT_HEALTH_ADD;
@@ -1941,7 +1941,7 @@ void update_game(void)
 					p->next->member.y+GRENADE_FIRE_YOFFSET,
 					p->next->member.xspeed+(p->next->member.status&2?-weapon[WEAPON_GRENADE].shell_xspeed:weapon[WEAPON_GRENADE].shell_xspeed),
 					p->next->member.yspeed+weapon[WEAPON_GRENADE].shell_yspeed,
-					(void *)(p->next->member.id)); 
+					(void *)(int)(p->next->member.id)); 
 				id++;
 				sendall_new_object(s,0);
 			}
@@ -2140,7 +2140,7 @@ void free_all_memory(void)
 void signal_handler(int sig_num)
 {
 	unsigned char packet[16];
-	unsigned char txt[256];
+	char txt[256];
 	
 	packet[0]=P_END;
 	memcpy(packet+1,"server",7);
@@ -2234,7 +2234,7 @@ void jump_player(struct player *p)
 /* change weapon of given player (w=new weapon) */
 void change_weapon_player(struct player *q,int w)
 {
-	unsigned char txt[256];
+	char txt[256];
 
 	if (!w)return;
 	w--;
@@ -2280,7 +2280,7 @@ void fire_player(struct player *q,int direction)
 			q->obj->y+FIRE_YOFFSET,
 			q->obj->xspeed+(direction==1?-weapon[1].shell_xspeed:weapon[1].shell_xspeed),
 			weapon[1].shell_yspeed,
-			(void *)(q->obj->id)); 
+			(void *)(int)(q->obj->id)); 
 		id++;
 		sendall_new_object(s,0);
 		s=new_obj(  /* straight */
@@ -2294,7 +2294,7 @@ void fire_player(struct player *q,int direction)
 			q->obj->y+FIRE_YOFFSET,
 			q->obj->xspeed+(direction==1?-weapon[q->current_weapon].speed:weapon[q->current_weapon].speed),
 			0,
-			(void *)(q->obj->id)); 
+			(void *)(int)(q->obj->id)); 
 		id++;
 		sendall_new_object(s,0);
 		s=new_obj(  /* straight */
@@ -2308,7 +2308,7 @@ void fire_player(struct player *q,int direction)
 			q->obj->y+FIRE_YOFFSET+int2double(1),
 			q->obj->xspeed+(direction==1?-weapon[q->current_weapon].speed:weapon[q->current_weapon].speed),
 			0,
-			(void *)(q->obj->id)); 
+			(void *)(int)(q->obj->id)); 
 		id++;
 		sendall_new_object(s,0);
 		s=new_obj(  /* one up */
@@ -2322,7 +2322,7 @@ void fire_player(struct player *q,int direction)
 			q->obj->y+FIRE_YOFFSET,
 			q->obj->xspeed+(direction==1?-weapon[q->current_weapon].speed:weapon[q->current_weapon].speed),
 			float2double((double).1*36),
-			(void *)(q->obj->id)); 
+			(void *)(int)(q->obj->id)); 
 		id++;
 		sendall_new_object(s,0);
 		s=new_obj(  /* two up */
@@ -2336,7 +2336,7 @@ void fire_player(struct player *q,int direction)
 			q->obj->y+FIRE_YOFFSET-int2double(1),
 			q->obj->xspeed+(direction==1?-weapon[q->current_weapon].speed:weapon[q->current_weapon].speed),
 			float2double((double).15*36),
-			(void *)(q->obj->id)); 
+			(void *)(int)(q->obj->id)); 
 		id++;
 		sendall_new_object(s,0);
 		s=new_obj(  /* one down */
@@ -2350,7 +2350,7 @@ void fire_player(struct player *q,int direction)
 			q->obj->y+FIRE_YOFFSET+int2double(1),
 			q->obj->xspeed+(direction==1?-weapon[q->current_weapon].speed:weapon[q->current_weapon].speed),
 			-float2double((double).1*36),
-			(void *)(q->obj->id)); 
+			(void *)(int)(q->obj->id)); 
 		id++;
 		sendall_new_object(s,0);
 		s=new_obj(  /* two down */
@@ -2364,7 +2364,7 @@ void fire_player(struct player *q,int direction)
 			q->obj->y+FIRE_YOFFSET,
 			q->obj->xspeed+(direction==1?-weapon[q->current_weapon].speed:weapon[q->current_weapon].speed),
 			-float2double((double).15*36),
-			(void *)(q->obj->id)); 
+			(void *)(int)(q->obj->id)); 
 		id++;
 		sendall_new_object(s,0);
 	}
@@ -2383,7 +2383,7 @@ void fire_player(struct player *q,int direction)
 				q->obj->y+FIRE_YOFFSET,
 				q->obj->xspeed+(direction==1?-weapon[q->current_weapon].shell_xspeed:weapon[q->current_weapon].shell_xspeed),
 				weapon[q->current_weapon].shell_yspeed,
-				(void *)(q->obj->id)); 
+				(void *)(int)(q->obj->id)); 
 			id++;
 			sendall_new_object(s,0);
 			s=new_obj(
@@ -2397,7 +2397,7 @@ void fire_player(struct player *q,int direction)
 				q->obj->y+FIRE_YOFFSET,
 				q->obj->xspeed+(direction==1?-weapon[q->current_weapon].speed:weapon[q->current_weapon].speed),
 				0,
-				(void *)(q->obj->id)); 
+				(void *)(int)(q->obj->id)); 
 			id++;
 			sendall_new_object(s,0);
 		}
@@ -2475,7 +2475,7 @@ void move_player(struct player *p)
 void update_players(void)
 {
 	struct player_list *p;
-	unsigned char txt[256];
+	char txt[256];
 	unsigned char packet;
 	unsigned long_long t=get_time();
 
@@ -2623,9 +2623,9 @@ void parse_command_line(int argc,char **argv)
 int server(void)
 {
 	int a;
-	unsigned char txt[256];
+	char txt[256];
 	unsigned long_long last_time;
-	unsigned char *LEVEL;
+	char *LEVEL;
 	
 	last_player=&players;
 	last_obj=&objects;
@@ -2656,20 +2656,20 @@ int server(void)
 
 	message("Loading sprites.\n",2);
 	load_sprites(DATA_PATH GAME_SPRITES_FILE); /* players, corpses, bullets, ... */
-	if (find_sprite("bullet",&bullet_sprite)){unsigned char msg[256];snprintf(msg,256,"Can't find sprite \"bullet\".\n");ERROR(msg);EXIT(1);}
-	if (find_sprite("slug",&slug_sprite)){unsigned char msg[256];snprintf(msg,256,"Can't find sprite \"slug\".\n");ERROR(msg);EXIT(1);}
-	if (find_sprite("shell",&shell_sprite)){unsigned char msg[256];snprintf(msg,256,"Can't find sprite \"shell\".\n");ERROR(msg);EXIT(1);}
-	if (find_sprite("sshell",&shotgun_shell_sprite)){unsigned char msg[256];snprintf(msg,256,"Can't find sprite \"sshell\".\n");ERROR(msg);EXIT(1);}
-	if (find_sprite("grenade",&grenade_sprite)){unsigned char msg[256];snprintf(msg,256,"Can't find sprite \"grenade\".\n");ERROR(msg);EXIT(1);}
-	if (find_sprite("mess1",&mess1_sprite)){unsigned char msg[256];snprintf(msg,256,"Can't find sprite \"mess1\".\n");ERROR(msg);EXIT(1);}
-	if (find_sprite("mess2",&mess2_sprite)){unsigned char msg[256];snprintf(msg,256,"Can't find sprite \"mess2\".\n");ERROR(msg);EXIT(1);}
-	if (find_sprite("mess3",&mess3_sprite)){unsigned char msg[256];snprintf(msg,256,"Can't find sprite \"mess3\".\n");ERROR(msg);EXIT(1);}
-	if (find_sprite("mess4",&mess4_sprite)){unsigned char msg[256];snprintf(msg,256,"Can't find sprite \"mess4\".\n");ERROR(msg);EXIT(1);}
-	if (find_sprite("noise",&noise_sprite)){unsigned char msg[256];snprintf(msg,256,"Can't find sprite \"noise\".\n");ERROR(msg);EXIT(1);}
+	if (find_sprite("bullet",&bullet_sprite)){char msg[256];snprintf(msg,256,"Can't find sprite \"bullet\".\n");ERROR(msg);EXIT(1);}
+	if (find_sprite("slug",&slug_sprite)){char msg[256];snprintf(msg,256,"Can't find sprite \"slug\".\n");ERROR(msg);EXIT(1);}
+	if (find_sprite("shell",&shell_sprite)){char msg[256];snprintf(msg,256,"Can't find sprite \"shell\".\n");ERROR(msg);EXIT(1);}
+	if (find_sprite("sshell",&shotgun_shell_sprite)){char msg[256];snprintf(msg,256,"Can't find sprite \"sshell\".\n");ERROR(msg);EXIT(1);}
+	if (find_sprite("grenade",&grenade_sprite)){char msg[256];snprintf(msg,256,"Can't find sprite \"grenade\".\n");ERROR(msg);EXIT(1);}
+	if (find_sprite("mess1",&mess1_sprite)){char msg[256];snprintf(msg,256,"Can't find sprite \"mess1\".\n");ERROR(msg);EXIT(1);}
+	if (find_sprite("mess2",&mess2_sprite)){char msg[256];snprintf(msg,256,"Can't find sprite \"mess2\".\n");ERROR(msg);EXIT(1);}
+	if (find_sprite("mess3",&mess3_sprite)){char msg[256];snprintf(msg,256,"Can't find sprite \"mess3\".\n");ERROR(msg);EXIT(1);}
+	if (find_sprite("mess4",&mess4_sprite)){char msg[256];snprintf(msg,256,"Can't find sprite \"mess4\".\n");ERROR(msg);EXIT(1);}
+	if (find_sprite("noise",&noise_sprite)){char msg[256];snprintf(msg,256,"Can't find sprite \"noise\".\n");ERROR(msg);EXIT(1);}
 	for (a=0;a<N_SHRAPNELS;a++)
 	{
 		sprintf(txt,"shrapnel%d",a+1);
-		if (find_sprite(txt,&shrapnel_sprite[a])){unsigned char msg[256];snprintf(msg,256,"Can't find sprite \"%s\".\n",txt);ERROR(msg);EXIT(1);}
+		if (find_sprite(txt,&shrapnel_sprite[a])){char msg[256];snprintf(msg,256,"Can't find sprite \"%s\".\n",txt);ERROR(msg);EXIT(1);}
 	}
 	
 	LEVEL=load_level(level_number);

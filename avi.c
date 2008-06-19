@@ -13,9 +13,9 @@
 int TRI_D_ON=0;
 int tri_d=0;
 
-unsigned char line[16384];
+char line[16384];
 /* For loading lines from ASCII files */
-unsigned char *lptr;
+char *lptr;
 /* Used in conjunction with "line" variable */
 unsigned char *pos=DUMMY;
 /* Pointer to a cube of chars containing all the positions of the avi animation
@@ -55,13 +55,13 @@ int last_color, last_char;
 
 void load_line(void)
 {
-	again:
-	lptr=line;
-	if (!(fgets(line,sizeof(line),f))){
+	do {
+	    lptr=line;
+	    if (!(fgets(line,sizeof(line),f))){
 		*line=0;
 		return;
-	}
-	if (*lptr=='#') goto again;
+	    }
+	} while (*lptr != '#');
 }
 
 int read_number(void)
@@ -177,7 +177,7 @@ void put_attribute(int x,int y,int pos, int chr)
 	ptr[1]=chr;
 }
 
-void load_avi(unsigned char *filename)
+void load_avi(char *filename)
 {
 	int xoffset=0, yoffset=-1,pos=-1,x;
 
@@ -248,7 +248,7 @@ void normalize_transparency(void)
 
 }
 
-void save_avi(unsigned char *filename)
+void save_avi(char *filename)
 {
 	int pos,y,x,t;
 	unsigned char *char_pointer,*attr_pointer;
@@ -377,7 +377,7 @@ int get_colour(void){
 void print_bottom_line(void)
 {
 	int offs=SCREEN_X*(SCREEN_Y-2);
-	unsigned char txt[32];
+	char txt[32];
 	int x;
 
 	memset(screen_a+offs,7,SCREEN_X);

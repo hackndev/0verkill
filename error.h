@@ -6,14 +6,15 @@
 
 #include "cfg.h"
 #include "config.h"
+#include <string.h>
 
 #define DUMMY ((void *)-1L)
 
 void do_not_optimize_here(void *p);
 void check_memory_leaks(void);
-void error(unsigned char *, ...);
-void debug_msg(unsigned char *, ...);
-void int_error(unsigned char *, ...);
+void error(char *, ...);
+void debug_msg(char *, ...);
+void int_error(char *, ...);
 extern int errline;
 extern unsigned char *errfile;
 
@@ -73,7 +74,7 @@ static inline void mem_free(void *p)
 {
 	if (p == DUMMY) return;
 	if (!p) {
-		internal("mem_free(NULL)");
+//		internal((unsigned char *)"mem_free(NULL)");
 		return;
 	}
 	free(p);
@@ -83,7 +84,7 @@ static inline void *mem_realloc(void *p, size_t size)
 {
 	if (p == DUMMY) return mem_alloc(size);
 	if (!p) {
-		internal("mem_realloc(NULL, %d)", size);
+//		internal((unsigned char *)"mem_realloc(NULL, %d)", size);
 		return NULL;
 	}
 	if (!size) {

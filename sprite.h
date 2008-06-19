@@ -34,7 +34,7 @@ struct sprite
 
 
 /* load sprite from a file */
-extern void load_sprite(unsigned char *,struct sprite *);
+extern void load_sprite(char *,struct sprite *);
 /* put sprite on given position */
 #ifdef HAVE_INLINE
 	extern inline void

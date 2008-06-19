@@ -116,7 +116,7 @@ struct  /* keyboard status */
 }keyboard_status;
 
 
-unsigned char *names[N_NAMES]={
+char *names[N_NAMES]={
 	"Terminator",
 	"Jack The Ripper",
 	"Rambo",
@@ -140,7 +140,7 @@ unsigned char *names[N_NAMES]={
 int direction=0;  /* 0=stop, 1=left, 2=right */
 int const1,const2,const3,const4;
 unsigned short port=DEFAULT_PORT;
-unsigned char *host;
+char *host;
 int priority;   
 /* 	0=nothing
  *	1=kill player
@@ -245,7 +245,7 @@ send_again:
 
 
 /* initiate connection with server */
-char * contact_server(int color,unsigned char *name)
+char * contact_server(int color, char *name)
 {
 	static unsigned char packet[256];
 	int l=strlen(name)+1;
@@ -491,8 +491,8 @@ void clean_memory(void)
 
 void change_level(void)
 {
-	unsigned char *LEVEL;
-	unsigned char txt[256];
+	char *LEVEL;
+	char txt[256];
 
 	clean_memory();
 	free_sprites(level_sprites_start);
@@ -856,13 +856,13 @@ int process_packet(unsigned char *packet,int l)
 
 		case P_MESSAGE:
 		if (l<2)break;   /* invalid packet */
-		n=2+strlen(packet+1);
+		n=2+strlen((char *)packet+1);
 		break;
 
 		case P_END:
 		if (l<2)printf("Game terminated.\n");
 		else printf("Game terminated by %s.\n",packet+1);
-		n=2+strlen(packet+1);
+		n=2+strlen((char *)packet+1);
 		shut_down(1);
 
 		case P_INFO:
@@ -871,7 +871,7 @@ int process_packet(unsigned char *packet,int l)
 		for (a=0;a<packet[5]&&a<TOP_PLAYERS_N;a++)
 		{
 			int x;
-			x=strlen(packet+l+9)+1;
+			x=strlen((char *)packet+l+9)+1;
 			l+=x+9;
 		}
 		n=l;
@@ -916,9 +916,9 @@ int process_packet(unsigned char *packet,int l)
 
 		case P_CHANGE_LEVEL:
 		{
-			unsigned char *md5;
+			char *md5;
 			int a;
-			char p;
+			unsigned char p;
 
 			if (l<38)break;   /* invalid packet */
 			a=get_int(packet+1);
@@ -926,7 +926,7 @@ int process_packet(unsigned char *packet,int l)
 			level_number=a;
 			
 			md5=md5_level(level_number);
-			if (strcmp(md5,packet+5))   /* MD5s differ */
+			if (strcmp((char *)md5,(char *)packet+5))   /* MD5s differ */
 			{
 				mem_free(md5);
 				ERROR("Invalid MD5 sum. Can't change level. Exiting...");
@@ -1038,7 +1038,7 @@ void parse_command_line(int argc,char **argv)
 }
 
 
-unsigned char * select_name(void)
+char * select_name(void)
 {
 	return names[(random())%N_NAMES];
 }
@@ -1072,7 +1072,7 @@ int main(int argc,char **argv)
 {
 	int color;
 	unsigned long_long last_time;
-	unsigned char *m;
+	char *m;
 
 
 #ifdef WIN32

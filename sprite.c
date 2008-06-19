@@ -173,13 +173,13 @@ int _conv_color(int c)
 
 
 /* load sprite from a file */
-void load_sprite(unsigned char * filename,struct sprite *s)
+void load_sprite(char * filename,struct sprite *s)
 {
 #define CURP (s->n_positions-1)
 #define CURL (s->positions[CURP].n-1)
 	FILE *f;
 	int x,a;
-	static unsigned char buffer[8192];
+	static char buffer[8192];
 	char *p,*q;
 	int step=0;  /*0=expecting 'p', 1=expecting 'l', 2=expecting 'a', 3=expecting 'p' or 's' or 'l', 4=expecting end */
 
@@ -188,7 +188,7 @@ void load_sprite(unsigned char * filename,struct sprite *s)
  
 	if (!(f=fopen(filename,"rb")))
 	{
-		unsigned char msg[256];
+		char msg[256];
 		snprintf(msg,256,"Error opening file \"%s\"!\n",filename);
 		ERROR(msg);
 		EXIT(1);
@@ -208,7 +208,7 @@ void load_sprite(unsigned char * filename,struct sprite *s)
 			case 'p':
 			if (step!=0&&step!=3)
 			{
-				unsigned char msg[256];
+				char msg[256];
 				snprintf(msg,256,"Syntax error in file \"%s\".\n",filename);
 				ERROR(msg);
 				EXIT(1);
@@ -232,7 +232,7 @@ void load_sprite(unsigned char * filename,struct sprite *s)
 			case 'l':
 			if (step!=1&&step!=3)
 			{
-				unsigned char msg[256];
+				char msg[256];
 				snprintf(msg,256,"Syntax error in file \"%s\".\n",filename);
 				ERROR(msg);
 				EXIT(1);
@@ -260,7 +260,7 @@ void load_sprite(unsigned char * filename,struct sprite *s)
 			case 'a':
 			if (step!=2)
 			{
-				unsigned char msg[256];
+				char msg[256];
 				snprintf(msg,256,"Syntax error in file \"%s\".\n",filename);
 				ERROR(msg);
 				EXIT(1);
@@ -289,7 +289,7 @@ void load_sprite(unsigned char * filename,struct sprite *s)
 			case 's':
 			if (step!=3)
 			{
-				unsigned char msg[256];
+				char msg[256];
 				snprintf(msg,256,"Syntax error in file \"%s\".\n",filename);
 				ERROR(msg);
 				EXIT(1);
@@ -300,7 +300,7 @@ void load_sprite(unsigned char * filename,struct sprite *s)
 				x=strtol(p,&q,0);
 				if (x<0||x>CURP)
 				{
-					unsigned char txt[256];
+					char txt[256];
 
 					snprintf(txt,256,"Error loading sprite \"%s\". Undefined position %d.\n",filename,x);
 					ERROR(txt);
@@ -320,7 +320,7 @@ void load_sprite(unsigned char * filename,struct sprite *s)
 
 			default:
 			{
-				unsigned char msg[256];
+				char msg[256];
 				snprintf(msg,256,"Syntax error in file \"%s\"!\n",filename);
 				ERROR(msg);
 				EXIT(1);
@@ -330,7 +330,7 @@ skip:  ;
 	}
 	if (step!=4)
 	{
-		unsigned char msg[256];
+		char msg[256];
 		snprintf(msg,256,"Unexpected end of file in \"%s\".\n",filename);
 		ERROR(msg);
 		EXIT(1);

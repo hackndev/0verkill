@@ -31,7 +31,7 @@ unsigned char *area_a;
 
 
 struct sprite *sprites=DUMMY;
-unsigned char **sprite_names=DUMMY;
+char **sprite_names=DUMMY;
 int n_sprites;  /* number of sprites */
 
 struct object_list *last_obj;
@@ -120,7 +120,7 @@ void _skip_ws(char **txt)
 /* find sprite according to its name */
 /* returns 1 on error */
 /* it's slow but not called in speed critical parts of the program */
-int find_sprite(unsigned char *name,int *num)
+int find_sprite(char *name,int *num)
 {
  for ((*num)=0;(*num)<n_sprites;(*num)++)
   if (!strcmp(sprite_names[*num],name))return 0;
@@ -185,7 +185,7 @@ int _convert_type(unsigned char c)
 
 
 /* load static data */
-void load_data(unsigned char * filename)
+void load_data(char * filename)
 {
  FILE * stream;
  static char line[1024];
@@ -234,7 +234,7 @@ void load_data(unsigned char * filename)
 
 
 /* load sprites */
-void load_sprites(unsigned char * filename)
+void load_sprites(char * filename)
 {
  FILE *stream;
  static char line[1024];
@@ -258,7 +258,7 @@ void load_sprites(unsigned char * filename)
   *p=0;p++;
   l=strlen(q);
   n_sprites++;
-  sprite_names=(unsigned char **)mem_realloc(sprite_names,n_sprites*sizeof(unsigned char*));
+  sprite_names=(char **)mem_realloc(sprite_names,n_sprites*sizeof(unsigned char*));
   if (!sprite_names){ERROR("Memory allocation error!\n");EXIT(1);}
   sprites=(struct sprite *)mem_realloc(sprites,n_sprites*sizeof(struct sprite));
   if (!sprites){ERROR("Memory allocation error!\n");EXIT(1);}
@@ -284,7 +284,7 @@ void free_sprites(int start_num)
 		free_sprite(sprites+a);
 	}
 	n_sprites=start_num;
-  	sprite_names=(unsigned char **)mem_realloc(sprite_names,n_sprites*sizeof(unsigned char*));
+  	sprite_names=(char **)mem_realloc(sprite_names,n_sprites*sizeof(unsigned char*));
 	if (!sprite_names){ERROR("Memory allocation error!\n");EXIT(1);}
 	sprites=mem_realloc(sprites,n_sprites*sizeof(struct sprite));
 	if (!sprites){ERROR("Memory allocation error!\n");EXIT(1);}
@@ -293,10 +293,10 @@ void free_sprites(int start_num)
 
 /* returns allocated string with level name or NULL on error */
 /* level_num is a line number in the LEVEL_FILE */
-unsigned char *load_level(int level_num)
+char *load_level(int level_num)
 {
-	unsigned char txt[1024];
-	unsigned char *retval;
+	char txt[1024];
+	char *retval;
 	int a;
 	FILE *f;
 
@@ -583,9 +583,10 @@ void update_position(struct it* obj,my_double new_x,my_double new_y,int width, i
 }
 
 
-unsigned char *__add_md5(unsigned char *filename, int *len, unsigned char**result)
+unsigned char *__add_md5(char *filename, int *len, unsigned char**result)
 {
-	unsigned char *p,*q;
+	unsigned char *p;
+	char *q;
 	int a;
 	
 	q=MD5File(filename,NULL);
@@ -604,12 +605,12 @@ unsigned char *__add_md5(unsigned char *filename, int *len, unsigned char**resul
  * level_num is the line number in level.dat file
  * returns allocated string with the MD5 sum or NULL (on error)
  */
-unsigned char* md5_level(int level_num)
+char* md5_level(int level_num)
 {
 	unsigned char *result=0;
 	char *q;
 	int len=0;
-	unsigned char p[2048];
+	char p[2048];
 	
 	q=load_level(level_num);
 	if (!q)return NULL;

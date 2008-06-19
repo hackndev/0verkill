@@ -83,7 +83,7 @@ client has: sender_server 1, recipient my_id
 	
 	p=mem_alloc(max_len+12);
 	if (!p)return -1;  /* not enough memory */
-	retval=recvfrom(fd,p,max_len+12,0,addr,addr_len);
+	retval=recvfrom(fd,p,max_len+12,0,addr,(unsigned int *)addr_len);
 	memcpy(packet,p+12,max_len);
 	crc=p[0]+(p[1]<<8)+(p[2]<<16)+(p[3]<<24);
 	s=p[4]+(p[5]<<8)+(p[6]<<16)+(p[7]<<24);

@@ -136,7 +136,7 @@ struct msgline_type
 }msg_line[N_MESSAGES];
 
 int last_message;
-unsigned char error_message[1024];
+char error_message[1024];
 
 unsigned char set_size;  /* -s option was on the command line */
 
@@ -188,7 +188,7 @@ void load_cfg(char *host,char *name,int *color)
 {
 	FILE *stream;
 	int a;
-	unsigned char txt[256];
+	char txt[256];
 
 #ifndef WIN32
 	sprintf(txt,"%s/%s",getenv("HOME"),CFG_FILE);
@@ -220,7 +220,7 @@ void load_cfg(char *host,char *name,int *color)
 void save_cfg(char *host,char *name,int color)
 {
 	FILE *stream;
-	unsigned char txt[256];
+	char txt[256];
 
 #ifndef WIN32
 	sprintf(txt,"%s/%s",getenv("HOME"),CFG_FILE);
@@ -381,7 +381,7 @@ send_again:
 
 
 /* initiate connection with server */
-char * contact_server(int color,unsigned char *name)
+char * contact_server(int color,char *name)
 {
 	static unsigned char packet[256];
 	int l=strlen(name)+1;
@@ -910,8 +910,8 @@ void draw_scene(void)
 
 void change_level(void)
 {
-	unsigned char *LEVEL;
-	unsigned char txt[256];
+	char *LEVEL;
+	char txt[256];
 
 	clean_memory();
 	free_sprites(level_sprites_start);
@@ -1161,32 +1161,39 @@ int process_packet(unsigned char *packet,int l)
 
 		case P_MESSAGE:
 		if (l<2)break;   /* invalid packet */
-		add_message(packet+1);
-		n=2+strlen(packet+1);
+		add_message((char *)packet+1);
+		n=2+strlen((char *)packet+1);
 		break;
 
 		case P_CHANGE_LEVEL:
 		{
-			unsigned char txt[256];
-			unsigned char *name;
-			unsigned char *md5;
+			char txt[256];
+			char *name;
+			char *md5;
 			int a;
-			char p;
+			unsigned char p;
 
 			if (l<38)break;   /* invalid packet */
 			a=get_int(packet+1);
 			if (level_number==a)goto level_changed;
 			level_number=a;
-			snprintf(txt,256, "Trying to change level to number %d",level_number);
+			snprintf(txt,256, "Trying to change level to number %d",
+				level_number);
 			add_message(txt);
 			name=load_level(level_number);
-			if (!name){snprintf(error_message,1024,"Cannot find level number %d. Game terminated. Press ENTER.", level_number);send_quit();return -1;}
+			if (!name) {
+				snprintf(error_message,1024,"Cannot find level "
+					"number %d. Game terminated. Press ENTER.",
+					level_number);
+				send_quit();
+				return -1;
+			}
 			snprintf(txt,256,"Changing level to \"%s\"",name);
 			mem_free(name);
 			add_message(txt);
 			
 			md5=md5_level(level_number);
-			if (strcmp(md5,packet+5))   /* MD5s differ */
+			if (strcmp((char *)md5,(char *)packet+5))   /* MD5s differ */
 			{
 				mem_free(md5);
 				snprintf(error_message,1024,"Invalid MD5 sum. Can't change level. Game terminated. Press ENTER.");
@@ -1226,7 +1233,7 @@ level_changed:
 			top_players[a].frags=get_int(packet+l);
 			top_players[a].deaths=get_int(packet+l+4);
 			top_players[a].color=packet[l+8];
-			x=strlen(packet+l+9)+1;
+			x=strlen((char *)packet+l+9)+1;
 			memcpy(top_players[a].name,packet+l+9,x);
 			l+=x+9;
 		}
@@ -1508,7 +1515,7 @@ void menu_screen(char *host,char *name,unsigned short *p,int *color)
 	sprintf(txt,"hero%d",*color);
 	if (find_sprite(txt,&sprite))
 	{
-		unsigned char msg[256];
+		char msg[256];
 		mem_free(banner);
 		shut_down(0);
 		snprintf(msg,256,"Error: Can't find sprite \"%s\".\n",txt);
@@ -1997,7 +2004,7 @@ int main(int argc,char **argv)
 	char host[MAX_HOST_LEN+1];
 	char name[MAX_NAME_LEN+1];
 	int a;
-	unsigned char txt[256];
+	char txt[256];
 	
 	
 #ifdef WIN32
@@ -2039,7 +2046,10 @@ int main(int argc,char **argv)
 	for (a=0;a<N_SHRAPNELS;a++)
 	{
 		sprintf(txt,"shrapnel%d",a+1);
-		if (find_sprite(txt,&shrapnel_sprite[a])){fprintf(stderr,"Can't find sprite \"%s\".\n",txt);EXIT(1);}
+		if (find_sprite(txt,&shrapnel_sprite[a])) {
+			fprintf(stderr,"Can't find sprite \"%s\".\n",txt);
+			EXIT(1);
+		}
 	}
 
 	signal(SIGINT,signal_handler);

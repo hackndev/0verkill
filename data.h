@@ -97,7 +97,7 @@ struct obj_attr_type
 /* weapon attribut table */
 struct weapon_type
 {
-	unsigned char *name;
+	char *name;
 	unsigned char cadence;
 	int ttl:16;
 	my_double speed,impact;
@@ -137,20 +137,20 @@ struct object_list
 extern struct object_list *last_obj;
 
 extern struct sprite *sprites;
-extern unsigned char **sprite_names;
+extern char **sprite_names;
 extern int n_sprites;
 
 /* static map */
 extern unsigned char *area;
 extern unsigned char *area_a;
 
-extern void load_sprites(unsigned char *);
-extern void load_data(unsigned char *);
-extern int find_sprite(unsigned char *,int *);
+extern void load_sprites(char *);
+extern void load_data(char *);
+extern int find_sprite(char *,int *);
 extern void init_area(void);
 extern void reinit_area(void);
 extern void free_area(void);
-extern unsigned char *md5_level(int);
+extern char *md5_level(int);
 extern struct it* new_obj(
 	unsigned int id,
 	unsigned char type,
@@ -195,5 +195,5 @@ void update_position(
 
 extern void _skip_ws(char**txt);
 extern int _convert_type(unsigned char c);
-extern unsigned char * load_level(int);
+extern char * load_level(int);
 #endif
