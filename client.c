@@ -383,7 +383,7 @@ send_again:
 /* initiate connection with server */
 char * contact_server(int color,char *name)
 {
-	static unsigned char packet[256];
+	static char packet[256];
 	int l=strlen(name)+1;
 	int a,r;
 	int min,maj;
@@ -426,14 +426,14 @@ char * contact_server(int color,char *name)
 		}
 		
 		case P_PLAYER_ACCEPTED:
-		my_id=get_int(packet+33);
+		my_id=get_int((char *)packet+33);
 		if (r<39){send_quit();return "Incompatible server version. Givin' up. Press Enter.";}
 		maj=packet[37];
 		min=packet[38];
 		if (maj!=VERSION_MAJOR||min<MIN_SERVER_VERSION_MINOR)
 		{send_quit();return "Incompatible server version. Givin' up. Press Enter.";}
 		game_start_offset=get_time();
-		game_start_offset-=get_long_long(packet+25);
+		game_start_offset-=get_long_long((unsigned char *)packet+25);
 		health=100;
 		armor=0;
 		for(a=0;a<ARMS;a++)
@@ -442,7 +442,7 @@ char * contact_server(int color,char *name)
 		current_weapon=0;
 		weapons=17;  /* gun and grenades */
 		hero=new_obj(
-			get_int(packet+1),   /* ID */
+			get_int((char *)packet+1),   /* ID */
 			T_PLAYER,   /* type */
 			0,  /* time to live */
 			get_int16(packet+5),   /* sprite */
@@ -927,7 +927,7 @@ void change_level(void)
 
 
 /* returns number of read bytes */
-int process_packet(unsigned char *packet,int l)
+int process_packet(char *packet,int l)
 {
 	int a,n=l;
 
@@ -942,7 +942,7 @@ int process_packet(unsigned char *packet,int l)
 		if (l<28)break;  /* invalid packet */
 		n=28;
 		new_obj(
-			get_int(packet+1), /* ID */
+			get_int((char *)packet+1), /* ID */
 			packet[25],  /* type */
 			get_int16(packet+26), /* time to live */
 			get_int16(packet+5),  /* sprite */
@@ -963,7 +963,7 @@ int process_packet(unsigned char *packet,int l)
 		
 		case P_DELETE_OBJECT:
 		if (l<5)break;  /* invalid packet */
-		delete_obj(get_int(packet+1));
+		delete_obj(get_int((char *)packet+1));
 		n=5;
 		break;
 
@@ -973,7 +973,7 @@ int process_packet(unsigned char *packet,int l)
 			struct object_list *p;
 			
 			n=26;
-			p=find_in_table(get_int(packet+1));
+			p=find_in_table(get_int((char *)packet+1));
 			if (!p)break;
 			if(packet[5]-(p->member.update_counter)>127)break; /* throw out old updates */
 			p->member.update_counter=packet[5];
@@ -996,7 +996,7 @@ int process_packet(unsigned char *packet,int l)
 			struct object_list *p;
 			
 			n=22;
-			p=find_in_table(get_int(packet+1));
+			p=find_in_table(get_int((char *)packet+1));
 			if (!p)break;
 			if(packet[5]-(p->member.update_counter)>127)break; /* throw out old updates */
 			p->member.update_counter=packet[5];
@@ -1013,7 +1013,7 @@ int process_packet(unsigned char *packet,int l)
 			struct object_list *p;
 			
 			n=14;
-			p=find_in_table(get_int(packet+1));
+			p=find_in_table(get_int((char *)packet+1));
 			if (!p)break;
 			if(packet[5]-(p->member.update_counter)>127)break; /* throw out old updates */
 			p->member.update_counter=packet[5];
@@ -1028,7 +1028,7 @@ int process_packet(unsigned char *packet,int l)
 			struct object_list *p;
 			
 			n=14;
-			p=find_in_table(get_int(packet+1));
+			p=find_in_table(get_int((char *)packet+1));
 			if (!p)break;
 			if(packet[5]-(p->member.update_counter)>127)break; /* throw out old updates */
 			p->member.update_counter=packet[5];
@@ -1043,7 +1043,7 @@ int process_packet(unsigned char *packet,int l)
 			struct object_list *p;
 			
 			n=16;
-			p=find_in_table(get_int(packet+1));
+			p=find_in_table(get_int((char *)packet+1));
 			if (!p)break;
 			if(packet[5]-(p->member.update_counter)>127)break; /* throw out old updates */
 			p->member.update_counter=packet[5];
@@ -1062,7 +1062,7 @@ int process_packet(unsigned char *packet,int l)
 			struct object_list *p;
 			
 			n=16;
-			p=find_in_table(get_int(packet+1));
+			p=find_in_table(get_int((char *)packet+1));
 			if (!p)break;
 			if(packet[5]-(p->member.update_counter)>127)break; /* throw out old updates */
 			p->member.update_counter=packet[5];
@@ -1081,7 +1081,7 @@ int process_packet(unsigned char *packet,int l)
 			struct object_list *p;
 			
 			n=18;
-			p=find_in_table(get_int(packet+1));
+			p=find_in_table(get_int((char *)packet+1));
 			if (!p)break;
 			if(packet[5]-(p->member.update_counter)>127)break; /* throw out old updates */
 			p->member.update_counter=packet[5];
@@ -1101,7 +1101,7 @@ int process_packet(unsigned char *packet,int l)
 			struct object_list *p;
 			
 			n=18;
-			p=find_in_table(get_int(packet+1));
+			p=find_in_table(get_int((char *)packet+1));
 			if (!p)break;
 			if(packet[5]-(p->member.update_counter)>127)break; /* throw out old updates */
 			p->member.update_counter=packet[5];
@@ -1121,7 +1121,7 @@ int process_packet(unsigned char *packet,int l)
 			struct object_list *p;
 
 			n=7;
-			p=find_in_table(get_int(packet+1));
+			p=find_in_table(get_int((char *)packet+1));
 			if (!p)break;  /* ignore objects we don't have */
 			p->member.status=get_int16(packet+5);
 			/* kdyz tasi, tak se nahodi ttl */
@@ -1136,7 +1136,7 @@ int process_packet(unsigned char *packet,int l)
 			struct object_list *p;
 	
 			n=8;
-			p=find_in_table(get_int(packet+1));
+			p=find_in_table(get_int((char *)packet+1));
 			if (!p)break;  /* ignore objects we don't have */
 			p->member.status|=128;
 			p->member.data=(void*)((packet[5]<<16)+(packet[7]<<8)+(packet[6]));
@@ -1152,8 +1152,8 @@ int process_packet(unsigned char *packet,int l)
 		armor=packet[2];
 		for (a=0;a<ARMS;a++)
 			ammo[a]=get_int16(packet+3+(a<<1));
-		frags=get_int(packet+3+ARMS*2);
-		deaths=get_int(packet+7+ARMS*2);
+		frags=get_int((char *)packet+3+ARMS*2);
+		deaths=get_int((char *)packet+7+ARMS*2);
 		current_weapon=packet[11+2*ARMS];
 		weapons=packet[12+2*ARMS];
 		n=23;
@@ -1174,7 +1174,7 @@ int process_packet(unsigned char *packet,int l)
 			char p;
 
 			if (l<38)break;   /* invalid packet */
-			a=get_int(packet+1);
+			a=get_int((char *)packet+1);
 			if (level_number==a)goto level_changed;
 			level_number=a;
 			snprintf(txt,256, "Trying to change level to number %d",
@@ -1225,13 +1225,13 @@ level_changed:
 
 		case P_INFO:
 		if (l<=5)break;
-		active_players=get_int(packet+1);
+		active_players=get_int((char *)packet+1);
 		l=6;
 		for (a=0;a<packet[5]&&a<TOP_PLAYERS_N;a++)
 		{
 			int x;
-			top_players[a].frags=get_int(packet+l);
-			top_players[a].deaths=get_int(packet+l+4);
+			top_players[a].frags=get_int((char *)packet+l);
+			top_players[a].deaths=get_int((char *)packet+l+4);
 			top_players[a].color=packet[l+8];
 			x=strlen((char *)packet+l+9)+1;
 			memcpy(top_players[a].name,packet+l+9,x);
@@ -1299,7 +1299,7 @@ int read_data(void)
 	{
 	        if ((l=recv_packet(packet,MAX_PACKET_LENGTH,(struct sockaddr*)(&client),&a,1,my_id,0))<0)
 			return 0;   /* something's strange */
-		if (process_packet((unsigned char *)packet,l)<0)return 1;
+		if (process_packet(packet,l)<0)return 1;
 
 	}
 	return 0;

@@ -387,54 +387,45 @@ void put_long_long(unsigned char *p,unsigned long_long num)
 }
 
 
-void put_int(unsigned char *p,int num)
+void put_int(char *p,int num)
 {
-        p[0]=num&255;num>>=8;
-        p[1]=num&255;num>>=8;
-        p[2]=num&255;num>>=8;
-        p[3]=num&255;
+        p[0]=num & 0xff;
+        p[1]=(num>>8) & 0xff;
+        p[2]=(num>>16) & 0xff;
+        p[3]=(num>>24) & 0xff;
 }
 
 
-int get_int(unsigned char *p)
+int get_int(char *p)
 {
-        return 	(int)p[0]+
-		((int)(p[1])<<8)+
-		((int)(p[2])<<16)+
-		((int)(p[3])<<24);
+	return	((p[0]&0xff) | ((p[1]&0xff)<<8) |
+		((p[2]&0xff)<<16) | ((p[3]&0xff)<<24));
+		
 }
 
 
-void put_int16(unsigned char *p,int num)
+void put_int16(char *p, short num)
 {
-        p[0]=num&255;num>>=8;
-        p[1]=num&255;
+        p[0]=num & 0xff;
+        p[1]=(num>>8) & 0xff;
 }
 
 
-int get_int16(unsigned char *p)
+int get_int16(char *p)
 {
-        return (int)p[0]+((int)(p[1])<<8);
+	return	((p[0]&0xff) | ((p[1]&0xff)<<8));
 }
 
 
-my_double get_float(unsigned char *p)
+my_double get_float(char *p)
 {
-	int a;
-	a=	(int)p[0]+
-		((int)(p[1])<<8)+
-		((int)(p[2])<<16)+
-		((int)(p[3])<<24);
-	return a;
+	return get_int(p);
 }
 
 
-void put_float(unsigned char *p,my_double num)
+void put_float(char *p,my_double num)
 {
-        p[0]=num&255;num>>=8;
-        p[1]=num&255;num>>=8;
-        p[2]=num&255;num>>=8;
-        p[3]=num&255;
+	put_int(p, num);
 }
 
 

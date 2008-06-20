@@ -164,14 +164,12 @@ extern struct it* new_obj(
 	my_double yspeed, 
 	void * data);
 void delete_obj(unsigned long id);
-extern void put_int(unsigned char *p,int num);
-extern int get_int(unsigned char *p);
-extern void put_int16(unsigned char *p,int num);
-extern int get_int16(unsigned char *p);
-extern void put_int(unsigned char *p,int num);
-extern int get_int(unsigned char *p);
-extern void put_float(unsigned char *p,my_double num);
-extern my_double get_float(unsigned char *p);
+extern void put_int(char *p,int num);
+extern int get_int(char *p);
+extern void put_int16(char *p,short num);
+extern int get_int16(char *p);
+extern void put_float(char *p,my_double num);
+extern my_double get_float(char *p);
 extern void put_long_long(unsigned char *p,unsigned long_long num);
 extern unsigned long_long get_long_long(unsigned char *p);
 extern void free_sprites(int);

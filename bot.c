@@ -247,7 +247,7 @@ send_again:
 /* initiate connection with server */
 char * contact_server(int color, char *name)
 {
-	static unsigned char packet[256];
+	static char packet[256];
 	int l=strlen(name)+1;
 	int a,r;
 	int min,maj;
@@ -297,7 +297,7 @@ char * contact_server(int color, char *name)
 		if (maj!=VERSION_MAJOR||min<MIN_SERVER_VERSION_MINOR)
 		{send_quit();return "Incompatible server version. Givin' up.\n";}
 		game_start_offset=get_time();
-		game_start_offset-=get_long_long(packet+25);
+		game_start_offset-=get_long_long((unsigned char *)packet+25);
 		health=100;
 		armor=0;
 		for(a=0;a<ARMS;a++)
@@ -622,7 +622,7 @@ void update_game(void)
 
 
 /* returns number of read bytes */
-int process_packet(unsigned char *packet,int l)
+int process_packet(char *packet,int l)
 {
 	int a,n=l;
 
@@ -968,7 +968,7 @@ void read_data(void)
 	{
 	        if ((l=recv_packet(packet,MAX_PACKET_LENGTH,(struct sockaddr*)(&client),&a,1,my_id,0))<0)
 			return;   /* something's strange */
-		process_packet((unsigned char *)packet,l);
+		process_packet(packet,l);
 
 	}
 }
