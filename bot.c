@@ -266,12 +266,12 @@ char * contact_server(int color, char *name)
 	packet[4]=color;
 	memcpy(packet+5,name,l);
 
-	send_packet((char *)packet,l+5,(struct sockaddr*)(&server),my_id,0);
+	send_packet(packet,l+5,(struct sockaddr*)(&server),my_id,0);
 
 
         if (!select(fd+1,&fds,NULL,NULL,&tv))return "No reply within 4 seconds.\n";
 
-	if ((r=recv_packet((char *)packet,256,0,0,1,0,0))<0)
+	if ((r=recv_packet(packet,256,0,0,1,0,0))<0)
 	{
 		if (errno==EINTR)return "Server hung up.\n";
 		else return "Connection error.\n";
@@ -856,13 +856,13 @@ int process_packet(char *packet,int l)
 
 		case P_MESSAGE:
 		if (l<2)break;   /* invalid packet */
-		n=2+strlen((char *)packet+1);
+		n=2+strlen(packet+1);
 		break;
 
 		case P_END:
 		if (l<2)printf("Game terminated.\n");
 		else printf("Game terminated by %s.\n",packet+1);
-		n=2+strlen((char *)packet+1);
+		n=2+strlen(packet+1);
 		shut_down(1);
 
 		case P_INFO:
@@ -871,7 +871,7 @@ int process_packet(char *packet,int l)
 		for (a=0;a<packet[5]&&a<TOP_PLAYERS_N;a++)
 		{
 			int x;
-			x=strlen((char *)packet+l+9)+1;
+			x=strlen(packet+l+9)+1;
 			l+=x+9;
 		}
 		n=l;
@@ -926,7 +926,7 @@ int process_packet(char *packet,int l)
 			level_number=a;
 			
 			md5=md5_level(level_number);
-			if (strcmp((char *)md5,(char *)packet+5))   /* MD5s differ */
+			if (strcmp((char *)md5,packet+5))   /* MD5s differ */
 			{
 				mem_free(md5);
 				ERROR("Invalid MD5 sum. Can't change level. Exiting...");

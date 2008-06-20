@@ -402,12 +402,12 @@ char * contact_server(int color,char *name)
 	packet[4]=color;
 	memcpy(packet+5,name,l);
 
-	send_packet((char *)packet,l+5,(struct sockaddr*)(&server),my_id,0);
+	send_packet(packet,l+5,(struct sockaddr*)(&server),my_id,0);
 
 
         if (!select(fd+1,&fds,NULL,NULL,&tv))return "No reply within 4 seconds. Press ENTER.";
 
-	if ((r=recv_packet((char *)packet,256,0,0,1,0,0))<0)
+	if ((r=recv_packet(packet,256,0,0,1,0,0))<0)
 	{
 		if (errno==EINTR)return "Server hung up. Press ENTER.";
 		else return "Connection error. Press ENTER.";
@@ -426,7 +426,7 @@ char * contact_server(int color,char *name)
 		}
 		
 		case P_PLAYER_ACCEPTED:
-		my_id=get_int((char *)packet+33);
+		my_id=get_int(packet+33);
 		if (r<39){send_quit();return "Incompatible server version. Givin' up. Press Enter.";}
 		maj=packet[37];
 		min=packet[38];
@@ -442,7 +442,7 @@ char * contact_server(int color,char *name)
 		current_weapon=0;
 		weapons=17;  /* gun and grenades */
 		hero=new_obj(
-			get_int((char *)packet+1),   /* ID */
+			get_int(packet+1),   /* ID */
 			T_PLAYER,   /* type */
 			0,  /* time to live */
 			get_int16(packet+5),   /* sprite */
@@ -942,7 +942,7 @@ int process_packet(char *packet,int l)
 		if (l<28)break;  /* invalid packet */
 		n=28;
 		new_obj(
-			get_int((char *)packet+1), /* ID */
+			get_int(packet+1), /* ID */
 			packet[25],  /* type */
 			get_int16(packet+26), /* time to live */
 			get_int16(packet+5),  /* sprite */
@@ -963,7 +963,7 @@ int process_packet(char *packet,int l)
 		
 		case P_DELETE_OBJECT:
 		if (l<5)break;  /* invalid packet */
-		delete_obj(get_int((char *)packet+1));
+		delete_obj(get_int(packet+1));
 		n=5;
 		break;
 
@@ -973,7 +973,7 @@ int process_packet(char *packet,int l)
 			struct object_list *p;
 			
 			n=26;
-			p=find_in_table(get_int((char *)packet+1));
+			p=find_in_table(get_int(packet+1));
 			if (!p)break;
 			if(packet[5]-(p->member.update_counter)>127)break; /* throw out old updates */
 			p->member.update_counter=packet[5];
@@ -996,7 +996,7 @@ int process_packet(char *packet,int l)
 			struct object_list *p;
 			
 			n=22;
-			p=find_in_table(get_int((char *)packet+1));
+			p=find_in_table(get_int(packet+1));
 			if (!p)break;
 			if(packet[5]-(p->member.update_counter)>127)break; /* throw out old updates */
 			p->member.update_counter=packet[5];
@@ -1013,7 +1013,7 @@ int process_packet(char *packet,int l)
 			struct object_list *p;
 			
 			n=14;
-			p=find_in_table(get_int((char *)packet+1));
+			p=find_in_table(get_int(packet+1));
 			if (!p)break;
 			if(packet[5]-(p->member.update_counter)>127)break; /* throw out old updates */
 			p->member.update_counter=packet[5];
@@ -1028,7 +1028,7 @@ int process_packet(char *packet,int l)
 			struct object_list *p;
 			
 			n=14;
-			p=find_in_table(get_int((char *)packet+1));
+			p=find_in_table(get_int(packet+1));
 			if (!p)break;
 			if(packet[5]-(p->member.update_counter)>127)break; /* throw out old updates */
 			p->member.update_counter=packet[5];
@@ -1043,7 +1043,7 @@ int process_packet(char *packet,int l)
 			struct object_list *p;
 			
 			n=16;
-			p=find_in_table(get_int((char *)packet+1));
+			p=find_in_table(get_int(packet+1));
 			if (!p)break;
 			if(packet[5]-(p->member.update_counter)>127)break; /* throw out old updates */
 			p->member.update_counter=packet[5];
@@ -1062,7 +1062,7 @@ int process_packet(char *packet,int l)
 			struct object_list *p;
 			
 			n=16;
-			p=find_in_table(get_int((char *)packet+1));
+			p=find_in_table(get_int(packet+1));
 			if (!p)break;
 			if(packet[5]-(p->member.update_counter)>127)break; /* throw out old updates */
 			p->member.update_counter=packet[5];
@@ -1081,7 +1081,7 @@ int process_packet(char *packet,int l)
 			struct object_list *p;
 			
 			n=18;
-			p=find_in_table(get_int((char *)packet+1));
+			p=find_in_table(get_int(packet+1));
 			if (!p)break;
 			if(packet[5]-(p->member.update_counter)>127)break; /* throw out old updates */
 			p->member.update_counter=packet[5];
@@ -1101,7 +1101,7 @@ int process_packet(char *packet,int l)
 			struct object_list *p;
 			
 			n=18;
-			p=find_in_table(get_int((char *)packet+1));
+			p=find_in_table(get_int(packet+1));
 			if (!p)break;
 			if(packet[5]-(p->member.update_counter)>127)break; /* throw out old updates */
 			p->member.update_counter=packet[5];
@@ -1121,7 +1121,7 @@ int process_packet(char *packet,int l)
 			struct object_list *p;
 
 			n=7;
-			p=find_in_table(get_int((char *)packet+1));
+			p=find_in_table(get_int(packet+1));
 			if (!p)break;  /* ignore objects we don't have */
 			p->member.status=get_int16(packet+5);
 			/* kdyz tasi, tak se nahodi ttl */
@@ -1136,7 +1136,7 @@ int process_packet(char *packet,int l)
 			struct object_list *p;
 	
 			n=8;
-			p=find_in_table(get_int((char *)packet+1));
+			p=find_in_table(get_int(packet+1));
 			if (!p)break;  /* ignore objects we don't have */
 			p->member.status|=128;
 			p->member.data=(void*)((packet[5]<<16)+(packet[7]<<8)+(packet[6]));
@@ -1152,8 +1152,8 @@ int process_packet(char *packet,int l)
 		armor=packet[2];
 		for (a=0;a<ARMS;a++)
 			ammo[a]=get_int16(packet+3+(a<<1));
-		frags=get_int((char *)packet+3+ARMS*2);
-		deaths=get_int((char *)packet+7+ARMS*2);
+		frags=get_int(packet+3+ARMS*2);
+		deaths=get_int(packet+7+ARMS*2);
 		current_weapon=packet[11+2*ARMS];
 		weapons=packet[12+2*ARMS];
 		n=23;
@@ -1161,8 +1161,8 @@ int process_packet(char *packet,int l)
 
 		case P_MESSAGE:
 		if (l<2)break;   /* invalid packet */
-		add_message((char *)packet+1);
-		n=2+strlen((char *)packet+1);
+		add_message(packet+1);
+		n=2+strlen(packet+1);
 		break;
 
 		case P_CHANGE_LEVEL:
@@ -1174,7 +1174,7 @@ int process_packet(char *packet,int l)
 			char p;
 
 			if (l<38)break;   /* invalid packet */
-			a=get_int((char *)packet+1);
+			a=get_int(packet+1);
 			if (level_number==a)goto level_changed;
 			level_number=a;
 			snprintf(txt,256, "Trying to change level to number %d",
@@ -1193,7 +1193,7 @@ int process_packet(char *packet,int l)
 			add_message(txt);
 			
 			md5=md5_level(level_number);
-			if (strcmp((char *)md5,(char *)packet+5))   /* MD5s differ */
+			if (strcmp((char *)md5,packet+5))   /* MD5s differ */
 			{
 				mem_free(md5);
 				snprintf(error_message,1024,"Invalid MD5 sum. Can't change level. Game terminated. Press ENTER.");
@@ -1225,15 +1225,15 @@ level_changed:
 
 		case P_INFO:
 		if (l<=5)break;
-		active_players=get_int((char *)packet+1);
+		active_players=get_int(packet+1);
 		l=6;
 		for (a=0;a<packet[5]&&a<TOP_PLAYERS_N;a++)
 		{
 			int x;
-			top_players[a].frags=get_int((char *)packet+l);
-			top_players[a].deaths=get_int((char *)packet+l+4);
+			top_players[a].frags=get_int(packet+l);
+			top_players[a].deaths=get_int(packet+l+4);
 			top_players[a].color=packet[l+8];
-			x=strlen((char *)packet+l+9)+1;
+			x=strlen(packet+l+9)+1;
 			memcpy(top_players[a].name,packet+l+9,x);
 			l+=x+9;
 		}

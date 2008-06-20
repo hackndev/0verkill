@@ -593,7 +593,7 @@ void send_chunk_to_player(struct player *player)
 }
 
 
-void send_chunk_packet_to_player(unsigned char *packet, int len, struct player *player)
+void send_chunk_packet_to_player(char *packet, int len, struct player *player)
 {
 	if (len>MAX_PACKET_LENGTH-1)return;
 	if ((player->packet_pos)+len>MAX_PACKET_LENGTH-1)send_chunk_to_player(player);
@@ -613,23 +613,23 @@ void send_chunks(void)
 
 /* send a packet to all players except one */
 /* if not_this_player is null, sends to all players */
-void sendall(unsigned char *packet,int len, struct player * not_this_player)
+void sendall(char *packet,int len, struct player * not_this_player)
 {
 	struct player_list* p;
 
 	if (!not_this_player)
 		for (p=&players;p->next;p=p->next)
- 			send_packet((char *)packet,len,(struct sockaddr*)(&(p->next->member.address)),0,p->next->member.id);
+ 			send_packet(packet,len,(struct sockaddr*)(&(p->next->member.address)),0,p->next->member.id);
 	else
 		for (p=&players;p->next;p=p->next)
 			if ((&(p->next->member))!=not_this_player)
- 				send_packet((char *)packet,len,(struct sockaddr*)(&(p->next->member.address)),0,p->next->member.id);
+ 				send_packet(packet,len,(struct sockaddr*)(&(p->next->member.address)),0,p->next->member.id);
 }
 
 
 /* send a packet to all players except one */
 /* if not_this_player is null, sends to all players */
-void sendall_chunked(unsigned char *packet,int len, struct player * not_this_player)
+void sendall_chunked(char *packet,int len, struct player * not_this_player)
 {
 	struct player_list* p;
 
@@ -689,7 +689,7 @@ void sendall_update_object(struct it* obj, struct player * not_this_player,int t
 	{
 		case 0: /* all */
 		packet[0]=P_UPDATE_OBJECT;
-		put_int((char *)packet+1,obj->id);
+		put_int(packet+1,obj->id);
 		packet[5]=obj->update_counter;
 		put_float(packet+6,obj->x);
 		put_float(packet+10,obj->y);
@@ -702,7 +702,7 @@ void sendall_update_object(struct it* obj, struct player * not_this_player,int t
 
 		case 1: /* coordinates and speed */
 		packet[0]=P_UPDATE_OBJECT_POS;
-		put_int((char *)packet+1,obj->id);
+		put_int(packet+1,obj->id);
 		packet[5]=obj->update_counter;
 		put_float(packet+6,obj->x);
 		put_float(packet+10,obj->y);
@@ -713,7 +713,7 @@ void sendall_update_object(struct it* obj, struct player * not_this_player,int t
 		
 		case 2: /* speed */
 		packet[0]=P_UPDATE_OBJECT_SPEED;
-		put_int((char *)packet+1,obj->id);
+		put_int(packet+1,obj->id);
 		packet[5]=obj->update_counter;
 		put_float(packet+6,obj->xspeed);
 		put_float(packet+10,obj->yspeed);
@@ -722,7 +722,7 @@ void sendall_update_object(struct it* obj, struct player * not_this_player,int t
 		
 		case 3: /* coordinates */
 		packet[0]=P_UPDATE_OBJECT_COORDS;
-		put_int((char *)packet+1,obj->id);
+		put_int(packet+1,obj->id);
 		packet[5]=obj->update_counter;
 		put_float(packet+6,obj->x);
 		put_float(packet+10,obj->y);
@@ -731,7 +731,7 @@ void sendall_update_object(struct it* obj, struct player * not_this_player,int t
 		
 		case 4: /* speed and status */
 		packet[0]=P_UPDATE_OBJECT_SPEED_STATUS;
-		put_int((char *)packet+1,obj->id);
+		put_int(packet+1,obj->id);
 		packet[5]=obj->update_counter;
 		put_float(packet+6,obj->xspeed);
 		put_float(packet+10,obj->yspeed);
@@ -741,7 +741,7 @@ void sendall_update_object(struct it* obj, struct player * not_this_player,int t
 		
 		case 5: /* coordinates and status */
 		packet[0]=P_UPDATE_OBJECT_COORDS_STATUS;
-		put_int((char *)packet+1,obj->id);
+		put_int(packet+1,obj->id);
 		packet[5]=obj->update_counter;
 		put_float(packet+6,obj->x);
 		put_float(packet+10,obj->y);
@@ -751,7 +751,7 @@ void sendall_update_object(struct it* obj, struct player * not_this_player,int t
 		
 		case 6: /* speed and status and ttl */
 		packet[0]=P_UPDATE_OBJECT_SPEED_STATUS_TTL;
-		put_int((char *)packet+1,obj->id);
+		put_int(packet+1,obj->id);
 		packet[5]=obj->update_counter;
 		put_float(packet+6,obj->xspeed);
 		put_float(packet+10,obj->yspeed);
@@ -762,7 +762,7 @@ void sendall_update_object(struct it* obj, struct player * not_this_player,int t
 		
 		case 7: /* coordinates and status and ttl */
 		packet[0]=P_UPDATE_OBJECT_COORDS_STATUS_TTL;
-		put_int((char *)packet+1,obj->id);
+		put_int(packet+1,obj->id);
 		packet[5]=obj->update_counter;
 		put_float(packet+6,obj->x);
 		put_float(packet+10,obj->y);
@@ -780,11 +780,11 @@ void sendall_update_object(struct it* obj, struct player * not_this_player,int t
 	
 	if (!not_this_player)
 		for (p=&players;p->next;p=p->next)
-			send_chunk_packet_to_player((unsigned char *)packet,l,&(p->next->member));
+			send_chunk_packet_to_player(packet,l,&(p->next->member));
 	else
 		for (p=&players;p->next;p=p->next)
 			if ((&(p->next->member))!=not_this_player)
- 				send_chunk_packet_to_player((unsigned char *)packet,l,&(p->next->member));
+ 				send_chunk_packet_to_player(packet,l,&(p->next->member));
 }
 
 
@@ -800,11 +800,11 @@ void sendall_update_status(struct it* obj, struct player * not_this_player)
 	
 	if (!not_this_player)
 		for (p=&players;p->next;p=p->next)
- 			send_chunk_packet_to_player((unsigned char *)packet,7,&(p->next->member));
+ 			send_chunk_packet_to_player(packet,7,&(p->next->member));
 	else
 		for (p=&players;p->next;p=p->next)
 			if ((&(p->next->member))!=not_this_player)
- 				send_chunk_packet_to_player((unsigned char *)packet,7,&(p->next->member));
+ 				send_chunk_packet_to_player(packet,7,&(p->next->member));
 }
 
 
@@ -812,10 +812,10 @@ void sendall_update_status(struct it* obj, struct player * not_this_player)
 void sendall_hit(unsigned long id,unsigned char direction,unsigned char xoffs,unsigned char yoffs,struct player* not_this_player)
 {
 	struct player_list* p;
-	static unsigned char packet[8];
+	static char packet[8];
 
 	packet[0]=P_HIT;
-	put_int((char *)packet+1,id);
+	put_int(packet+1,id);
 	packet[5]=direction;
 	packet[6]=xoffs;
 	packet[7]=yoffs;
@@ -855,7 +855,7 @@ int _qsort_cmp(const void *a,const void *b)
 /* if addr is NULL info is sent to all */
 void send_info(struct sockaddr *addr,int id)
 {
-	unsigned char *packet;
+	char *packet;
 	int p=active_players>TOP_PLAYERS_N?TOP_PLAYERS_N:active_players;
 	int a,n,l;
 	struct player **t;  /* table for qsort */
@@ -876,22 +876,22 @@ void send_info(struct sockaddr *addr,int id)
 	
 	/* create packet header */
 	packet[0]=P_INFO;
-	put_int((char *)packet+1,active_players);
+	put_int(packet+1,active_players);
 	packet[5]=p;
 	n=6;
 
 	/* put players into packet */
 	for (a=0;a<p;a++)
 	{
-		put_int((char *)packet+n,(t[a])->frags);
-		put_int((char *)packet+n+4,(t[a])->deaths);
+		put_int(packet+n,(t[a])->frags);
+		put_int(packet+n+4,(t[a])->deaths);
 		packet[n+8]=t[a]->color;
 		l=strlen((t[a])->name)+1;
 		memcpy(packet+n+9,(t[a])->name,l);
 		n+=l+9;
 	}
 	if (!addr)sendall(packet,n,0);
-	else send_packet((char *)packet,n,addr,0,id);
+	else send_packet(packet,n,addr,0,id);
 
 	mem_free(packet);
 	mem_free(t);
@@ -907,7 +907,7 @@ void send_message(struct player* player, char *name, char *msg)
 	packet[0]=P_MESSAGE;
 	if (!name){snprintf(packet+1,256,"%s",msg);len=strlen(msg)+1+1;}
 	else {snprintf(packet+1,256,"%s> %s",name,msg);len=strlen(name)+strlen(msg)+1+3;}
-	send_chunk_packet_to_player((unsigned char *)packet,len,player);
+	send_chunk_packet_to_player(packet,len,player);
 }
 
 
@@ -923,7 +923,7 @@ void sendall_message(char *name, char *msg,struct player *not1,struct player* no
 	else {snprintf(packet+1,255,"%s> %s",name,msg);len=strlen(name)+strlen(msg)+1+3;}
 	for (p=&players;p->next;p=p->next)
 		if ((!not1||(&(p->next->member))!=not1)&&(!not2||(&(p->next->member))!=not2))
- 			send_chunk_packet_to_player((unsigned char *)packet,len,&(p->next->member));
+ 			send_chunk_packet_to_player(packet,len,&(p->next->member));
 }
 
 
@@ -934,7 +934,7 @@ void sendall_bell(void)
 
 	packet=P_BELL;
 	for (p=&players;p->next;p=p->next)
- 		send_chunk_packet_to_player((unsigned char *)&packet,1,&(p->next->member));
+ 		send_chunk_packet_to_player(&packet,1,&(p->next->member));
 
 }
 
@@ -945,7 +945,7 @@ void send_new_obj(struct sockaddr* address, struct it* obj,int id)
 	static char packet[32];
 
 	packet[0]=P_NEW_OBJ;
-	put_int((char *)packet+1,obj->id);
+	put_int(packet+1,obj->id);
 	put_int16(packet+5,obj->sprite);
 	put_float(packet+7,obj->x);
 	put_float(packet+11,obj->y);
@@ -954,7 +954,7 @@ void send_new_obj(struct sockaddr* address, struct it* obj,int id)
 	put_int16(packet+23,obj->status);
 	packet[25]=obj->type;
 	put_int16(packet+26,obj->ttl);
-	send_packet((char *)packet,28,address,0,id);
+	send_packet(packet,28,address,0,id);
 }
 
 
@@ -964,7 +964,7 @@ void send_new_obj_chunked(struct player* player, struct it* obj)
 	static char packet[32];
 
 	packet[0]=P_NEW_OBJ;
-	put_int((char *)packet+1,obj->id);
+	put_int(packet+1,obj->id);
 	put_int16(packet+5,obj->sprite);
 	put_float(packet+7,obj->x);
 	put_float(packet+11,obj->y);
@@ -973,7 +973,7 @@ void send_new_obj_chunked(struct player* player, struct it* obj)
 	put_int16(packet+23,obj->status);
 	packet[25]=obj->type;
 	put_int16(packet+26,obj->ttl);
-	send_chunk_packet_to_player((unsigned char *)packet,28,player);
+	send_chunk_packet_to_player(packet,28,player);
 }
 
 
@@ -988,11 +988,11 @@ void send_update_player(struct player* p)
 	packet[2]=p->armor;
 	for (a=0;a<ARMS;a++)
 		put_int16(packet+3+(a<<1),p->ammo[a]);
-	put_int((char *)packet+3+2*ARMS,p->frags);
-	put_int((char *)packet+7+2*ARMS,p->deaths);
+	put_int(packet+3+2*ARMS,p->frags);
+	put_int(packet+7+2*ARMS,p->deaths);
 	packet[11+2*ARMS]=p->current_weapon;
 	packet[12+2*ARMS]=p->weapons;
-	send_chunk_packet_to_player((unsigned char *)packet,13+2*ARMS,p);
+	send_chunk_packet_to_player(packet,13+2*ARMS,p);
 }
 
 /* send a packet to all players except one */
@@ -1032,12 +1032,12 @@ void send_objects(struct player* player,struct it* not_this_object)
 /* if not_this_object is null, sends all objects */
 void send_change_level(struct player* player)
 {
-	unsigned char packet[64];
+	char packet[64];
 
 	packet[0]=P_CHANGE_LEVEL;
-	put_int((char *)packet+1,level_number);
+	put_int(packet+1,level_number);
 	memcpy(packet+5,level_checksum,33);
-	send_packet((char *)packet,38,(struct sockaddr*)(&(player->address)),0,player->id);
+	send_packet(packet,38,(struct sockaddr*)(&(player->address)),0,player->id);
 }
 
 
@@ -1055,11 +1055,11 @@ void send_timeq_objects(struct player *player)
 /* delete player's hero and send message */
 void delete_player(struct player_list *q)
 {
-	unsigned char packet[5];
+	char packet[5];
 	
 	/* delete object player's hero */
 	packet[0]=P_DELETE_OBJECT;
-	put_int((char *)packet+1,q->member.obj->id);
+	put_int(packet+1,q->member.obj->id);
 	sendall_chunked(packet,5,&(q->member));
 	delete_obj(q->member.obj->id);
 
@@ -1196,7 +1196,7 @@ void read_data(void)
 	FD_SET(fd,&rfds);
 	while (select(fd+1,&rfds,0,0,&tv))
 	{
-		if ((l=recv_packet((char *)packet,256,(struct sockaddr*)(&client),&a,0,0,&s))==-1)
+		if ((l=recv_packet(packet,256,(struct sockaddr*)(&client),&a,0,0,&s))==-1)
 			return;
 
  		last_packet_came=get_time();
@@ -1212,7 +1212,7 @@ void read_data(void)
 					message("Incompatible client version.\n",2);
 					packet[0]=P_PLAYER_REFUSED;
 					packet[1]=E_PLAYER_REFUSED;
-					send_packet((char *)packet,2,(struct sockaddr*)(&client),0,last_player->member.id);
+					send_packet(packet,2,(struct sockaddr*)(&client),0,last_player->member.id);
 					break;
 				}
 				maj=packet[2];
@@ -1225,16 +1225,16 @@ void read_data(void)
 					message("Incompatible client version. Player refused.\n",2);
 					packet[0]=P_PLAYER_REFUSED;
 					packet[1]=E_INCOMPATIBLE_VERSION;
-					send_packet((char *)packet,2,(struct sockaddr*)(&client),0,last_player->member.id);
+					send_packet(packet,2,(struct sockaddr*)(&client),0,last_player->member.id);
 					break;
 				}
 				find_birthplace(&x,&y);
-				if (add_player(packet[4],(char *)packet+5,&client,x,y)) /* failed to add player */
+				if (add_player(packet[4],packet+5,&client,x,y)) /* failed to add player */
 				{
 					message("Player refused.\n",2);
 					packet[0]=P_PLAYER_REFUSED;
 					packet[1]=E_PLAYER_REFUSED;
-					send_packet((char *)packet,2,(struct sockaddr*)(&client),0,last_player->member.id);
+					send_packet(packet,2,(struct sockaddr*)(&client),0,last_player->member.id);
 					break;
 				}
 				snprintf(txt,256,"Player #%d accepted, name \"%s\", address %s.\n",n_players,packet+5,txt1);
@@ -1304,7 +1304,7 @@ void read_data(void)
 			p=&(q->member);
 			packet[0]=P_END;
 			memcpy(packet+1,p->name,strlen(p->name)+1);
-			sendall((unsigned char *)packet,2+strlen(p->name),0);
+			sendall(packet,2+strlen(p->name),0);
 			snprintf(txt,256,"Game terminated by player \"%s\".\n",p->name);
 			message(txt,2);
 			exit(0);
@@ -1314,7 +1314,7 @@ void read_data(void)
 			if (!q)  /* this player has been deleted, but due to network inconsistency he doesn't know it */
 			{
 				packet[0]=P_PLAYER_DELETED;
-				send_packet((char *)packet,1,(struct sockaddr*)(&client),0,last_player->member.id);
+				send_packet(packet,1,(struct sockaddr*)(&client),0,last_player->member.id);
 				break;
 			}
 			snprintf(txt,256,"%s left the game.\n",q->member.name);
@@ -1346,7 +1346,7 @@ void read_data(void)
 			if (l<2)break;   /* invalid packet */
 			q=find_player(&client,s);
 			if (!q)break;
-			sendall_message(q->member.name,(char *)packet+1,0,0);
+			sendall_message(q->member.name,packet+1,0,0);
 			snprintf(txt,256,"%s> %s\n",q->member.name,packet+1);
 			message(txt,1);
 			break;
@@ -1768,11 +1768,11 @@ int dynamic_collision(struct it *obj)
 				case T_SHRAPNEL:
 				if (p->type==T_CORPSE)
 				{
-					unsigned char packet[5];
+					char packet[5];
 					px=PX;
 					py=PY;
 					packet[0]=P_DELETE_OBJECT;
-					put_int((char *)packet+1,p->id);
+					put_int(packet+1,p->id);
 					sendall_chunked(packet,5,0);
 					delete_obj(p->id);
 					create_mess(px,py,py);
@@ -1855,7 +1855,7 @@ int dynamic_collision(struct it *obj)
 /* recompute objects positions */
 void update_game(void)
 {
-	static unsigned char packet[64];
+	static char packet[64];
         struct object_list *p;
 	struct player_list *q;
         int w,h,b,a;
@@ -1957,8 +1957,8 @@ void update_game(void)
 
 					case T_GRENADE:
 					packet[0]=P_EXPLODE_GRENADE;
-					put_int((char *)packet+1,id);
-					put_int((char *)packet+5,p->next->member.id);
+					put_int(packet+1,id);
+					put_int(packet+5,p->next->member.id);
 					sendall_chunked(packet,9,0);
 					
 					for (b=0;b<N_SHRAPNELS_EXPLODE;b++)
@@ -1986,7 +1986,7 @@ void update_game(void)
 
 					default:
 					packet[0]=P_DELETE_OBJECT;
-					put_int((char *)packet+1,p->next->member.id);
+					put_int(packet+1,p->next->member.id);
 					sendall_chunked(packet,5,0);
 					delete_obj(p->next->member.id);
 					if (!(p->next))return;
@@ -2067,7 +2067,7 @@ void update_game(void)
 		if ((p->next->member.type==T_SHRAPNEL||p->next->member.type==T_BULLET)&&(stop_x||stop_y))  /* bullet and shrapnel die crashing into wall */
 		{
 			packet[0]=P_DELETE_OBJECT;
-			put_int((char *)packet+1,p->next->member.id);
+			put_int(packet+1,p->next->member.id);
 			sendall_chunked(packet,5,0);
 			delete_obj(p->next->member.id);
 			if (!(p->next))break;
@@ -2080,7 +2080,7 @@ dc:
 		{ 
 			case 1:  /* object dies */
 			packet[0]=P_DELETE_OBJECT;
-			put_int((char *)packet+1,p->next->member.id);
+			put_int(packet+1,p->next->member.id);
 			sendall_chunked(packet,5,0);
 
 			case 2:
@@ -2139,7 +2139,7 @@ void free_all_memory(void)
 /* fatal signal handler (sigsegv, sigabrt, ... ) */
 void signal_handler(int sig_num)
 {
-	unsigned char packet[16];
+	char packet[16];
 	char txt[256];
 	
 	packet[0]=P_END;
@@ -2487,7 +2487,7 @@ void update_players(void)
 			snprintf(txt,256,"%s not responding. Kicked out of the game.\n",p->next->member.name);
 			message(txt,2);
 			packet=P_PLAYER_DELETED;
-			send_packet(&packet,1,(struct sockaddr*)(&(p->next->member.address)),0,last_player->member.id);
+			send_packet((char *)&packet,1,(struct sockaddr*)(&(p->next->member.address)),0,last_player->member.id);
 			snprintf(txt,256,"%s was kicked out of the game.",p->next->member.name);
 			sendall_message(0,txt,0,0);
 			delete_player(p->next);
