@@ -56,7 +56,7 @@ void init_socket(void)
 /* contact server, send information request and wait for response */
 void contact_server(void)
 {
-        static unsigned char packet[256];
+        static char packet[256];
         int a;
 
         fd_set fds;
@@ -79,7 +79,7 @@ void contact_server(void)
         }
 	
 	if ((*packet)!=P_INFO){fprintf(stderr,"Server error.\n");exit(1);}
-	a=get_int(packet+1);
+	a=get_int((unsigned char *)packet+1);
 	printf("%d\n",a);
 }
 

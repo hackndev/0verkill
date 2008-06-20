@@ -34,7 +34,7 @@ void send_packet(char *packet,int len,const struct sockaddr* addr,int sender,int
 	unsigned long crc=crc32((unsigned char *)packet,len);
 	p=mem_alloc(len+12);
 	if (!p)return;  /* not enough memory */
-	memcpy(p+12,(unsigned char *)packet,len);
+	memcpy(p+12,packet,len);
 	p[0]=crc&255;crc>>=8;  /* CRC 32 */
 	p[1]=crc&255;crc>>=8;
 	p[2]=crc&255;crc>>=8;
@@ -84,7 +84,7 @@ client has: sender_server 1, recipient my_id
 	p=mem_alloc(max_len+12);
 	if (!p)return -1;  /* not enough memory */
 	retval=recvfrom(fd,p,max_len+12,0,addr,(unsigned int *)addr_len);
-	memcpy((unsigned char *)packet,p+12,max_len);
+	memcpy(packet,p+12,max_len);
 	crc=p[0]+(p[1]<<8)+(p[2]<<16)+(p[3]<<24);
 	s=p[4]+(p[5]<<8)+(p[6]<<16)+(p[7]<<24);
 	if (sender)*sender=s;
