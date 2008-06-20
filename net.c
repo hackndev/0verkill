@@ -28,13 +28,13 @@ PACKET:
  * sender = sender's (my) ID 
  * recipient = recipient's ID
  */
-void send_packet(unsigned char *packet,int len,const struct sockaddr* addr,int sender,int recipient)
+void send_packet(char *packet,int len,const struct sockaddr* addr,int sender,int recipient)
 {
 	unsigned char *p;
-	unsigned long crc=crc32(packet,len);
+	unsigned long crc=crc32((unsigned char *)packet,len);
 	p=mem_alloc(len+12);
 	if (!p)return;  /* not enough memory */
-	memcpy(p+12,packet,len);
+	memcpy(p+12,(unsigned char *)packet,len);
 	p[0]=crc&255;crc>>=8;  /* CRC 32 */
 	p[1]=crc&255;crc>>=8;
 	p[2]=crc&255;crc>>=8;
@@ -67,7 +67,7 @@ void send_packet(unsigned char *packet,int len,const struct sockaddr* addr,int s
 /* returns:	-1 on error
 		length of received data (data! not CRC nor sender's/recipient's ID 
  */
-int recv_packet(unsigned char *packet,int max_len,struct sockaddr* addr,int *addr_len,int sender_server,int recipient,int *sender)
+int recv_packet(char *packet,int max_len,struct sockaddr* addr,int *addr_len,int sender_server,int recipient,int *sender)
 /* sender_server:
 		1=check if sender is 0  (server)
 		0=don't check sender's ID 
@@ -84,14 +84,14 @@ client has: sender_server 1, recipient my_id
 	p=mem_alloc(max_len+12);
 	if (!p)return -1;  /* not enough memory */
 	retval=recvfrom(fd,p,max_len+12,0,addr,(unsigned int *)addr_len);
-	memcpy(packet,p+12,max_len);
+	memcpy((unsigned char *)packet,p+12,max_len);
 	crc=p[0]+(p[1]<<8)+(p[2]<<16)+(p[3]<<24);
 	s=p[4]+(p[5]<<8)+(p[6]<<16)+(p[7]<<24);
 	if (sender)*sender=s;
 	r=p[8]+(p[9]<<8)+(p[10]<<16)+(p[11]<<24);
 	mem_free(p);
 	if (retval==-1)return -1;
-	if (crc!=crc32(packet,retval-12))return -1;
+	if (crc!=crc32((unsigned char *)packet,retval-12))return -1;
 	if (r!=recipient)return -1;
 	if (sender_server&&s)return -1;
 	return retval-12;

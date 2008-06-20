@@ -582,7 +582,7 @@ int add_player(unsigned char color, char *name,struct sockaddr_in *address,int x
 
 void send_chunk_to_player(struct player *player)
 {
-	static unsigned char p[MAX_PACKET_LENGTH];
+	static char p[MAX_PACKET_LENGTH];
 
 	if (!(player->packet_pos))return;
 	if (player->packet_pos>MAX_PACKET_LENGTH-1)return;
@@ -619,11 +619,11 @@ void sendall(unsigned char *packet,int len, struct player * not_this_player)
 
 	if (!not_this_player)
 		for (p=&players;p->next;p=p->next)
- 			send_packet(packet,len,(struct sockaddr*)(&(p->next->member.address)),0,p->next->member.id);
+ 			send_packet((char *)packet,len,(struct sockaddr*)(&(p->next->member.address)),0,p->next->member.id);
 	else
 		for (p=&players;p->next;p=p->next)
 			if ((&(p->next->member))!=not_this_player)
- 				send_packet(packet,len,(struct sockaddr*)(&(p->next->member.address)),0,p->next->member.id);
+ 				send_packet((char *)packet,len,(struct sockaddr*)(&(p->next->member.address)),0,p->next->member.id);
 }
 
 
@@ -891,7 +891,7 @@ void send_info(struct sockaddr *addr,int id)
 		n+=l+9;
 	}
 	if (!addr)sendall(packet,n,0);
-	else send_packet(packet,n,addr,0,id);
+	else send_packet((char *)packet,n,addr,0,id);
 
 	mem_free(packet);
 	mem_free(t);
@@ -929,12 +929,12 @@ void sendall_message(char *name, char *msg,struct player *not1,struct player* no
 
 void sendall_bell(void)
 {
-	static unsigned char packet;
+	static char packet;
 	struct player_list* p;
 
 	packet=P_BELL;
 	for (p=&players;p->next;p=p->next)
- 		send_chunk_packet_to_player(&packet,1,&(p->next->member));
+ 		send_chunk_packet_to_player((unsigned char *)&packet,1,&(p->next->member));
 
 }
 
@@ -954,7 +954,7 @@ void send_new_obj(struct sockaddr* address, struct it* obj,int id)
 	put_int16(packet+23,obj->status);
 	packet[25]=obj->type;
 	put_int16(packet+26,obj->ttl);
-	send_packet(packet,28,address,0,id);
+	send_packet((char *)packet,28,address,0,id);
 }
 
 
@@ -1037,7 +1037,7 @@ void send_change_level(struct player* player)
 	packet[0]=P_CHANGE_LEVEL;
 	put_int(packet+1,level_number);
 	memcpy(packet+5,level_checksum,33);
-	send_packet(packet,38,(struct sockaddr*)(&(player->address)),0,player->id);
+	send_packet((char *)packet,38,(struct sockaddr*)(&(player->address)),0,player->id);
 }
 
 
@@ -1196,7 +1196,7 @@ void read_data(void)
 	FD_SET(fd,&rfds);
 	while (select(fd+1,&rfds,0,0,&tv))
 	{
-		if ((l=recv_packet(packet,256,(struct sockaddr*)(&client),&a,0,0,&s))==-1)
+		if ((l=recv_packet((char *)packet,256,(struct sockaddr*)(&client),&a,0,0,&s))==-1)
 			return;
 
  		last_packet_came=get_time();
@@ -1212,7 +1212,7 @@ void read_data(void)
 					message("Incompatible client version.\n",2);
 					packet[0]=P_PLAYER_REFUSED;
 					packet[1]=E_PLAYER_REFUSED;
-					send_packet(packet,2,(struct sockaddr*)(&client),0,last_player->member.id);
+					send_packet((char *)packet,2,(struct sockaddr*)(&client),0,last_player->member.id);
 					break;
 				}
 				maj=packet[2];
@@ -1225,7 +1225,7 @@ void read_data(void)
 					message("Incompatible client version. Player refused.\n",2);
 					packet[0]=P_PLAYER_REFUSED;
 					packet[1]=E_INCOMPATIBLE_VERSION;
-					send_packet(packet,2,(struct sockaddr*)(&client),0,last_player->member.id);
+					send_packet((char *)packet,2,(struct sockaddr*)(&client),0,last_player->member.id);
 					break;
 				}
 				find_birthplace(&x,&y);
@@ -1234,7 +1234,7 @@ void read_data(void)
 					message("Player refused.\n",2);
 					packet[0]=P_PLAYER_REFUSED;
 					packet[1]=E_PLAYER_REFUSED;
-					send_packet(packet,2,(struct sockaddr*)(&client),0,last_player->member.id);
+					send_packet((char *)packet,2,(struct sockaddr*)(&client),0,last_player->member.id);
 					break;
 				}
 				snprintf(txt,256,"Player #%d accepted, name \"%s\", address %s.\n",n_players,packet+5,txt1);
@@ -1256,7 +1256,7 @@ void read_data(void)
 				put_int(packet+33,last_player->member.id);
 				packet[37]=VERSION_MAJOR;
 				packet[38]=VERSION_MINOR;
-				send_packet(packet,39,(struct sockaddr*)(&client),0,0);
+				send_packet((char *)packet,39,(struct sockaddr*)(&client),0,0);
 				send_change_level(&(last_player->member));
 				sendall_bell();
 				sendall_message(0,txt,0,0);
@@ -1314,13 +1314,13 @@ void read_data(void)
 			if (!q)  /* this player has been deleted, but due to network inconsistency he doesn't know it */
 			{
 				packet[0]=P_PLAYER_DELETED;
-				send_packet(packet,1,(struct sockaddr*)(&client),0,last_player->member.id);
+				send_packet((char *)packet,1,(struct sockaddr*)(&client),0,last_player->member.id);
 				break;
 			}
 			snprintf(txt,256,"%s left the game.\n",q->member.name);
 			message(txt,2);
 			packet[0]=P_PLAYER_DELETED;
-			send_packet(packet,1,(struct sockaddr*)(&client),0,last_player->member.id);
+			send_packet((char *)packet,1,(struct sockaddr*)(&client),0,last_player->member.id);
 			snprintf(txt,256,"%s left the game.",q->member.name);
 			sendall_message(0,txt,0,0);
 			delete_player(q);
@@ -2476,7 +2476,7 @@ void update_players(void)
 {
 	struct player_list *p;
 	char txt[256];
-	unsigned char packet;
+	char packet;
 	unsigned long_long t=get_time();
 
 	for (p=&players;p->next;p=p->next)

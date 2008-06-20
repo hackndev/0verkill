@@ -221,7 +221,7 @@ char * init_socket(void)
 /* send quit request to server */
 void send_quit(void)
 {
-	unsigned char p;
+	char p;
 	fd_set rfds;
 	struct timeval tv;
 	int a=sizeof(server);
@@ -266,12 +266,12 @@ char * contact_server(int color, char *name)
 	packet[4]=color;
 	memcpy(packet+5,name,l);
 
-	send_packet(packet,l+5,(struct sockaddr*)(&server),my_id,0);
+	send_packet((char *)packet,l+5,(struct sockaddr*)(&server),my_id,0);
 
 
         if (!select(fd+1,&fds,NULL,NULL,&tv))return "No reply within 4 seconds.\n";
 
-	if ((r=recv_packet(packet,256,0,0,1,0,0))<0)
+	if ((r=recv_packet((char *)packet,256,0,0,1,0,0))<0)
 	{
 		if (errno==EINTR)return "Server hung up.\n";
 		else return "Connection error.\n";
@@ -330,7 +330,7 @@ char * contact_server(int color, char *name)
 /* I want to be born again */
 void send_reenter_game(void)
 {
-	unsigned char packet;
+	char packet;
 	packet=P_REENTER_GAME;
 	send_packet(&packet,1,(struct sockaddr*)(&server),my_id,0);
 }
@@ -339,7 +339,7 @@ void send_reenter_game(void)
 /* send chat message */
 void send_message(char *msg)
 {
-	static unsigned char packet[MAX_MESSAGE_LENGTH+2];
+	static char packet[MAX_MESSAGE_LENGTH+2];
 	int a;
 
 	a=strlen(msg)+1;
@@ -352,7 +352,7 @@ void send_message(char *msg)
 /* send end of game to server */
 void send_keyboard(void)
 {
-	unsigned char packet[3];
+	char packet[3];
 	packet[0]=P_KEYBOARD;
 	packet[1]=	keyboard_status.right|
 			(keyboard_status.left<<1)|
@@ -918,7 +918,7 @@ int process_packet(unsigned char *packet,int l)
 		{
 			char *md5;
 			int a;
-			unsigned char p;
+			char p;
 
 			if (l<38)break;   /* invalid packet */
 			a=get_int(packet+1);
@@ -956,7 +956,7 @@ void read_data(void)
         fd_set rfds;
         struct timeval tv;
         struct sockaddr_in client;
-        static unsigned char packet[MAX_PACKET_LENGTH];
+        static char packet[MAX_PACKET_LENGTH];
         int a=sizeof(client);
 	int l;
 
@@ -968,7 +968,7 @@ void read_data(void)
 	{
 	        if ((l=recv_packet(packet,MAX_PACKET_LENGTH,(struct sockaddr*)(&client),&a,1,my_id,0))<0)
 			return;   /* something's strange */
-		process_packet(packet,l);
+		process_packet((unsigned char *)packet,l);
 
 	}
 }

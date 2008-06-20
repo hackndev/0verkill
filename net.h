@@ -46,8 +46,8 @@
 extern int fd;
 
 /* send packet with CRC and sender's and recipient's ID */
-extern void send_packet(unsigned char *packet,int len,const struct sockaddr* addr,int sender,int recipient);
+extern void send_packet(char *packet,int len,const struct sockaddr* addr,int sender,int recipient);
 /* receive packet with CRC and sender's and recipient's ID */
-extern int recv_packet(unsigned char *packet,int max_len,struct sockaddr* addr,int *addr_len,int sender,int recipient, int *s);
+extern int recv_packet(char *packet,int max_len,struct sockaddr* addr,int *addr_len,int sender,int recipient, int *s);
 
 #endif
