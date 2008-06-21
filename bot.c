@@ -834,7 +834,7 @@ int process_packet(char *packet,int l)
 			p=find_in_table(get_int(packet+1));
 			if (!p)break;  /* ignore objects we don't have */
 			p->member.status|=128;
-			p->member.data=(void*)((packet[5]<<16)+(packet[7]<<8)+(packet[6]));
+			p->member.data=(void*)(long)((packet[5]<<16)+(packet[7]<<8)+(packet[6]));
 			/* kdyz tasi, tak se nahodi ttl */
 			if (p->member.type==T_PLAYER&&(p->member.status&32)&&(p->member.status&16))
 				p->member.ttl=weapon[current_weapon].cadence+HOLD_GUN_AFTER_SHOOT;

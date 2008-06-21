@@ -1165,7 +1165,7 @@ void create_noise(int x,int y,struct player *p)
 	struct it *o;
 
 	p->obj->status|=4096;
-	o=new_obj(id,T_NOISE,NOISE_TTL,noise_sprite,0,0,int2double(x),int2double(y),0,0,(void *)(p->id));
+	o=new_obj(id,T_NOISE,NOISE_TTL,noise_sprite,0,0,int2double(x),int2double(y),0,0,(void *)(long)(p->id));
 	if (!o)return;
 	id++;
 	sendall_new_object(o,0);
@@ -1789,7 +1789,7 @@ int dynamic_collision(struct it *obj)
 				c=weapon[obj->status].armor_damage*(2-double2int(obj->y-p->y)/(double)PLAYER_HEIGHT)*obj->ttl/weapon[obj->status].ttl;
 				if (a>=H)  /* player was slain */
 				{
-					o=&((find_in_table((int)(obj->data)))->member);  /* owner of the bullet */
+					o=&((find_in_table((long)(obj->data)))->member);  /* owner of the bullet */
 					((struct player*)(p->data))->deaths++;
 					if (o->data==p->data) /* suicide */
 					{
@@ -1914,7 +1914,7 @@ void update_game(void)
 			if (p->next->member.type==T_NOISE&&p->next->member.ttl==(NOISE_TTL>>1))
 			{
 				/* find player */
-				q=find_player(0,(int)(p->next->member.data));
+				q=find_player(0,(long)(p->next->member.data));
 				if (q) /* player is still in the game */
 				{
 					init_player(&(q->member),q->member.obj->x,q->member.obj->y);
@@ -1941,7 +1941,7 @@ void update_game(void)
 					p->next->member.y+GRENADE_FIRE_YOFFSET,
 					p->next->member.xspeed+(p->next->member.status&2?-weapon[WEAPON_GRENADE].shell_xspeed:weapon[WEAPON_GRENADE].shell_xspeed),
 					p->next->member.yspeed+weapon[WEAPON_GRENADE].shell_yspeed,
-					(void *)(int)(p->next->member.id)); 
+					(void *)(long)(p->next->member.id)); 
 				id++;
 				sendall_new_object(s,0);
 			}
@@ -2280,7 +2280,7 @@ void fire_player(struct player *q,int direction)
 			q->obj->y+FIRE_YOFFSET,
 			q->obj->xspeed+(direction==1?-weapon[1].shell_xspeed:weapon[1].shell_xspeed),
 			weapon[1].shell_yspeed,
-			(void *)(int)(q->obj->id)); 
+			(void *)(long)(q->obj->id)); 
 		id++;
 		sendall_new_object(s,0);
 		s=new_obj(  /* straight */
@@ -2294,7 +2294,7 @@ void fire_player(struct player *q,int direction)
 			q->obj->y+FIRE_YOFFSET,
 			q->obj->xspeed+(direction==1?-weapon[q->current_weapon].speed:weapon[q->current_weapon].speed),
 			0,
-			(void *)(int)(q->obj->id)); 
+			(void *)(long)(q->obj->id)); 
 		id++;
 		sendall_new_object(s,0);
 		s=new_obj(  /* straight */
@@ -2308,7 +2308,7 @@ void fire_player(struct player *q,int direction)
 			q->obj->y+FIRE_YOFFSET+int2double(1),
 			q->obj->xspeed+(direction==1?-weapon[q->current_weapon].speed:weapon[q->current_weapon].speed),
 			0,
-			(void *)(int)(q->obj->id)); 
+			(void *)(long)(q->obj->id)); 
 		id++;
 		sendall_new_object(s,0);
 		s=new_obj(  /* one up */
@@ -2322,7 +2322,7 @@ void fire_player(struct player *q,int direction)
 			q->obj->y+FIRE_YOFFSET,
 			q->obj->xspeed+(direction==1?-weapon[q->current_weapon].speed:weapon[q->current_weapon].speed),
 			float2double((double).1*36),
-			(void *)(int)(q->obj->id)); 
+			(void *)(long)(q->obj->id)); 
 		id++;
 		sendall_new_object(s,0);
 		s=new_obj(  /* two up */
@@ -2336,7 +2336,7 @@ void fire_player(struct player *q,int direction)
 			q->obj->y+FIRE_YOFFSET-int2double(1),
 			q->obj->xspeed+(direction==1?-weapon[q->current_weapon].speed:weapon[q->current_weapon].speed),
 			float2double((double).15*36),
-			(void *)(int)(q->obj->id)); 
+			(void *)(long)(q->obj->id)); 
 		id++;
 		sendall_new_object(s,0);
 		s=new_obj(  /* one down */
@@ -2350,7 +2350,7 @@ void fire_player(struct player *q,int direction)
 			q->obj->y+FIRE_YOFFSET+int2double(1),
 			q->obj->xspeed+(direction==1?-weapon[q->current_weapon].speed:weapon[q->current_weapon].speed),
 			-float2double((double).1*36),
-			(void *)(int)(q->obj->id)); 
+			(void *)(long)(q->obj->id)); 
 		id++;
 		sendall_new_object(s,0);
 		s=new_obj(  /* two down */
@@ -2364,7 +2364,7 @@ void fire_player(struct player *q,int direction)
 			q->obj->y+FIRE_YOFFSET,
 			q->obj->xspeed+(direction==1?-weapon[q->current_weapon].speed:weapon[q->current_weapon].speed),
 			-float2double((double).15*36),
-			(void *)(int)(q->obj->id)); 
+			(void *)(long)(q->obj->id)); 
 		id++;
 		sendall_new_object(s,0);
 	}
@@ -2383,7 +2383,7 @@ void fire_player(struct player *q,int direction)
 				q->obj->y+FIRE_YOFFSET,
 				q->obj->xspeed+(direction==1?-weapon[q->current_weapon].shell_xspeed:weapon[q->current_weapon].shell_xspeed),
 				weapon[q->current_weapon].shell_yspeed,
-				(void *)(int)(q->obj->id)); 
+				(void *)(long)(q->obj->id)); 
 			id++;
 			sendall_new_object(s,0);
 			s=new_obj(
@@ -2397,7 +2397,7 @@ void fire_player(struct player *q,int direction)
 				q->obj->y+FIRE_YOFFSET,
 				q->obj->xspeed+(direction==1?-weapon[q->current_weapon].speed:weapon[q->current_weapon].speed),
 				0,
-				(void *)(int)(q->obj->id)); 
+				(void *)(long)(q->obj->id)); 
 			id++;
 			sendall_new_object(s,0);
 		}

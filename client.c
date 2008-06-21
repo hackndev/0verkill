@@ -841,9 +841,9 @@ void draw_scene(void)
 					{	
 						tri_d=1;
 						put_sprite(
-							double2int(p->next->member.x-hero->x)+SCREEN_XOFFSET+fore+((int)(p->next->member.data)&255),
-							double2int(p->next->member.y-hero->y)+SCREEN_YOFFSET+(((int)(p->next->member.data)>>8)&255),
-							sprites[hit_sprite].positions+sprites[hit_sprite].steps[((int)p->next->member.data)>>16],
+							double2int(p->next->member.x-hero->x)+SCREEN_XOFFSET+fore+((long)(p->next->member.data)&255),
+							double2int(p->next->member.y-hero->y)+SCREEN_YOFFSET+(((long)(p->next->member.data)>>8)&255),
+							sprites[hit_sprite].positions+sprites[hit_sprite].steps[((long)p->next->member.data)>>16],
 							1
 							);
 						tri_d=0;
@@ -851,9 +851,9 @@ void draw_scene(void)
 #endif
 						
 					put_sprite(
-						double2int(p->next->member.x-hero->x)+SCREEN_XOFFSET+((int)(p->next->member.data)&255),
-						double2int(p->next->member.y-hero->y)+SCREEN_YOFFSET+(((int)(p->next->member.data)>>8)&255),
-						sprites[hit_sprite].positions+sprites[hit_sprite].steps[((int)p->next->member.data)>>16],
+						double2int(p->next->member.x-hero->x)+SCREEN_XOFFSET+((long)(p->next->member.data)&255),
+						double2int(p->next->member.y-hero->y)+SCREEN_YOFFSET+(((long)(p->next->member.data)>>8)&255),
+						sprites[hit_sprite].positions+sprites[hit_sprite].steps[((long)p->next->member.data)>>16],
 						1
 						);
 				}
@@ -889,18 +889,18 @@ void draw_scene(void)
 			{
 				tri_d=1;
 				put_sprite(
-					SCREEN_XOFFSET+((int)(hero->data)&255),
-					SCREEN_YOFFSET+(((int)(hero->data)>>8)&255),
-					sprites[hit_sprite].positions+sprites[hit_sprite].steps[((int)hero->data)>>16],
+					SCREEN_XOFFSET+((long)(hero->data)&255),
+					SCREEN_YOFFSET+(((long)(hero->data)>>8)&255),
+					sprites[hit_sprite].positions+sprites[hit_sprite].steps[((long)hero->data)>>16],
 					1
 					);
 				tri_d=0;
 			}
 #endif
 			put_sprite(
-				SCREEN_XOFFSET+((int)(hero->data)&255),
-				SCREEN_YOFFSET+(((int)(hero->data)>>8)&255),
-				sprites[hit_sprite].positions+sprites[hit_sprite].steps[((int)hero->data)>>16],
+				SCREEN_XOFFSET+((long)(hero->data)&255),
+				SCREEN_YOFFSET+(((long)(hero->data)>>8)&255),
+				sprites[hit_sprite].positions+sprites[hit_sprite].steps[((long)hero->data)>>16],
 				1
 				);
 		}
@@ -1139,7 +1139,7 @@ int process_packet(char *packet,int l)
 			p=find_in_table(get_int(packet+1));
 			if (!p)break;  /* ignore objects we don't have */
 			p->member.status|=128;
-			p->member.data=(void*)((packet[5]<<16)+(packet[7]<<8)+(packet[6]));
+			p->member.data=(void*)(long)((packet[5]<<16)+(packet[7]<<8)+(packet[6]));
 			/* kdyz tasi, tak se nahodi ttl */
 			if (p->member.type==T_PLAYER&&(p->member.status&32)&&(p->member.status&16))
 				p->member.ttl=weapon[current_weapon].cadence+HOLD_GUN_AFTER_SHOOT;
