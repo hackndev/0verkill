@@ -333,10 +333,10 @@ struct it * new_obj(
 	int sprite, 
 	unsigned char pos, 
 	int status,
-	my_double x,
-	my_double y, 
-	my_double xspeed, 
-	my_double yspeed, 
+	int x,
+	int y, 
+	int xspeed, 
+	int yspeed, 
 	void * data)
 {
         last_obj->next=mem_alloc(sizeof(struct object_list));
@@ -417,18 +417,6 @@ int get_int16(char *p)
 }
 
 
-my_double get_float(char *p)
-{
-	return get_int(p);
-}
-
-
-void put_float(char *p,my_double num)
-{
-	put_int(p, num);
-}
-
-
 unsigned long_long get_long_long(unsigned char *p)
 {
 #define ULL unsigned long_long
@@ -448,7 +436,7 @@ unsigned long_long get_long_long(unsigned char *p)
 /* test if vertical line from yh to yl can move from old_x to new_x axis */
 /* returns farthest possible x axis */
 /* flag is filled with 1 if objects is stopped */
-my_double can_go_x(my_double old_x,my_double new_x,int yh, int yl,unsigned char *flag)
+int can_go_x(int old_x,int new_x,int yh, int yl,unsigned char *flag)
 {
 	int x,y;
 	
@@ -482,7 +470,7 @@ my_double can_go_x(my_double old_x,my_double new_x,int yh, int yl,unsigned char 
 /* returns farthest possible y axis */
 /* flag is filled with 1 if objects is stopped */
 /* down ladder: 1=fall through ladders etc., 0=stand on ladders */
-my_double can_go_y(my_double old_y, my_double new_y,int xl, int xr,unsigned char *flag,unsigned char down_ladder)
+int can_go_y(int old_y, int new_y,int xl, int xr,unsigned char *flag,unsigned char down_ladder)
 {
 	int x,y;
 	
@@ -555,7 +543,7 @@ get_dimensions(int type,int status,struct pos *s,int *w,int *h)
 
 
 /* updates object's position */
-void update_position(struct it* obj,my_double new_x,my_double new_y,int width, int height,unsigned char *fx,unsigned char *fy)
+void update_position(struct it* obj,int new_x,int new_y,int width, int height,unsigned char *fx,unsigned char *fy)
 {
 	unsigned char down_ladder=0;
 

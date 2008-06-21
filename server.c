@@ -505,7 +505,7 @@ int select_hero(int num)
 
 
 /* initialize player */
-void init_player(struct player* p,my_double x,my_double y)
+void init_player(struct player* p,int x,int y)
 {
 	int a;
 	
@@ -643,7 +643,7 @@ void sendall_chunked(char *packet,int len, struct player * not_this_player)
 }
 
 
-int which_update(struct it *obj,my_double old_x,my_double old_y,my_double old_x_speed,my_double old_y_speed,unsigned int old_status,int old_ttl)
+int which_update(struct it *obj,int old_x,int old_y,int old_x_speed,int old_y_speed,unsigned int old_status,int old_ttl)
 {
 	int a=0;
 	
@@ -691,10 +691,10 @@ void sendall_update_object(struct it* obj, struct player * not_this_player,int t
 		packet[0]=P_UPDATE_OBJECT;
 		put_int(packet+1,obj->id);
 		packet[5]=obj->update_counter;
-		put_float(packet+6,obj->x);
-		put_float(packet+10,obj->y);
-		put_float(packet+14,obj->xspeed);
-		put_float(packet+18,obj->yspeed);
+		put_int(packet+6,obj->x);
+		put_int(packet+10,obj->y);
+		put_int(packet+14,obj->xspeed);
+		put_int(packet+18,obj->yspeed);
 		put_int16(packet+22,obj->status);
 		put_int16(packet+24,obj->ttl);
 		l=26;
@@ -704,10 +704,10 @@ void sendall_update_object(struct it* obj, struct player * not_this_player,int t
 		packet[0]=P_UPDATE_OBJECT_POS;
 		put_int(packet+1,obj->id);
 		packet[5]=obj->update_counter;
-		put_float(packet+6,obj->x);
-		put_float(packet+10,obj->y);
-		put_float(packet+14,obj->xspeed);
-		put_float(packet+18,obj->yspeed);
+		put_int(packet+6,obj->x);
+		put_int(packet+10,obj->y);
+		put_int(packet+14,obj->xspeed);
+		put_int(packet+18,obj->yspeed);
 		l=22;
 		break;
 		
@@ -715,8 +715,8 @@ void sendall_update_object(struct it* obj, struct player * not_this_player,int t
 		packet[0]=P_UPDATE_OBJECT_SPEED;
 		put_int(packet+1,obj->id);
 		packet[5]=obj->update_counter;
-		put_float(packet+6,obj->xspeed);
-		put_float(packet+10,obj->yspeed);
+		put_int(packet+6,obj->xspeed);
+		put_int(packet+10,obj->yspeed);
 		l=14;
 		break;
 		
@@ -724,8 +724,8 @@ void sendall_update_object(struct it* obj, struct player * not_this_player,int t
 		packet[0]=P_UPDATE_OBJECT_COORDS;
 		put_int(packet+1,obj->id);
 		packet[5]=obj->update_counter;
-		put_float(packet+6,obj->x);
-		put_float(packet+10,obj->y);
+		put_int(packet+6,obj->x);
+		put_int(packet+10,obj->y);
 		l=14;
 		break;
 		
@@ -733,8 +733,8 @@ void sendall_update_object(struct it* obj, struct player * not_this_player,int t
 		packet[0]=P_UPDATE_OBJECT_SPEED_STATUS;
 		put_int(packet+1,obj->id);
 		packet[5]=obj->update_counter;
-		put_float(packet+6,obj->xspeed);
-		put_float(packet+10,obj->yspeed);
+		put_int(packet+6,obj->xspeed);
+		put_int(packet+10,obj->yspeed);
 		put_int16(packet+14,obj->status);
 		l=16;
 		break;
@@ -743,8 +743,8 @@ void sendall_update_object(struct it* obj, struct player * not_this_player,int t
 		packet[0]=P_UPDATE_OBJECT_COORDS_STATUS;
 		put_int(packet+1,obj->id);
 		packet[5]=obj->update_counter;
-		put_float(packet+6,obj->x);
-		put_float(packet+10,obj->y);
+		put_int(packet+6,obj->x);
+		put_int(packet+10,obj->y);
 		put_int16(packet+14,obj->status);
 		l=16;
 		break;
@@ -753,8 +753,8 @@ void sendall_update_object(struct it* obj, struct player * not_this_player,int t
 		packet[0]=P_UPDATE_OBJECT_SPEED_STATUS_TTL;
 		put_int(packet+1,obj->id);
 		packet[5]=obj->update_counter;
-		put_float(packet+6,obj->xspeed);
-		put_float(packet+10,obj->yspeed);
+		put_int(packet+6,obj->xspeed);
+		put_int(packet+10,obj->yspeed);
 		put_int16(packet+14,obj->status);
 		put_int16(packet+16,obj->ttl);
 		l=18;
@@ -764,8 +764,8 @@ void sendall_update_object(struct it* obj, struct player * not_this_player,int t
 		packet[0]=P_UPDATE_OBJECT_COORDS_STATUS_TTL;
 		put_int(packet+1,obj->id);
 		packet[5]=obj->update_counter;
-		put_float(packet+6,obj->x);
-		put_float(packet+10,obj->y);
+		put_int(packet+6,obj->x);
+		put_int(packet+10,obj->y);
 		put_int16(packet+14,obj->status);
 		put_int16(packet+16,obj->ttl);
 		l=18;
@@ -947,10 +947,10 @@ void send_new_obj(struct sockaddr* address, struct it* obj,int id)
 	packet[0]=P_NEW_OBJ;
 	put_int(packet+1,obj->id);
 	put_int16(packet+5,obj->sprite);
-	put_float(packet+7,obj->x);
-	put_float(packet+11,obj->y);
-	put_float(packet+15,obj->xspeed);
-	put_float(packet+19,obj->yspeed);
+	put_int(packet+7,obj->x);
+	put_int(packet+11,obj->y);
+	put_int(packet+15,obj->xspeed);
+	put_int(packet+19,obj->yspeed);
 	put_int16(packet+23,obj->status);
 	packet[25]=obj->type;
 	put_int16(packet+26,obj->ttl);
@@ -966,10 +966,10 @@ void send_new_obj_chunked(struct player* player, struct it* obj)
 	packet[0]=P_NEW_OBJ;
 	put_int(packet+1,obj->id);
 	put_int16(packet+5,obj->sprite);
-	put_float(packet+7,obj->x);
-	put_float(packet+11,obj->y);
-	put_float(packet+15,obj->xspeed);
-	put_float(packet+19,obj->yspeed);
+	put_int(packet+7,obj->x);
+	put_int(packet+11,obj->y);
+	put_int(packet+15,obj->xspeed);
+	put_int(packet+19,obj->yspeed);
 	put_int16(packet+23,obj->status);
 	packet[25]=obj->type;
 	put_int16(packet+26,obj->ttl);
@@ -1081,10 +1081,10 @@ struct it * add_to_timeq(
         int sprite,
         unsigned char pos,
         int status,
-        my_double x,
-        my_double y,
-        my_double xspeed,
-        my_double yspeed,
+        int x,
+        int y,
+        int xspeed,
+        int yspeed,
         void * data,unsigned long_long t)
 {
 	struct queue_list *p;
@@ -1246,10 +1246,10 @@ void read_data(void)
 				last_player->member.obj->status|=1024;
 				put_int(packet+1,last_player->member.obj->id);
 				put_int16(packet+5,last_player->member.obj->sprite);
-				put_float(packet+7,last_player->member.obj->x);
-				put_float(packet+11,last_player->member.obj->y);
-				put_float(packet+15,last_player->member.obj->xspeed);
-				put_float(packet+19,last_player->member.obj->yspeed);
+				put_int(packet+7,last_player->member.obj->x);
+				put_int(packet+11,last_player->member.obj->y);
+				put_int(packet+15,last_player->member.obj->xspeed);
+				put_int(packet+19,last_player->member.obj->yspeed);
 				put_int16(packet+23,last_player->member.obj->status);
 				t=get_time();
 				put_long_long((unsigned char *)packet+25,t-game_start);
@@ -1466,7 +1466,7 @@ int dynamic_collision(struct it *obj)
 	struct player_list *pl;
 	char txt[256];
 	struct it *o;
-	my_double b;
+	int b;
 	int a,c,s;
 	int px,py,h;
 
@@ -1860,16 +1860,16 @@ void update_game(void)
 	struct player_list *q;
         int w,h,b,a;
 	unsigned char stop_x,stop_y;
-	my_double x,y,xs,ys;
-	my_double x1,y1;
+	int x,y,xs,ys;
+	int x1,y1;
 	unsigned char sy;
 	struct it *s;   /* for grenades throwing */
 	int status;
-	my_double DELTA_TIME;
+	int DELTA_TIME;
 	unsigned long_long t;
 	unsigned int old_status;
 	int old_ttl;
-	my_double old_x,old_y,old_x_speed,old_y_speed;
+	int old_x,old_y,old_x_speed,old_y_speed;
 
         for(p=&objects;p->next;p=p->next)
         {
@@ -1964,7 +1964,7 @@ void update_game(void)
 					for (b=0;b<N_SHRAPNELS_EXPLODE;b++)
 					{
 						double angle=(double)b*2*M_PI/N_SHRAPNELS_EXPLODE;
-						my_double spd=add_int(mul_int(my_and(mul_int(weapon[WEAPON_GRENADE].speed,b+1),15),16),100);
+						int spd=add_int(mul_int(my_and(mul_int(weapon[WEAPON_GRENADE].speed,b+1),15),16),100);
 						
 						new_obj(
 							id,
@@ -2175,7 +2175,7 @@ void walk_player(struct player *q,int direction, int speed, int creep)
 
 	unsigned int old_status=q->obj->status;
 	int old_ttl=q->obj->ttl;
-	my_double 	old_x=q->obj->x,
+	int 	old_x=q->obj->x,
 			old_y=q->obj->y,
 			old_x_speed=q->obj->xspeed,
 			old_y_speed=q->obj->yspeed;

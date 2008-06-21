@@ -9,25 +9,23 @@
 #define PREC2 (1<<PREC)
 #define LOW_BITS (PREC2-1)
 
-typedef int my_double;
-
-#define float2double(a) ((my_double)((a)*PREC2))
+#define float2double(a) ((int)((a)*PREC2))
 #define int2double(a) ((a)<<PREC)
 #define double2int(a) ((a)>>PREC)
-/* my_double and (my_double a,int b) */
+/* int and (int a,int b) */
 #define my_and(a,b) ((a)&((b<<PREC)+LOW_BITS))
-#define mul(a,b) ((my_double)(((long_long)(a)*(b))>>PREC))
-/* my_double add_int (my_double a,int b) */
+#define mul(a,b) ((int)(((long_long)(a)*(b))>>PREC))
+/* int add_int (int a,int b) */
 #define add_int(a,b) ((a)+((b)<<PREC))
-/* my_double mul_int (my_double a,int b) */
-#define mul_int(a,b) ((my_double)(((long_long)(a)*((b)<<PREC))>>PREC))
-/* my_double sub_int (my_double a,int b) */
+/* int mul_int (int a,int b) */
+#define mul_int(a,b) ((int)(((long_long)(a)*((b)<<PREC))>>PREC))
+/* int sub_int (int a,int b) */
 #define sub_int(a,b) ((a)-((b)<<PREC))
-/* my_double sub_int (int a,my_double b) */
+/* int sub_int (int a,int b) */
 #define sub_from_int(a,b) (((a)<<PREC)-(b))
 #define my_abs(a) ((a)>0?(a):-(a))
 #define my_sgn(a) ((a)>0?1:((a)<0?-1:0))
-/* int round_up(my_double a) */
+/* int round_up(int a) */
 #define round_up(a) (((a)+LOW_BITS)>>PREC)
 
 /* "min" and "max" might already been defined on Win32 */

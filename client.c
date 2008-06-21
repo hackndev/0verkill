@@ -448,10 +448,10 @@ char * contact_server(int color,char *name)
 			get_int16(packet+5),   /* sprite */
 			0,        /* position */
 			get_int16(packet+23),        /* status */
-			get_float(packet+7),     /* X */
-			get_float(packet+11),    /* Y */
-			get_float(packet+15),    /* XSPEED */
-			get_float(packet+19),    /* YSPEED */
+			get_int(packet+7),     /* X */
+			get_int(packet+11),    /* Y */
+			get_int(packet+15),    /* XSPEED */
+			get_int(packet+19),    /* YSPEED */
 			0
 			);
 		break;
@@ -539,7 +539,7 @@ void update_game(void)
 	int w,h;
 	unsigned char stop_x,stop_y,sy;
 	unsigned long_long t;
-	my_double x,y,x1,y1,DELTA_TIME;
+	int x,y,x1,y1,DELTA_TIME;
 
 	for(p=&objects;p->next;p=p->next)
 	{
@@ -948,10 +948,10 @@ int process_packet(char *packet,int l)
 			get_int16(packet+5),  /* sprite */
 			0, /* anim position */
 			get_int16(packet+23),  /* status */
-			get_float(packet+7),  /* x */
-			get_float(packet+11),  /* y */
-			get_float(packet+15),  /* xspeed */
-			get_float(packet+19),  /* yspeed */
+			get_int(packet+7),  /* x */
+			get_int(packet+11),  /* y */
+			get_int(packet+15),  /* xspeed */
+			get_int(packet+19),  /* yspeed */
 			0  /* data */
 		);
 		break;
@@ -977,10 +977,10 @@ int process_packet(char *packet,int l)
 			if (!p)break;
 			if(packet[5]-(p->member.update_counter)>127)break; /* throw out old updates */
 			p->member.update_counter=packet[5];
-			p->member.x=get_float(packet+6);
-			p->member.y=get_float(packet+10);
-			p->member.xspeed=get_float(packet+14);
-			p->member.yspeed=get_float(packet+18);
+			p->member.x=get_int(packet+6);
+			p->member.y=get_int(packet+10);
+			p->member.xspeed=get_int(packet+14);
+			p->member.yspeed=get_int(packet+18);
 			p->member.status=get_int16(packet+22);
 			p->member.data=0;
 			p->member.ttl=get_int16(packet+24);
@@ -1000,10 +1000,10 @@ int process_packet(char *packet,int l)
 			if (!p)break;
 			if(packet[5]-(p->member.update_counter)>127)break; /* throw out old updates */
 			p->member.update_counter=packet[5];
-			p->member.x=get_float(packet+6);
-			p->member.y=get_float(packet+10);
-			p->member.xspeed=get_float(packet+14);
-			p->member.yspeed=get_float(packet+18);
+			p->member.x=get_int(packet+6);
+			p->member.y=get_int(packet+10);
+			p->member.xspeed=get_int(packet+14);
+			p->member.yspeed=get_int(packet+18);
 		}
 		break;
 
@@ -1017,8 +1017,8 @@ int process_packet(char *packet,int l)
 			if (!p)break;
 			if(packet[5]-(p->member.update_counter)>127)break; /* throw out old updates */
 			p->member.update_counter=packet[5];
-			p->member.xspeed=get_float(packet+6);
-			p->member.yspeed=get_float(packet+10);
+			p->member.xspeed=get_int(packet+6);
+			p->member.yspeed=get_int(packet+10);
 		}
 		break;
 
@@ -1032,8 +1032,8 @@ int process_packet(char *packet,int l)
 			if (!p)break;
 			if(packet[5]-(p->member.update_counter)>127)break; /* throw out old updates */
 			p->member.update_counter=packet[5];
-			p->member.x=get_float(packet+6);
-			p->member.y=get_float(packet+10);
+			p->member.x=get_int(packet+6);
+			p->member.y=get_int(packet+10);
 		}
 		break;
 
@@ -1047,8 +1047,8 @@ int process_packet(char *packet,int l)
 			if (!p)break;
 			if(packet[5]-(p->member.update_counter)>127)break; /* throw out old updates */
 			p->member.update_counter=packet[5];
-			p->member.xspeed=get_float(packet+6);
-			p->member.yspeed=get_float(packet+10);
+			p->member.xspeed=get_int(packet+6);
+			p->member.yspeed=get_int(packet+10);
 			p->member.status=get_int16(packet+14);
 			/* kdyz tasi, tak se nahodi ttl */
 			if (p->member.type==T_PLAYER&&(p->member.status&32)&&(p->member.status&16))
@@ -1066,8 +1066,8 @@ int process_packet(char *packet,int l)
 			if (!p)break;
 			if(packet[5]-(p->member.update_counter)>127)break; /* throw out old updates */
 			p->member.update_counter=packet[5];
-			p->member.x=get_float(packet+6);
-			p->member.y=get_float(packet+10);
+			p->member.x=get_int(packet+6);
+			p->member.y=get_int(packet+10);
 			p->member.status=get_int16(packet+14);
 			/* kdyz tasi, tak se nahodi ttl */
 			if (p->member.type==T_PLAYER&&(p->member.status&32)&&(p->member.status&16))
@@ -1085,8 +1085,8 @@ int process_packet(char *packet,int l)
 			if (!p)break;
 			if(packet[5]-(p->member.update_counter)>127)break; /* throw out old updates */
 			p->member.update_counter=packet[5];
-			p->member.xspeed=get_float(packet+6);
-			p->member.yspeed=get_float(packet+10);
+			p->member.xspeed=get_int(packet+6);
+			p->member.yspeed=get_int(packet+10);
 			p->member.status=get_int16(packet+14);
 			p->member.ttl=get_int16(packet+16);
 			/* kdyz tasi, tak se nahodi ttl */
@@ -1105,8 +1105,8 @@ int process_packet(char *packet,int l)
 			if (!p)break;
 			if(packet[5]-(p->member.update_counter)>127)break; /* throw out old updates */
 			p->member.update_counter=packet[5];
-			p->member.x=get_float(packet+6);
-			p->member.y=get_float(packet+10);
+			p->member.x=get_int(packet+6);
+			p->member.y=get_int(packet+10);
 			p->member.status=get_int16(packet+14);
 			p->member.ttl=get_int16(packet+16);
 			/* kdyz tasi, tak se nahodi ttl */
@@ -1256,7 +1256,7 @@ level_changed:
 			for (b=0;b<N_SHRAPNELS_EXPLODE;b++)
 			{
 				double angle=(double)b*2*M_PI/N_SHRAPNELS_EXPLODE;
-				my_double spd=add_int(mul_int(my_and(mul_int(weapon[WEAPON_GRENADE].speed,b+1),15),16),100);
+				int spd=add_int(mul_int(my_and(mul_int(weapon[WEAPON_GRENADE].speed,b+1),15),16),100);
 						
 				new_obj(
 					i,

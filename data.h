@@ -82,8 +82,8 @@ unsigned char *weapon_name[ARMS];
 struct obj_attr_type
 {
 	unsigned char fall;   /* 1=can fall, 0=can't */
-	my_double bounce_x,bounce_y;  /* slow down during horizontal/vertical bouncing */
-	my_double slow_down_x;   /* slow down when not falling, speed is multiplied with this constant */
+	int bounce_x,bounce_y;  /* slow down during horizontal/vertical bouncing */
+	int slow_down_x;   /* slow down when not falling, speed is multiplied with this constant */
 	unsigned char maintainer;   
 	unsigned char foreground;   /* is this object in foreground? */
 	       /* who computes the object: 
@@ -100,20 +100,20 @@ struct weapon_type
 	char *name;
 	unsigned char cadence;
 	int ttl:16;
-	my_double speed,impact;
+	int speed,impact;
 	unsigned char lethalness;
 	unsigned char armor_damage;
 	unsigned char basic_ammo;
 	unsigned char add_ammo;
 	unsigned char max_ammo;
-	my_double shell_xspeed,shell_yspeed;
+	int shell_xspeed,shell_yspeed;
 }weapon[ARMS];
 
 
 /* object in the game */
 struct it
 {
-	my_double x,y,xspeed,yspeed;  /* position and velocity */
+	int x,y,xspeed,yspeed;  /* position and velocity */
 	unsigned char type;  /* one of T_...... constants */
 	unsigned int id:24;   /* unique ID */
 	int ttl:16;   /* time to live */
@@ -158,18 +158,16 @@ extern struct it* new_obj(
 	int sprite, 
 	unsigned char pos, 
 	int status, 
-	my_double x,
-	my_double y, 
-	my_double xspeed, 
-	my_double yspeed, 
+	int x,
+	int y, 
+	int xspeed, 
+	int yspeed, 
 	void * data);
 void delete_obj(unsigned long id);
 extern void put_int(char *p,int num);
 extern int get_int(char *p);
 extern void put_int16(char *p,short num);
 extern int get_int16(char *p);
-extern void put_float(char *p,my_double num);
-extern my_double get_float(char *p);
 extern void put_long_long(unsigned char *p,unsigned long_long num);
 extern unsigned long_long get_long_long(unsigned char *p);
 extern void free_sprites(int);
@@ -183,8 +181,8 @@ get_dimensions(int type,int status,struct pos *s,int *w,int *h);
 
 void update_position(
 	struct it* obj,
-	my_double new_x,
-	my_double new_y,
+	int new_x,
+	int new_y,
 	int width,
 	int height,
 	unsigned char *fx,
