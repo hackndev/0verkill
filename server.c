@@ -1694,6 +1694,26 @@ int dynamic_collision(struct it *obj)
 				}
 				return 2;
 
+				case T_TELEPORT:
+				{
+					char txt[256];
+					if (p->type!=T_PLAYER)break;
+
+					find_birthplace(&px,&py);
+					create_noise(px,py,(struct player*)p->data);					
+					p->x=int2double(px);
+					p->y=int2double(py);
+					sendall_update_object(((struct player*)p->data)->obj,0,3);
+
+					sendall_update_status(p,0);
+					send_message((struct player*)(p->data),0,"You teleported");
+					snprintf(txt,256,"%s teleported.\n",((struct player*)(p->data))->name);
+					message(txt,1);
+					add_to_timeq(obj->id,T_TELEPORT,0,obj->sprite,0,0,obj->x,obj->y,0,0,0,0);
+        				sendall_update_status(obj,0);
+				}
+				return 2;
+
 				case T_ARMOR:
 				{
 					char txt[256];

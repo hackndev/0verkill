@@ -17,7 +17,7 @@
 #define TYPE_BIRTHPLACE 666
 
 /* object types */
-#define N_TYPES 22
+#define N_TYPES 23
 
 #define T_PLAYER 0
 #define T_BULLET 1
@@ -41,6 +41,7 @@
 #define T_NOISE 19
 #define T_NOTHING_FORE 20
 #define T_KILL 21
+#define T_TELEPORT 22
 
 
 #define E_INCOMPATIBLE_VERSION 0

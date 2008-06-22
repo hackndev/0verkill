@@ -157,3 +157,4 @@ humpolec	grx/humpolec.avi
 rampa		grx/rampa.avi
 nosmoking	grx/nosmoking.avi
 --BIRTHPLACE--	grx/noise.avi
+teleport	grx/teleport.avi

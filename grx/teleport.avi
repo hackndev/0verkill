@@ -1,0 +1,95 @@
+#---- image 0 ----
+p2,0
+l  TELEPORT
+a  ffffffff
+l   AGENCY
+a   ffffff
+l  .   , .
+a  4   4 4
+l ,   -   *
+a 4   c   c
+l .  '  *  -
+a c  c  c  4
+l  , *.   _
+a  4 4c   4
+l  =   ,
+a  4   c
+l *      |
+a c      4
+l   * '
+a   4 4
+l .    *   -
+a 4    c   c
+l  = *  *
+a  c c  4
+l  .   * _
+a  4     4 
+l ' * *  .
+a c c 4  c
+l  _  -
+a  4  c
+l  .   ' *
+a  c   4 4
+p2,0
+l  TELEPORT
+a  ffffffff
+l   AGENCY
+a   ffffff
+l    . , .
+a    4 c 4
+l ,*  -    
+a 4c  4
+l    '  * ' 
+a    4  4 4
+l  , *  .  *
+a  4 c  4  c
+l   *  ,  *
+a   4  c  4
+l *  *  , *
+a 4  4  4 c
+l - * '  .
+a 4 c c  4
+l .    *   -
+a c    4   c
+l    *  *
+a    4  4
+l  "   * '
+a  4   c 4
+l  .  * ,
+a  4  4 4
+l =   *   *
+a c   c   4
+l  *   .
+a  4   4
+p2,0
+l  TELEPORT
+a  ffffffff
+l   AGENCY
+a   ffffff
+l  . *  ' -
+a  4 c  4 4
+l   , =  * 
+a   4 4  c
+l    * *  . 
+a    c c  c
+l  *  . .   
+a  c  4 c
+l *  , *  * ,
+a 4  c 4  4 c
+l *  *  , *
+a c  4  4 4
+l - *    .
+a 4 4    c
+l .    *   ,
+a 4    c   4
+l  "    * 
+a  4    4
+l , -  *   *
+a c 4  4   c
+l  .  *  *-
+a  c  4  c4
+l =   ' ,* 
+a 4   4 44
+l  - _ . *
+a  c 4 c 4
+s0,0,0,0,1,1,1,1,2,2,2,2

@@ -67,6 +67,7 @@ struct obj_attr_type obj_attr[N_TYPES]=
 	{1,0,0,0,NOBODY,0},  /* noise */
 	{0,0,0,0,NOBODY,1},  /* nothing in foreground */
 	{0,0,0,0,NOBODY,1},  /* killing object */
+	{1,0,0,0,NOBODY,0},  /* teleport */
 };
 
 
@@ -174,6 +175,8 @@ int _convert_type(unsigned char c)
   case '5': return T_AMMO_GRENADE;
 
   case 'I': return T_INVISIBILITY;
+  
+  case 'T': return T_TELEPORT;
   
   /* birthplace */
   case 'B': return TYPE_BIRTHPLACE;
