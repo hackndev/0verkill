@@ -1700,7 +1700,11 @@ int dynamic_collision(struct it *obj)
 					if (p->type!=T_PLAYER)break;
 
 					find_birthplace(&px,&py);
-					create_noise(px,py,(struct player*)p->data);					
+					o=new_obj(id,T_NOISE,NOISE_TTL,noise_sprite,0,0,int2double(px),int2double(py),0,0,(void *)(long)(p->id));
+					if (!o)
+					    return 2;
+					id++;
+					sendall_new_object(o,0);
 					p->x=int2double(px);
 					p->y=int2double(py);
 					sendall_update_object(((struct player*)p->data)->obj,0,3);
