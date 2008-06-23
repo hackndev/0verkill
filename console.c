@@ -85,7 +85,8 @@ my_print(char *str)
 void c_refresh(void)
 {
 #ifdef SCREEN_BUFFERING
-	write(1,screen_buffer,screen_buffer_pos);
+	ssize_t ret = 0;
+	ret = write(1,screen_buffer,screen_buffer_pos);
 	screen_buffer_pos=0;
 #else
 	fflush(stdout);
@@ -206,7 +207,7 @@ void c_sethlt_bg(unsigned char hlt,unsigned char bg)
 void c_setcolor_3b(unsigned char a)
 {
 	char txt[8];
-	snprintf(txt,16,"\033[%dm",30+(a&7));
+	snprintf(txt,sizeof(txt),"\033[%dm",30+(a&7));
 	my_print(txt);
 }
 

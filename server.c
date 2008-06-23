@@ -905,8 +905,8 @@ void send_message(struct player* player, char *name, char *msg)
 	int len;
 
 	packet[0]=P_MESSAGE;
-	if (!name){snprintf(packet+1,256,"%s",msg);len=strlen(msg)+1+1;}
-	else {snprintf(packet+1,256,"%s> %s",name,msg);len=strlen(name)+strlen(msg)+1+3;}
+	if (!name){snprintf(packet+1,sizeof(packet)-1,"%s",msg);len=strlen(msg)+1+1;}
+	else {snprintf(packet+1,sizeof(packet)-1,"%s> %s",name,msg);len=strlen(name)+strlen(msg)+1+3;}
 	send_chunk_packet_to_player(packet,len,player);
 }
 
