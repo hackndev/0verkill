@@ -78,7 +78,7 @@ client has: sender_server 1, recipient my_id
 {
 	unsigned char *p;
 	int retval;
-	unsigned long crc;
+	unsigned int crc;
 	int s,r;
 	
 	p=mem_alloc(max_len+12);
