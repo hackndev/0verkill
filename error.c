@@ -144,7 +144,7 @@ void int_error(char *m, ...)
 {
 	va_list l;
 	va_start(l, m);
-	sprintf(errbuf, "\033[1mINTERNAL ERROR\033[0m at %s:%d: ", errfile, errline);
+	snprintf(errbuf, sizeof(errbuf), "\033[1mINTERNAL ERROR\033[0m at %s:%d: ", errfile, errline);
 	strcat(errbuf, m);
 	er(1, errbuf, l);
 	force_dump();
@@ -154,7 +154,7 @@ void debug_msg(char *m, ...)
 {
 	va_list l;
 	va_start(l, m);
-	sprintf(errbuf, "DEBUG MESSAGE at %s:%d: ", errfile, errline);
+	snprintf(errbuf, sizeof(errbuf), "DEBUG MESSAGE at %s:%d: ", errfile, errline);
 	strcat(errbuf, m);
 	er(0, errbuf, l);
 }

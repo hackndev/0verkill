@@ -191,9 +191,9 @@ void load_cfg(char *host,char *name,int *color)
 	char txt[256];
 
 #ifndef WIN32
-	sprintf(txt,"%s/%s",getenv("HOME"),CFG_FILE);
+	snprintf(txt, sizeof(txt), "%s/%s",getenv("HOME"),CFG_FILE);
 #else
-	sprintf(txt,"./%s",CFG_FILE);
+	snprintf(txt, sizeof(txt), "./%s",CFG_FILE);
 #endif
 	stream=fopen(txt,"r");
 	if (!stream)return;
@@ -223,9 +223,9 @@ void save_cfg(char *host,char *name,int color)
 	char txt[256];
 
 #ifndef WIN32
-	sprintf(txt,"%s/%s",getenv("HOME"),CFG_FILE);
+	snprintf(txt, sizeof(txt), "%s/%s",getenv("HOME"),CFG_FILE);
 #else
-	sprintf(txt,"./%s",CFG_FILE);
+	snprintf(txt, sizeof(txt), "./%s",CFG_FILE);
 #endif
 	stream=fopen(txt,"w");
 	if (!stream)return;
@@ -1324,36 +1324,36 @@ void draw_board(void)
 	memset(screen+offs,'-',SCREEN_X);
 	memset(screen+offs+SCREEN_X,0,SCREEN_X);
 	print2screen(0,SCREEN_Y-1,7,"HEALTH");
-	sprintf(txt,"% 3d%%",health);
+	snprintf(txt, sizeof(txt), "% 3d%%",health);
 	print2screen(6,SCREEN_Y-1,select_color(health,100),txt);
 
 	print2screen(11+(space>>1),SCREEN_Y-2,4,",");
 	print2screen(11+(space>>1),SCREEN_Y-1,4,"|");
 	print2screen(11+space,SCREEN_Y-1,7,"FRAGS");
-	sprintf(txt,"% 4d",frags);
+	snprintf(txt, sizeof(txt), "% 4d",frags);
 	print2screen(11+space+6,SCREEN_Y-1,11,txt);
 
 	print2screen(21+space+(space>>1),SCREEN_Y-2,4,",");
 	print2screen(21+space+(space>>1),SCREEN_Y-1,4,"|");
 	print2screen(21+(space<<1),SCREEN_Y-1,7,"DEATHS");
-	sprintf(txt,"% 4d",deaths);
+	snprintf(txt, sizeof(txt), "% 4d",deaths);
 	print2screen(21+(space<<1)+7,SCREEN_Y-1,11,txt);
 
 	print2screen(31+(space<<1)+(space>>1),SCREEN_Y-2,4,",");
 	print2screen(31+(space<<1)+(space>>1),SCREEN_Y-1,4,"|");
-	sprintf(txt,"%10s",weapon[current_weapon].name);
+	snprintf(txt, sizeof(txt), "%10s",weapon[current_weapon].name);
 	print2screen(31+3*space,SCREEN_Y-1,11,txt);
 	
 	print2screen(41+(3*space)+(space>>1),SCREEN_Y-2,4,",");
 	print2screen(41+(3*space)+(space>>1),SCREEN_Y-1,4,"|");
 	print2screen(41+(space<<2),SCREEN_Y-1,7,"AMMO");
-	sprintf(txt,"% 4d",ammo[current_weapon]);
+	snprintf(txt, sizeof(txt), "% 4d",ammo[current_weapon]);
 	print2screen(41+5+(space<<2),SCREEN_Y-1,select_color(ammo[current_weapon],weapon[current_weapon].max_ammo),txt);
 
 	print2screen(49+(space<<2)+(space>>1),SCREEN_Y-2,4,",");
 	print2screen(49+(space<<2)+(space>>1),SCREEN_Y-1,4,"|");
 	print2screen(49+5*space,SCREEN_Y-1,7,"ARMOR");
-	sprintf(txt,"% 4d%%",armor);
+	snprintf(txt, sizeof(txt), "% 4d%%",armor);
 	print2screen(49+5+5*space,SCREEN_Y-1,select_color(armor,100),txt);
 	if ((hero->status)&64)print2screen(SCREEN_X-14,SCREEN_Y-2,11,"INVISIBILITY");
 	if (autorun)print2screen(2,SCREEN_Y-2,15,"AUTORUN");
@@ -1511,8 +1511,8 @@ void menu_screen(char *host,char *name,unsigned short *p,int *color)
 	
 	load_banner(&banner);
 	l=strlen(banner);
-	sprintf(port,"%d",*p);
-	sprintf(txt,"hero%d",*color);
+	snprintf(port, sizeof(port), "%d",*p);
+	snprintf(txt, sizeof(txt), "hero%d",*color);
 	if (find_sprite(txt,&sprite))
 	{
 		char msg[256];
@@ -1615,7 +1615,7 @@ cycle:
 		{
 			(*color)++;
 			if (*color>30)(*color)=1;
-			sprintf(txt,"hero%d",*color);
+			snprintf(txt, sizeof(txt), "hero%d",*color);
 			if (find_sprite(txt,&sprite))
 				{shut_down(0);mem_free(banner);fprintf(stderr,"Error: Can't find sprite \"%s\".\n",txt);}
 		}
@@ -1624,7 +1624,7 @@ cycle:
 		{
 			(*color)--;
 			if (*color<1)(*color)=30;
-			sprintf(txt,"hero%d",*color);
+			snprintf(txt, sizeof(txt), "hero%d",*color);
 			if (find_sprite(txt,&sprite))
 				{shut_down(0);mem_free(banner);fprintf(stderr,"Error: Can't find sprite \"%s\".\n",txt);}
 		}
@@ -1846,7 +1846,7 @@ void print_hall_of_fame(void)
 	unsigned char color;
 
 	if (!active_players)return;
-	sprintf(txt,"TOP %d PLAYERS",TOP_PLAYERS_N);
+	snprintf(txt, sizeof(txt), "TOP %d PLAYERS",TOP_PLAYERS_N);
 	draw_frame(HALL_FAME_X,HALL_FAME_Y,HALL_FAME_WIDTH,HALL_FAME_HEIGHT,15);
 	print2screen(HALL_FAME_X+1+((HALL_FAME_WIDTH-strlen(txt))>>1),HALL_FAME_Y+1,11,txt);
 	print2screen(HALL_FAME_X+2,HALL_FAME_Y+3,15,"NAME");
@@ -1856,12 +1856,12 @@ void print_hall_of_fame(void)
 	{
 		color=((top_players[a].color-1)%15)+1;
 		print2screen(HALL_FAME_X+2,HALL_FAME_Y+4+a,color,top_players[a].name);
-		sprintf(txt,"% 5d",top_players[a].frags);
+		snprintf(txt, sizeof(txt), "% 5d",top_players[a].frags);
 		print2screen(HALL_FAME_X+2+MAX_NAME_LEN+2,HALL_FAME_Y+4+a,color,txt);
-		sprintf(txt,"% 5d",top_players[a].deaths);
+		snprintf(txt, sizeof(txt), "% 5d",top_players[a].deaths);
 		print2screen(HALL_FAME_X+2+MAX_NAME_LEN+9,HALL_FAME_Y+4+a,color,txt);
 	}
-	sprintf(txt,"%d",active_players);
+	snprintf(txt, sizeof(txt), "%d",active_players);
 	print2screen(HALL_FAME_X+2,HALL_FAME_Y+HALL_FAME_HEIGHT,11,"Players in the game:");
 	print2screen(HALL_FAME_X+23,HALL_FAME_Y+HALL_FAME_HEIGHT,7,txt);
 }
@@ -2045,7 +2045,7 @@ int main(int argc,char **argv)
 	if (find_sprite("bulge",&bulge_sprite)){ERROR("Error: Can't find sprite \"bulge\".\n");EXIT(1);}
 	for (a=0;a<N_SHRAPNELS;a++)
 	{
-		sprintf(txt,"shrapnel%d",a+1);
+		snprintf(txt, sizeof(txt), "shrapnel%d",a+1);
 		if (find_sprite(txt,&shrapnel_sprite[a])) {
 			fprintf(stderr,"Can't find sprite \"%s\".\n",txt);
 			EXIT(1);

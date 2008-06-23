@@ -123,7 +123,7 @@ void load_room(char * filename)
 	if (!(stream=fopen(filename,"rb")))
 	{
 		char msg[256];
-		sprintf(msg,"Can't open file \"%s\"!\n",filename);
+		snprintf(msg,sizeof(msg),"Can't open file \"%s\"!\n",filename);
 		ERROR(msg);
 		EXIT(1);
 	}
@@ -144,7 +144,7 @@ void load_room(char * filename)
 		if (find_sprite(name,&n))
 		{
 			char msg[256];
-			sprintf(msg,"Unknown bitmap name \"%s\"!\n",name);
+			snprintf(msg,sizeof(msg),"Unknown bitmap name \"%s\"!\n",name);
 			ERROR(msg);
 			EXIT(1);
 		}
@@ -293,7 +293,7 @@ void save_data(void)
 	
 	for(p=&objects;p->next;p=p->next)
 	{
-		sprintf(txt,"%s %c %d %d\n",sprite_names[O.sprite],O.type,O.x,O.y);
+		snprintf(txt,sizeof(txt),"%s %c %d %d\n",sprite_names[O.sprite],O.type,O.x,O.y);
 		switch (O.type)
 		{
 			case 'b':
@@ -445,22 +445,22 @@ again:
 	c_goto(0,SCREEN_Y-1);
 	c_setcolor(11);
 	c_print("X: ");
-	sprintf(txt,"% 4d   ",x+xoffset);
+	snprintf(txt,sizeof(txt),"% 4d   ",x+xoffset);
 	c_setcolor(7);
 	c_print(txt);
 	c_setcolor(11);
 	c_print("Y: ");
-	sprintf(txt,"% 4d   ",y+yoffset);
+	snprintf(txt,sizeof(txt),"% 4d   ",y+yoffset);
 	c_setcolor(7);
 	c_print(txt);
 	c_setcolor(11);
 	c_print("OBJECT: ");
-	sprintf(txt,"%-.20s   ",obj?(char*)(sprite_names[obj->sprite]):"----");
+	snprintf(txt,sizeof(txt),"%-.20s   ",obj?(char*)(sprite_names[obj->sprite]):"----");
 	c_setcolor(7);
 	c_print(txt);
 	c_setcolor(11);
 	c_print("TYPE: ");
-	sprintf(txt,"%c   ",obj?obj->type:'-');
+	snprintf(txt,sizeof(txt),"%c   ",obj?obj->type:'-');
 	c_setcolor(7);
 	c_print(txt);
 	update=0;

@@ -132,11 +132,11 @@ LPTSTR GetLastErrorText(LPTSTR lpszBuf, DWORD dwSize) {
 		globErr, LANG_NEUTRAL, (LPTSTR)&lpszTemp, 0, NULL);
 	/* supplied buffer is not long enough */
 	if (( !dwRet )||( (long)dwSize < (long)dwRet+14 ))
-		sprintf(lpszBuf, ": %u", globErr);
+		snprintf(lpszBuf, sizeof(lpszBuf), ": %u", globErr);
 	else {
 		lpszTemp[lstrlen(lpszTemp)-2] = TEXT('\0');
 		CharToOem(lpszTemp, lpszTemp);
-		sprintf(lpszBuf, ": %u: %s", globErr, lpszTemp);
+		snprintf(lpszBuf, sizeof(lpszBuf), ": %u: %s", globErr, lpszTemp);
 	}
 	if ( lpszTemp )
 		LocalFree((HLOCAL)lpszTemp);
@@ -237,7 +237,7 @@ void AddToMessageLog(LPTSTR lpszMsg, int infoOnly) {
 
 	hEventSource=RegisterEventSource(NULL, SERVICE_NAME);
 
-	sprintf(szMsg, infoOnly ? "%s notification:" : "%s error: %u", SERVICE_NAME, globErr);
+	snprintf(szMsg, sizeof(szMsg), infoOnly ? "%s notification:" : "%s error: %u", SERVICE_NAME, globErr);
 	lpszStrings[0]=szMsg;
 	lpszStrings[1]=lpszMsg;
 
@@ -373,9 +373,9 @@ void print_ip(char * txt,struct in_addr ip)
 {
 	unsigned int a;
 
-	sprintf(txt,"%d",*((unsigned char *)&ip));
+	snprintf(txt, sizeof(txt), "%d",*((unsigned char *)&ip));
 	for (a=1;a<sizeof(ip);a++)
-		sprintf(txt+strlen(txt),".%d",((unsigned char *)&ip)[a]);
+		snprintf(txt+strlen(txt),sizeof(txt)-strlen(txt),".%d",((unsigned char *)&ip)[a]);
 }
 
 
@@ -498,7 +498,7 @@ int select_hero(int num)
 	static char txt[32];
 	int a;
 
-	sprintf(txt,"hero%d",num);
+	snprintf(txt, sizeof(txt), "hero%d",num);
 	if (find_sprite(txt,&a))return -1;
 	return a;
 }
@@ -1392,7 +1392,7 @@ void create_corpse(int x,int y,int num)
 	int xoffs=num>15?-15:-5;
 	int yoffs=num>15?-1:0;
 
-	sprintf(txt,"corpse%d",num);
+	snprintf(txt, sizeof(txt), "corpse%d",num);
 	if (find_sprite(txt,&a))return;
 	
 	o=new_obj(id,T_CORPSE,CORPSE_TTL,a,0,0,int2double(x+xoffs),int2double(y+yoffs),0,0,0);
@@ -2692,7 +2692,7 @@ int server(void)
 	if (find_sprite("noise",&noise_sprite)){char msg[256];snprintf(msg,256,"Can't find sprite \"noise\".\n");ERROR(msg);EXIT(1);}
 	for (a=0;a<N_SHRAPNELS;a++)
 	{
-		sprintf(txt,"shrapnel%d",a+1);
+		snprintf(txt, sizeof(txt), "shrapnel%d",a+1);
 		if (find_sprite(txt,&shrapnel_sprite[a])){char msg[256];snprintf(msg,256,"Can't find sprite \"%s\".\n",txt);ERROR(msg);EXIT(1);}
 	}
 	
