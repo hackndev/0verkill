@@ -1563,7 +1563,7 @@ cycle:
 	bulge_anim%=sprites[bulge_sprite].n_steps;
 	if (*error_message)
 	{
-		print2screen((SCREEN_X-strlen(error_message)>>1),SCREEN_Y-1,9,error_message);
+		print2screen(((SCREEN_X-strlen(error_message))>>1),SCREEN_Y-1,9,error_message);
 
 #ifdef TRI_D
 		if (TRI_D_ON)
@@ -1636,7 +1636,7 @@ cycle:
 			*p=strtol(port,0,10);
 			if ((m=find_server(host,*p)))
 			{
-				print2screen((SCREEN_X-strlen(m)>>1),SCREEN_Y-1,9,m);
+				print2screen(((SCREEN_X-strlen(m))>>1),SCREEN_Y-1,9,m);
 #ifdef TRI_D
 				if (TRI_D_ON)
 				{
@@ -1651,7 +1651,7 @@ cycle:
 			}
 			if ((m=init_socket()))
 			{
-				print2screen((SCREEN_X-strlen(m)>>1),SCREEN_Y-1,9,m);
+				print2screen(((SCREEN_X-strlen(m))>>1),SCREEN_Y-1,9,m);
 #ifdef TRI_D
 				if (TRI_D_ON)
 				{
@@ -1666,7 +1666,7 @@ cycle:
 			}
 			if ((m=contact_server(*color,name)))
 			{
-				print2screen((SCREEN_X-strlen(m)>>1),SCREEN_Y-1,9,m);
+				print2screen(((SCREEN_X-strlen(m))>>1),SCREEN_Y-1,9,m);
 #ifdef TRI_D
 				if (TRI_D_ON)
 				{
@@ -1744,8 +1744,8 @@ void print_help(void)
 	char *x = "";
 	char *y = "";
 #ifdef XWINDOW
-	x = " for X windows"
-	y = " [-d <display>] [-f <font name>]"
+	x = " for X windows";
+	y = " [-d <display>] [-f <font name>]";
 #endif
         printf( 
 		"0verkill client%s"

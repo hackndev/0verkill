@@ -9,7 +9,7 @@
 void print_help_window(void)
 {
 	draw_frame(HELP_X,HELP_Y,HELP_WIDTH,HELP_HEIGHT,14);
-	print2screen(HELP_X+(HELP_WIDTH-4>>1),HELP_Y+1,11,"HELP");
+	print2screen(HELP_X+((HELP_WIDTH-4)>>1),HELP_Y+1,11,"HELP");
 	print2screen(HELP_X+3,HELP_Y+3,10,"LEFT,RIGHT");
 	print2screen(HELP_X+21,HELP_Y+3,7,"move");
 	print2screen(HELP_X+3,HELP_Y+4,10,"UP");

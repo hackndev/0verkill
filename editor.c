@@ -72,8 +72,8 @@ void set_sigint(void)
 void help(void)
 {
 	draw_frame(HELP_X,HELP_Y,HELP_WIDTH,HELP_HEIGHT,14);
-	print2screen(HELP_X+(HELP_WIDTH-4>>1),HELP_Y+1,12,"HELP");
-	print2screen(HELP_X+(HELP_WIDTH-9>>1),HELP_Y+3,11,"SCROLLING");
+	print2screen(HELP_X+((HELP_WIDTH-4)>>1),HELP_Y+1,12,"HELP");
+	print2screen(HELP_X+((HELP_WIDTH-9)>>1),HELP_Y+3,11,"SCROLLING");
 	
 	/* cursor moving help */
 	print2screen(HELP_X+8,HELP_Y+4,4,"CURSOR MOVING:");
@@ -98,13 +98,13 @@ void help(void)
 	print2screen(HELP_X+64,HELP_Y+8,8,"DOWN");
 	
 	/* now the keys */
-	print2screen(HELP_X+(HELP_WIDTH-4>>1),HELP_Y+11,11,"KEYS");
-	print2screen(HELP_X+(HELP_WIDTH-11>>1),HELP_Y+12,8,"BUILD - [N]");
-	print2screen(HELP_X+(HELP_WIDTH-12>>1),HELP_Y+13,8,"DELETE - [X]");
-	print2screen(HELP_X+(HELP_WIDTH-19>>1),HELP_Y+14,8,"TYPE CHANGE - [TAB], [T] (+ [SHIFT] =reverse)");
-	print2screen(HELP_X+(HELP_WIDTH-11>>1),HELP_Y+15,8,"SAVE - [F2]");
-	print2screen(HELP_X+(HELP_WIDTH-11>>1),HELP_Y+16,8,"HELP - [F1]");
-	print2screen(HELP_X+(HELP_WIDTH-26>>1),HELP_Y+17,8,"ITEM CHANGE - ([+] and [-])");
+	print2screen(HELP_X+((HELP_WIDTH-4)>>1),HELP_Y+11,11,"KEYS");
+	print2screen(HELP_X+((HELP_WIDTH-11)>>1),HELP_Y+12,8,"BUILD - [N]");
+	print2screen(HELP_X+((HELP_WIDTH-12)>>1),HELP_Y+13,8,"DELETE - [X]");
+	print2screen(HELP_X+((HELP_WIDTH-19)>>1),HELP_Y+14,8,"TYPE CHANGE - [TAB], [T] (+ [SHIFT] =reverse)");
+	print2screen(HELP_X+((HELP_WIDTH-11)>>1),HELP_Y+15,8,"SAVE - [F2]");
+	print2screen(HELP_X+((HELP_WIDTH-11)>>1),HELP_Y+16,8,"HELP - [F1]");
+	print2screen(HELP_X+((HELP_WIDTH-26)>>1),HELP_Y+17,8,"ITEM CHANGE - ([+] and [-])");
 
 	blit_screen(1);
 	sleep(2);
