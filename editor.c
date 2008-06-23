@@ -30,18 +30,18 @@ struct object_list *last_obj;
 int level_number;
 
 
-void catch_signal(void)
+void catch_signal(int sig_num)
 {
 	c_shutdown();
-	exit(0);
+	exit(sig_num);
 }
 
 
-void catch_sigsegv(void)
+void catch_sigsegv(int sig_num)
 {
 	c_shutdown();
 	raise(SIGSEGV);
-	exit(0);
+	exit(sig_num);
 }
 
 
@@ -50,7 +50,7 @@ void set_sigint(void)
 	struct sigaction sa_old;
 	struct sigaction sa_new;
 
-	sa_new.sa_handler =(void*) catch_signal;
+	sa_new.sa_handler = catch_signal;
 	sigemptyset(&sa_new.sa_mask);
 	sa_new.sa_flags = 0;
 	sigaction(SIGINT,&sa_new,&sa_old);
@@ -61,7 +61,7 @@ void set_sigint(void)
 	sigaction(SIGFPE,&sa_new,&sa_old);
 	sigaction(SIGBUS,&sa_new,&sa_old);
 
-	sa_new.sa_handler =(void*) catch_sigsegv;
+	sa_new.sa_handler = catch_sigsegv;
 	sigemptyset(&sa_new.sa_mask);
 	sa_new.sa_flags = 0;
 	sigaction(SIGSEGV,&sa_new,&sa_old);

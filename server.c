@@ -2526,6 +2526,10 @@ void update_players(void)
 /* write help message to stdout */
 void print_help(void)
 {
+	char *p = "";
+#ifdef __EMX__
+	p = "Portions (c) 2000 by Mikulas Patocka\n";
+#endif
 #ifdef WIN32
 	printf(	"0verkill server.\n"
 		"(c)2000 Brainsoft\n"
@@ -2539,11 +2543,9 @@ void print_help(void)
 #else
 	printf(	"0verkill server.\n"
 		"(c)2000 Brainsoft\n"
-#ifdef __EMX__
-		"Portions (c) 2000 by Mikulas Patocka\n"
-#endif
+		"%s\n"
 		"Usage: server [-nh] [-l <level number>] [-p <port number>]\n"
-		"-n		Server can't be ended by client\n"
+		"-n		Server can't be ended by client\n", p
 		);
 #endif
 }

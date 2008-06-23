@@ -1741,18 +1741,18 @@ void sigwinch_handler(int signum)
 /* print command line help */
 void print_help(void)
 {
-        printf( 
-		"0verkill client"
+	char *x = "";
+	char *y = "";
 #ifdef XWINDOW
-		" for X windows"
+	x = " for X windows"
+	y = " [-d <display>] [-f <font name>]"
 #endif
+        printf( 
+		"0verkill client%s"
 		".\n"
                 "(c)2000 Brainsoft\n"
-                "Usage: 0verkill [-h] [-3] [-s <width>x<height>]"
-#ifdef XWINDOW
-		" [-d <display>] [-f <font name>]"
-#endif
-		"\n"
+                "Usage: 0verkill [-h] [-3] [-s <width>x<height>]%s"
+		"\n", x, y
 	);
 }
 
