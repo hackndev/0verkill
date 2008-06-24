@@ -128,10 +128,6 @@ void c_init(int w,int h)
 /* close console */
 void c_shutdown(void)
 {
-#ifdef SCREEN_BUFFERING
-	mem_free(screen_buffer);
-#endif
-
 	kbd_close();
 	tcsetattr(0,TCSANOW,&term_setting);
 	c_cursor(C_NORMAL);
@@ -139,6 +135,9 @@ void c_shutdown(void)
 	c_cls();
 	my_print("\033[;H");
 	c_refresh();
+#ifdef SCREEN_BUFFERING
+	mem_free(screen_buffer);
+#endif
 	console_ok=1;
 }
 
