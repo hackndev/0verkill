@@ -310,7 +310,7 @@ void shut_down(int x)
 	c_shutdown();
 	free_sprites(0);
 	free_area();
-	if (hero)delete_obj(hero->id);
+	if (!x&&hero)delete_obj(hero->id);
 
 	
 	/* delete all objects except hero */
