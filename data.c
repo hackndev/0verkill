@@ -379,59 +379,43 @@ void delete_obj(unsigned long id)
 
 void put_long_long(unsigned char *p,unsigned long_long num)
 {
-        p[0]=num&255;num>>=8;
-        p[1]=num&255;num>>=8;
-        p[2]=num&255;num>>=8;
-        p[3]=num&255;num>>=8;
-        p[4]=num&255;num>>=8;
-        p[5]=num&255;num>>=8;
-        p[6]=num&255;num>>=8;
-        p[7]=num&255;
+        memcpy(p,&num,8);
 }
 
 
 void put_int(char *p,int num)
 {
-        p[0]=num & 0xff;
-        p[1]=(num>>8) & 0xff;
-        p[2]=(num>>16) & 0xff;
-        p[3]=(num>>24) & 0xff;
+        memcpy(p,&num,4);
 }
 
 
 int get_int(char *p)
 {
-	return	((p[0]&0xff) | ((p[1]&0xff)<<8) |
-		((p[2]&0xff)<<16) | ((p[3]&0xff)<<24));
-		
+	int i=0;
+	memcpy(&i,p,4);
+	return i;		
 }
 
 
 void put_int16(char *p, short num)
 {
-        p[0]=num & 0xff;
-        p[1]=(num>>8) & 0xff;
+        memcpy(p,&num,2);
 }
 
 
 int get_int16(char *p)
 {
-	return	((p[0]&0xff) | ((p[1]&0xff)<<8));
+	short i=0;
+	memcpy(&i,p,2);
+	return i;		
 }
 
 
 unsigned long_long get_long_long(unsigned char *p)
 {
-#define ULL unsigned long_long
-        return 	(ULL)p[0]+
-		((ULL)(p[1])<<8)+
-		((ULL)(p[2])<<16)+
-		((ULL)(p[3])<<24)+
-		((ULL)(p[4])<<32)+
-		((ULL)(p[5])<<40)+
-		((ULL)(p[6])<<48)+
-		((ULL)(p[7])<<56);
-#undef ULL
+	long_long i=0;
+	memcpy(&i,p,8);
+	return i;		
 }
 
 
