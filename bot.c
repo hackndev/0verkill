@@ -981,6 +981,7 @@ void signal_handler(int signum)
 	if (connected)send_quit();
 	shut_down(0);
 	clear_memory();
+	if (fd) close(fd);
 #ifdef HAVE_PSIGNAL
 	psignal(signum,"Exiting on signal");
 #else
@@ -1141,4 +1142,5 @@ again:
 	send_keyboard();
 	sleep_until(last_time+CLIENT_PERIOD_USEC);
 	goto again;
+	if (fd) close(fd);
 }
