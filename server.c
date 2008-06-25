@@ -1510,15 +1510,15 @@ int dynamic_collision(struct it *obj)
 				{
 					char txt[256];
 					if (p->type!=T_PLAYER)break;
-					if (((struct player*)(p->data))->ammo[0]==MAX_AMMO(0))break;
+					if (((struct player*)(p->data))->ammo[WEAPON_GUN]==MAX_AMMO(WEAPON_GUN))break;
 
- 					if(is_weapon_better((struct player*)(p->data), 0) 
- 						&& is_weapon_empty((struct player*)(p->data), 0))
- 						P->current_weapon = 0;
+ 					if(is_weapon_better((struct player*)(p->data), WEAPON_GUN) 
+ 						&& is_weapon_empty((struct player*)(p->data), WEAPON_GUN))
+ 						P->current_weapon = WEAPON_GUN;
 
-					((struct player*)(p->data))->ammo[0]+=weapon[0].add_ammo;
-					if (((struct player*)(p->data))->ammo[0]>MAX_AMMO(0))
-						((struct player*)(p->data))->ammo[0]=MAX_AMMO(0);
+					((struct player*)(p->data))->ammo[WEAPON_GUN]+=weapon[WEAPON_GUN].add_ammo;
+					if (((struct player*)(p->data))->ammo[WEAPON_GUN]>MAX_AMMO(WEAPON_GUN))
+						((struct player*)(p->data))->ammo[WEAPON_GUN]=MAX_AMMO(WEAPON_GUN);
 /*					P->current_weapon=select_best_weapon(P);  */
 					send_update_player((struct player*)(p->data));
 					send_message((struct player*)(p->data),0,"You got a magazine");
@@ -1534,15 +1534,15 @@ int dynamic_collision(struct it *obj)
 				{
 					char txt[256];
 					if (p->type!=T_PLAYER)break;
-					if (((struct player*)(p->data))->ammo[1]==MAX_AMMO(1))break;
+					if (((struct player*)(p->data))->ammo[WEAPON_SHOTGUN]==MAX_AMMO(WEAPON_SHOTGUN))break;
 
- 					if(is_weapon_better((struct player*)(p->data), 1) 
- 						&& is_weapon_empty((struct player*)(p->data), 1))
- 						P->current_weapon = 1;
+ 					if(is_weapon_better((struct player*)(p->data), WEAPON_SHOTGUN) 
+ 						&& is_weapon_empty((struct player*)(p->data), WEAPON_SHOTGUN))
+ 						P->current_weapon = WEAPON_SHOTGUN;
 
-					((struct player*)(p->data))->ammo[1]+=weapon[1].add_ammo;
-					if (((struct player*)(p->data))->ammo[1]>MAX_AMMO(1))
-						((struct player*)(p->data))->ammo[1]=MAX_AMMO(1);
+					((struct player*)(p->data))->ammo[WEAPON_SHOTGUN]+=weapon[WEAPON_SHOTGUN].add_ammo;
+					if (((struct player*)(p->data))->ammo[WEAPON_SHOTGUN]>MAX_AMMO(WEAPON_SHOTGUN))
+						((struct player*)(p->data))->ammo[WEAPON_SHOTGUN]=MAX_AMMO(WEAPON_SHOTGUN);
 /*					P->current_weapon=select_best_weapon(P);  */
 					send_update_player((struct player*)(p->data));
 					send_message((struct player*)(p->data),0,"You got shotgun shells");
@@ -1558,15 +1558,15 @@ int dynamic_collision(struct it *obj)
 				{
 					char txt[256];
 					if (p->type!=T_PLAYER)break;
-					if (((struct player*)(p->data))->ammo[3]==MAX_AMMO(3))break;
+					if (((struct player*)(p->data))->ammo[WEAPON_RIFLE]==MAX_AMMO(WEAPON_RIFLE))break;
 
- 					if(is_weapon_better((struct player*)(p->data), 3) 
- 						&& is_weapon_empty((struct player*)(p->data), 3))
- 						P->current_weapon = 3;
+ 					if(is_weapon_better((struct player*)(p->data), WEAPON_RIFLE) 
+ 						&& is_weapon_empty((struct player*)(p->data), WEAPON_RIFLE))
+ 						P->current_weapon = WEAPON_RIFLE;
 
-					((struct player*)(p->data))->ammo[3]+=weapon[3].add_ammo;
-					if (((struct player*)(p->data))->ammo[3]>MAX_AMMO(3))
-						((struct player*)(p->data))->ammo[3]=MAX_AMMO(3);
+					((struct player*)(p->data))->ammo[WEAPON_RIFLE]+=weapon[WEAPON_RIFLE].add_ammo;
+					if (((struct player*)(p->data))->ammo[WEAPON_RIFLE]>MAX_AMMO(WEAPON_RIFLE))
+						((struct player*)(p->data))->ammo[WEAPON_RIFLE]=MAX_AMMO(WEAPON_RIFLE);
 /*					P->current_weapon=select_best_weapon(P);  */
 					send_update_player((struct player*)(p->data));
 					send_message((struct player*)(p->data),0,"You got cartridges");
@@ -1582,15 +1582,15 @@ int dynamic_collision(struct it *obj)
 				{
 					char txt[256];
 					if (p->type!=T_PLAYER)break;
-					if (((struct player*)(p->data))->ammo[2]==MAX_AMMO(2))break;
+					if (((struct player*)(p->data))->ammo[WEAPON_UZI]==MAX_AMMO(WEAPON_UZI))break;
 
- 					if(is_weapon_better((struct player*)(p->data), 2) 
- 						&& is_weapon_empty((struct player*)(p->data), 2))
- 						P->current_weapon = 2;
+ 					if(is_weapon_better((struct player*)(p->data), WEAPON_UZI) 
+ 						&& is_weapon_empty((struct player*)(p->data), WEAPON_UZI))
+ 						P->current_weapon = WEAPON_UZI;
 
-					((struct player*)(p->data))->ammo[2]+=weapon[2].add_ammo;
-					if (((struct player*)(p->data))->ammo[2]>MAX_AMMO(2))
-						((struct player*)(p->data))->ammo[2]=MAX_AMMO(2);
+					((struct player*)(p->data))->ammo[WEAPON_UZI]+=weapon[WEAPON_UZI].add_ammo;
+					if (((struct player*)(p->data))->ammo[WEAPON_UZI]>MAX_AMMO(WEAPON_UZI))
+						((struct player*)(p->data))->ammo[WEAPON_UZI]=MAX_AMMO(WEAPON_UZI);
 /*					P->current_weapon=select_best_weapon(P); */
 					send_update_player((struct player*)(p->data));
 					send_message((struct player*)(p->data),0,"You got ammo for Uzi");
@@ -1606,16 +1606,16 @@ int dynamic_collision(struct it *obj)
 				{
 					char txt[256];
 					if (p->type!=T_PLAYER)break;
-					if ((((struct player*)(p->data))->ammo[2]==MAX_AMMO(2))&&((((struct player *)(p->data))->weapons)&4))break;
+					if ((((struct player*)(p->data))->ammo[WEAPON_UZI]==MAX_AMMO(WEAPON_UZI))&&((((struct player *)(p->data))->weapons)&WEAPON_MASK_UZI))break;
 
- 					if(is_weapon_better((struct player*)(p->data), 2) 
- 						&& !is_weapon_usable((struct player*)(p->data), 2))
- 						P->current_weapon = 2;
+ 					if(is_weapon_better((struct player*)(p->data), WEAPON_UZI) 
+ 						&& !is_weapon_usable((struct player*)(p->data), WEAPON_UZI))
+ 						P->current_weapon = WEAPON_UZI;
 
-					((struct player*)(p->data))->weapons|=4;
-					((struct player*)(p->data))->ammo[2]+=weapon[2].basic_ammo;
-					if (((struct player*)(p->data))->ammo[2]>MAX_AMMO(2))
-						((struct player*)(p->data))->ammo[2]=MAX_AMMO(2);
+					((struct player*)(p->data))->weapons|=WEAPON_MASK_UZI;
+					((struct player*)(p->data))->ammo[WEAPON_UZI]+=weapon[WEAPON_UZI].basic_ammo;
+					if (((struct player*)(p->data))->ammo[WEAPON_UZI]>MAX_AMMO(WEAPON_UZI))
+						((struct player*)(p->data))->ammo[WEAPON_UZI]=MAX_AMMO(WEAPON_UZI);
 //					P->current_weapon=select_best_weapon(P);
 					send_update_player((struct player*)(p->data));
 					send_message((struct player*)(p->data),0,"You got Uzi");
@@ -1631,16 +1631,16 @@ int dynamic_collision(struct it *obj)
 				{
 					char txt[256];
 					if (p->type!=T_PLAYER)break;
-					if ((((struct player*)(p->data))->ammo[3]==MAX_AMMO(3))&&((((struct player *)(p->data))->weapons)&8))break;
+					if ((((struct player*)(p->data))->ammo[WEAPON_RIFLE]==MAX_AMMO(WEAPON_RIFLE))&&((((struct player *)(p->data))->weapons)&WEAPON_MASK_RIFLE))break;
 
- 					if(is_weapon_better((struct player*)(p->data), 3) 
- 						&& !is_weapon_usable((struct player*)(p->data), 3))
- 						P->current_weapon = 3;
+ 					if(is_weapon_better((struct player*)(p->data), WEAPON_RIFLE) 
+ 						&& !is_weapon_usable((struct player*)(p->data), WEAPON_RIFLE))
+ 						P->current_weapon = WEAPON_RIFLE;
 
-					((struct player*)(p->data))->weapons|=8;
-					((struct player*)(p->data))->ammo[3]+=weapon[3].basic_ammo;
-					if (((struct player*)(p->data))->ammo[3]>MAX_AMMO(3))
-						((struct player*)(p->data))->ammo[3]=MAX_AMMO(3);
+					((struct player*)(p->data))->weapons|=WEAPON_MASK_RIFLE;
+					((struct player*)(p->data))->ammo[WEAPON_RIFLE]+=weapon[WEAPON_RIFLE].basic_ammo;
+					if (((struct player*)(p->data))->ammo[WEAPON_RIFLE]>MAX_AMMO(WEAPON_RIFLE))
+						((struct player*)(p->data))->ammo[WEAPON_RIFLE]=MAX_AMMO(WEAPON_RIFLE);
 //					P->current_weapon=select_best_weapon(P);
 					send_update_player((struct player*)(p->data));
 					send_message((struct player*)(p->data),0,"You got sniper rifle");
@@ -1656,16 +1656,16 @@ int dynamic_collision(struct it *obj)
 				{
 					char txt[256];
 					if (p->type!=T_PLAYER)break;
-					if ((((struct player*)(p->data))->ammo[1]==MAX_AMMO(1))&&((((struct player *)(p->data))->weapons)&2))break;
+					if ((((struct player*)(p->data))->ammo[WEAPON_SHOTGUN]==MAX_AMMO(WEAPON_SHOTGUN))&&((((struct player *)(p->data))->weapons)&WEAPON_MASK_SHOTGUN))break;
 
- 					if(is_weapon_better((struct player*)(p->data), 1) 
- 						&& !is_weapon_usable((struct player*)(p->data), 1))
- 						P->current_weapon = 1;
+ 					if(is_weapon_better((struct player*)(p->data), WEAPON_SHOTGUN) 
+ 						&& !is_weapon_usable((struct player*)(p->data), WEAPON_SHOTGUN))
+ 						P->current_weapon = WEAPON_SHOTGUN;
 
-					((struct player*)(p->data))->weapons|=2;
-					((struct player*)(p->data))->ammo[1]+=weapon[1].basic_ammo;
-					if (((struct player*)(p->data))->ammo[1]>MAX_AMMO(1))
-						((struct player*)(p->data))->ammo[1]=MAX_AMMO(1);
+					((struct player*)(p->data))->weapons|=WEAPON_MASK_SHOTGUN;
+					((struct player*)(p->data))->ammo[WEAPON_SHOTGUN]+=weapon[WEAPON_SHOTGUN].basic_ammo;
+					if (((struct player*)(p->data))->ammo[WEAPON_SHOTGUN]>MAX_AMMO(WEAPON_SHOTGUN))
+						((struct player*)(p->data))->ammo[WEAPON_SHOTGUN]=MAX_AMMO(WEAPON_SHOTGUN);
 //					P->current_weapon=select_best_weapon(P);
 					send_update_player((struct player*)(p->data));
 					send_message((struct player*)(p->data),0,"You got a shotgun");
