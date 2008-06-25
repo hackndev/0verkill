@@ -118,7 +118,7 @@ put_line(int xs, int ys,unsigned char *scrn,unsigned char *attr,int x,int y,stru
 	for (a=0;a<l->len&&x+a<xs;a++)
 	{
 		if (!l->attr[a])continue;
-		if (	plastic&&
+		if (	plastic&&x+a+b>=0&&
 			((attr[x+a+b]&240)==TYPE_FOREGROUND||
 			(attr[x+a+b]&240)==TYPE_JUMP_FOREGROUND)
 		    ) continue;
