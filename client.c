@@ -375,6 +375,7 @@ send_again:
 	if (!select(fd+1,&rfds,0,0,&tv)&&count<=MAX_COUNT)goto send_again;
 	recv_packet(&p,1,(struct sockaddr*)(&server),&a,1,my_id,0);
 	if (p!=P_PLAYER_DELETED&&count<=MAX_COUNT)goto send_again;
+	if(fd) close(fd);
 }
 
 #undef MAX_COUNT

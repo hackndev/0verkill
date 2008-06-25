@@ -2183,6 +2183,7 @@ void signal_handler(int sig_num)
 	message(txt,2);
 	free_all_memory();
 	check_memory_leaks();
+	if (fd) close(fd);
 #ifdef WIN32
 	hServerExitEvent=1;
 #else
@@ -2806,5 +2807,6 @@ int main(int argc, char **argv)
 	a=server();
 	free_all_memory();
 	check_memory_leaks();
+	if (fd) close(fd);
 	return a;
 }
