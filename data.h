@@ -169,8 +169,8 @@ extern void put_int(char *p,int num);
 extern int get_int(char *p);
 extern void put_int16(char *p,short num);
 extern int get_int16(char *p);
-extern void put_long_long(unsigned char *p,unsigned long_long num);
-extern unsigned long_long get_long_long(unsigned char *p);
+extern void put_long_long(char *p,unsigned long_long num);
+extern unsigned long_long get_long_long(char *p);
 extern void free_sprites(int);
 
 #ifdef HAVE_INLINE

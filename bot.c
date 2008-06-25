@@ -297,7 +297,7 @@ char * contact_server(int color, char *name)
 		if (maj!=VERSION_MAJOR||min<MIN_SERVER_VERSION_MINOR)
 		{send_quit();return "Incompatible server version. Givin' up.\n";}
 		game_start_offset=get_time();
-		game_start_offset-=get_long_long((unsigned char *)packet+25);
+		game_start_offset-=get_long_long(packet+25);
 		health=100;
 		armor=0;
 		for(a=0;a<ARMS;a++)

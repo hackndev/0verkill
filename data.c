@@ -376,8 +376,7 @@ void delete_obj(unsigned long id)
 	mem_free(q);
 }
 
-
-void put_long_long(unsigned char *p,unsigned long_long num)
+void put_long_long(char *p,unsigned long_long num)
 {
         memcpy(p,&num,8);
 }
@@ -411,7 +410,7 @@ int get_int16(char *p)
 }
 
 
-unsigned long_long get_long_long(unsigned char *p)
+unsigned long_long get_long_long(char *p)
 {
 	long_long i=0;
 	memcpy(&i,p,8);

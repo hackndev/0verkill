@@ -1252,7 +1252,7 @@ void read_data(void)
 				put_int(packet+19,last_player->member.obj->yspeed);
 				put_int16(packet+23,last_player->member.obj->status);
 				t=get_time();
-				put_long_long((unsigned char *)packet+25,t-game_start);
+				put_long_long(packet+25,t-game_start);
 				put_int(packet+33,last_player->member.id);
 				packet[37]=VERSION_MAJOR;
 				packet[38]=VERSION_MINOR;
