@@ -2158,6 +2158,7 @@ void free_all_memory(void)
 	
 	free_area();
 	if (level_checksum)mem_free(level_checksum);
+	free_packet_buffer();
 }
 
 /* fatal signal handler (sigsegv, sigabrt, ... ) */

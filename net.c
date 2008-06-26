@@ -28,11 +28,16 @@ PACKET:
  * sender = sender's (my) ID 
  * recipient = recipient's ID
  */
+unsigned char *p;
+int alloc_len = 0;
 void send_packet(char *packet,int len,const struct sockaddr* addr,int sender,int recipient)
 {
-	unsigned char *p;
 	unsigned long crc=crc32((unsigned char *)packet,len);
-	p=mem_alloc(len+12);
+	if (!p) p=mem_alloc(len+12);
+	else if (len > alloc_len) {
+	    p=mem_realloc(p,len+12);
+	    alloc_len = len;
+	}
 	if (!p)return;  /* not enough memory */
 	memcpy(p+12,packet,len);
 	p[0]=crc&255;crc>>=8;  /* CRC 32 */
@@ -51,7 +56,6 @@ void send_packet(char *packet,int len,const struct sockaddr* addr,int sender,int
 	p[11]=recipient&255;
 	
 	sendto(fd,p,len+12,0,addr,sizeof(*addr));
-	mem_free(p);
 }
 
 
@@ -76,12 +80,15 @@ server has: sender_server 0, recipient 0
 client has: sender_server 1, recipient my_id
 */
 {
-	unsigned char *p;
 	int retval;
 	unsigned int crc;
 	int s,r;
 	
-	p=mem_alloc(max_len+12);
+	if (!p) p=mem_alloc(max_len+12);
+	else if (max_len > alloc_len) {
+	    p=mem_realloc(p,max_len+12);
+	    alloc_len = max_len;
+	}
 	if (!p)return -1;  /* not enough memory */
 	retval=recvfrom(fd,p,max_len+12,0,addr,(unsigned int *)addr_len);
 	if (retval<12) {
@@ -93,7 +100,6 @@ client has: sender_server 1, recipient my_id
 	s=p[4]+(p[5]<<8)+(p[6]<<16)+(p[7]<<24);
 	if (sender)*sender=s;
 	r=p[8]+(p[9]<<8)+(p[10]<<16)+(p[11]<<24);
-	mem_free(p);
 	if (retval==-1)return -1;
 	if (crc!=crc32((unsigned char *)packet,retval-12))return -1;
 	if (r!=recipient)return -1;
@@ -101,3 +107,9 @@ client has: sender_server 1, recipient my_id
 	return retval-12;
 }
 
+/* free packet buffer, called only when terminating */
+void free_packet_buffer() {
+	if (p)
+	    mem_free(p);
+	return;
+}

@@ -323,6 +323,7 @@ void shut_down(int x)
 	msg_line[last_message].msg=0;
 
 	shutdown_sprites();
+	free_packet_buffer();
 	check_memory_leaks();
 	if (x)EXIT(0);
 }

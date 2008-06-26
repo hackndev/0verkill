@@ -186,6 +186,7 @@ void shut_down(int a)
 	if (a)
 	{
 		clear_memory();
+		free_packet_buffer();
 		check_memory_leaks();
 		EXIT(0);
 	}
@@ -988,6 +989,7 @@ void signal_handler(int signum)
 	fprintf(stderr, "Exiting on signal: %d\n", signum);
 #endif
 	if (!in_signal_handler){in_signal_handler=1;check_memory_leaks();}
+	free_packet_buffer();
 	EXIT(1);
 }
 
