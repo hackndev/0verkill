@@ -21,8 +21,8 @@ struct player
 	unsigned int frags;
 	unsigned int deaths;
 	unsigned short ammo[ARMS];
-	unsigned char current_weapon;
-	unsigned char weapons;  /* bitmask of player's weapons */
+	unsigned short current_weapon;
+	unsigned short weapons;  /* bitmask of player's weapons */
 	unsigned long_long last_update;  /* last time client sent a packet */
 	struct  /* keyboard status */
 	{

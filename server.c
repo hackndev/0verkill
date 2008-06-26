@@ -70,7 +70,7 @@ unsigned long_long last_player_left=0,last_packet_came=0;
 
 char *level_checksum=0;   /* MD5 sum of the level */
 
-unsigned char weapons_order[ARMS]={4,0,3,1,2};
+unsigned short weapons_order[ARMS]={4,0,3,1,2,5};
 
 struct birthplace_type
 {
@@ -414,7 +414,7 @@ void message(char *msg,int output)
 /* switch weapon to the player's best one */
 int select_best_weapon(struct player* p)
 {
-	unsigned char t[ARMS]={4,0,1,3,2}; 
+	unsigned short t[ARMS]={4,0,1,3,2,5}; 
 	int a;
 
 	for (a=ARMS-1;a>=0;a--)
@@ -990,9 +990,9 @@ void send_update_player(struct player* p)
 		put_int16(packet+3+(a<<1),p->ammo[a]);
 	put_int(packet+3+2*ARMS,p->frags);
 	put_int(packet+7+2*ARMS,p->deaths);
-	packet[11+2*ARMS]=p->current_weapon;
-	packet[12+2*ARMS]=p->weapons;
-	send_chunk_packet_to_player(packet,13+2*ARMS,p);
+	put_int16(packet+11+2*ARMS,p->current_weapon);
+	put_int16(packet+13+2*ARMS,p->weapons);
+	send_chunk_packet_to_player(packet,15+2*ARMS,p);
 }
 
 /* send a packet to all players except one */

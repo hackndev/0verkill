@@ -61,7 +61,7 @@
 #define WEAPON_MASK_GUN 1
 
 
-#define ARMS 5
+#define ARMS 6
 
 unsigned char *weapon_name[ARMS];
 

@@ -80,8 +80,8 @@
 unsigned char health,armor;
 unsigned int frags,deaths;
 unsigned short ammo[ARMS];
-unsigned char current_weapon;
-unsigned char weapons;
+unsigned short current_weapon;
+unsigned short weapons;
 unsigned char creep;
 unsigned char autorun,autocreep;
 int my_id;
@@ -1149,16 +1149,16 @@ int process_packet(char *packet,int l)
 		break;
 
 		case P_UPDATE_PLAYER:
-		if (l<23)break;  /* invalid packet */
+		if (l<27)break;  /* invalid packet */
 		health=packet[1];
 		armor=packet[2];
 		for (a=0;a<ARMS;a++)
 			ammo[a]=get_int16(packet+3+(a<<1));
 		frags=get_int(packet+3+ARMS*2);
 		deaths=get_int(packet+7+ARMS*2);
-		current_weapon=packet[11+2*ARMS];
-		weapons=packet[12+2*ARMS];
-		n=23;
+		current_weapon=get_int16(packet+11+ARMS*2);
+		weapons=get_int16(packet+13+ARMS*2);
+		n=27;
 		break;
 
 		case P_MESSAGE:
