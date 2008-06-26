@@ -293,8 +293,7 @@ void draw_frame(int x,int y,int w,int h,unsigned char color)
 	print2screen(x+w+1,y,color,"+");
 	print2screen(x+w+1,y+h+1,color,"+");
 	print2screen(x,y+h+1,color,"+");
-	for (a=0;a<w;a++)
-		t[a]='-';
+	memset(t,'-',w);
 	print2screen(x+1,y,color,t);
 	print2screen(x+1,y+h+1,color,t);
 	memset(t,' ',w+1);
