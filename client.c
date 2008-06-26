@@ -1986,6 +1986,8 @@ void play(void)
 			keyboard_status.weapon=4;
 		if (!chat && c_was_pressed('5'))
 			keyboard_status.weapon=5;
+		if (!chat && c_was_pressed('6'))
+			keyboard_status.weapon=6;
 		if (c_pressed(K_LEFT_SHIFT)||c_pressed(K_RIGHT_SHIFT)||autorun)
 		keyboard_status.speed=1;
 		if (c_pressed(K_LEFT))

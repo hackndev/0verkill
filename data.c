@@ -68,6 +68,7 @@ struct obj_attr_type obj_attr[N_TYPES]=
 	{0,0,0,0,NOBODY,1},  /* nothing in foreground */
 	{0,0,0,0,NOBODY,1},  /* killing object */
 	{1,0,0,0,NOBODY,0},  /* teleport */
+	{1,0,0,0,NOBODY,0},  /* BFG */
 };
 
 
@@ -79,7 +80,8 @@ struct weapon_type weapon[ARMS]=
 	{"Shotgun",25,50,float2double(3*36),float2double(.5*36),10,5,6,12,30,float2double((double).3*36),-float2double((double)1.2*36)},
 	{"Uzi",3,50,float2double(4*36),float2double(.25*36),15,4,50,50,150,float2double((double).9*36),-float2double((double)1.5*36)},
 	{"Rifle",40,70,float2double(6*36),float2double(.4*36),50,20,1,15,15,0,0},
-	{"Grenades",15,60,float2double((double)3.73*36),0,75,40,0,6,24,float2double(3*36),-float2double((double)1.5*36)}  /* shell speed=grenade throwing speed, bullet speed=shrapnel speed */
+	{"Grenades",15,60,float2double((double)3.73*36),0,75,40,0,6,24,float2double(3*36),-float2double((double)1.5*36)},  /* shell speed=grenade throwing speed, bullet speed=shrapnel speed */
+	{"BFG",200,70,float2double(2*36),float2double(1*36),100,100,1,1,1,float2double((double).01*36),-float2double((double)1*36)},
 };
 
 
@@ -159,6 +161,8 @@ int _convert_type(unsigned char c)
   case 'K': return T_KILL;
 
   case 'S': return T_SHOTGUN;
+
+  case 'Z': return T_BFG;
 
   case 'U': return T_UZI;
   

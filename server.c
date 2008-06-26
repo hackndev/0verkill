@@ -62,7 +62,7 @@ int active_players=0;  /* # of players in the game */
 unsigned int id=0;  /* my ID */
 unsigned long_long game_start; /* time of game start */
 /* important sprites */
-int grenade_sprite,bullet_sprite,slug_sprite,shell_sprite,shotgun_shell_sprite,mess1_sprite,mess2_sprite,mess3_sprite,mess4_sprite,noise_sprite;
+int grenade_sprite,bullet_sprite,slug_sprite,shell_sprite,shotgun_shell_sprite,mess1_sprite,mess2_sprite,mess3_sprite,mess4_sprite,noise_sprite,bfgcell_sprite;
 int shrapnel_sprite[N_SHRAPNELS];
 int nonquitable=0;  /* 1=clients can't abort game pressing F12 (request is ignored) */
 unsigned long_long last_tick;
@@ -1677,6 +1677,31 @@ int dynamic_collision(struct it *obj)
 				}
 				return 2;
 
+				case T_BFG:
+				{
+					char txt[256];
+					if (p->type!=T_PLAYER)break;
+					if ((((struct player*)(p->data))->ammo[WEAPON_BFG]==MAX_AMMO(WEAPON_BFG))&&((((struct player *)(p->data))->weapons)&WEAPON_MASK_BFG))break;
+
+ 					if(is_weapon_better((struct player*)(p->data), WEAPON_BFG) 
+ 						&& !is_weapon_usable((struct player*)(p->data), WEAPON_BFG))
+ 						P->current_weapon = WEAPON_BFG;
+
+					((struct player*)(p->data))->weapons|=WEAPON_MASK_BFG;
+					((struct player*)(p->data))->ammo[WEAPON_BFG]+=weapon[WEAPON_BFG].basic_ammo;
+					if (((struct player*)(p->data))->ammo[WEAPON_BFG]>MAX_AMMO(WEAPON_BFG))
+						((struct player*)(p->data))->ammo[WEAPON_BFG]=MAX_AMMO(WEAPON_BFG);
+//					P->current_weapon=select_best_weapon(P);
+					send_update_player((struct player*)(p->data));
+					send_message((struct player*)(p->data),0,"You got a BFG");
+					snprintf(txt,256,"%s got a BFG.\n",((struct player*)(p->data))->name);
+					message(txt,1);
+					obj->status|=64;
+					add_to_timeq(obj->id,T_BFG,0,obj->sprite,0,0,obj->x,obj->y,0,0,0,WEAPON_RESPAWN_TIME);
+        				sendall_update_status(obj,0);
+				}
+				return 2;
+
 				case T_INVISIBILITY:
 				{
 					char txt[256];
@@ -2394,7 +2419,22 @@ void fire_player(struct player *q,int direction)
 		id++;
 		sendall_new_object(s,0);
 	}
-	else
+	else if (q->current_weapon==WEAPON_BFG) {
+		s=new_obj(  /* straight */
+			id,
+			T_BULLET,
+			weapon[q->current_weapon].ttl,
+			bfgcell_sprite,
+			0,
+			q->current_weapon,
+			add_int(q->obj->x,direction==1?-2:PLAYER_WIDTH+2),
+			q->obj->y+FIRE_YOFFSET,
+			q->obj->xspeed+(direction==1?-weapon[q->current_weapon].speed:weapon[q->current_weapon].speed),
+			0,
+			(void *)(long)(q->obj->id)); 
+		id++;
+		sendall_new_object(s,0);
+	} else
 	{
 		if (q->current_weapon!=WEAPON_GRENADE)  /* not grenades */
 		{
@@ -2694,6 +2734,7 @@ int server(void)
 	if (find_sprite("mess3",&mess3_sprite)){char msg[256];snprintf(msg,256,"Can't find sprite \"mess3\".\n");ERROR(msg);EXIT(1);}
 	if (find_sprite("mess4",&mess4_sprite)){char msg[256];snprintf(msg,256,"Can't find sprite \"mess4\".\n");ERROR(msg);EXIT(1);}
 	if (find_sprite("noise",&noise_sprite)){char msg[256];snprintf(msg,256,"Can't find sprite \"noise\".\n");ERROR(msg);EXIT(1);}
+	if (find_sprite("bfgcell",&bfgcell_sprite)){char msg[256];snprintf(msg,256,"Can't find sprite \"bfgcell\".\n");ERROR(msg);EXIT(1);}
 	for (a=0;a<N_SHRAPNELS;a++)
 	{
 		snprintf(txt, sizeof(txt), "shrapnel%d",a+1);

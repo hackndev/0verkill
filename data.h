@@ -17,7 +17,7 @@
 #define TYPE_BIRTHPLACE 666
 
 /* object types */
-#define N_TYPES 23
+#define N_TYPES 25
 
 #define T_PLAYER 0
 #define T_BULLET 1
@@ -42,18 +42,22 @@
 #define T_NOTHING_FORE 20
 #define T_KILL 21
 #define T_TELEPORT 22
+#define T_BFG 23
+#define T_BFGCELL 24
 
 
 #define E_INCOMPATIBLE_VERSION 0
 #define E_PLAYER_REFUSED 1
 
 
+#define WEAPON_BFG 5
 #define WEAPON_GRENADE 4
 #define WEAPON_RIFLE 3
 #define WEAPON_UZI 2
 #define WEAPON_SHOTGUN 1
 #define WEAPON_GUN 0
 
+#define WEAPON_MASK_BFG 32
 #define WEAPON_MASK_GRENADE 16
 #define WEAPON_MASK_RIFLE 8
 #define WEAPON_MASK_UZI 4
