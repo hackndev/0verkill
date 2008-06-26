@@ -1149,7 +1149,7 @@ int process_packet(char *packet,int l)
 		break;
 
 		case P_UPDATE_PLAYER:
-		if (l<27)break;  /* invalid packet */
+		if (l<15+2*ARMS)break;  /* invalid packet */
 		health=packet[1];
 		armor=packet[2];
 		for (a=0;a<ARMS;a++)
@@ -1158,7 +1158,7 @@ int process_packet(char *packet,int l)
 		deaths=get_int(packet+7+ARMS*2);
 		current_weapon=get_int16(packet+11+ARMS*2);
 		weapons=get_int16(packet+13+ARMS*2);
-		n=27;
+		n=15+2*ARMS;
 		break;
 
 		case P_MESSAGE:
