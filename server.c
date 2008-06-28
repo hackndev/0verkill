@@ -63,7 +63,7 @@ unsigned int id=0;  /* my ID */
 unsigned long_long game_start; /* time of game start */
 /* important sprites */
 int grenade_sprite,bullet_sprite,slug_sprite,shell_sprite,shotgun_shell_sprite,mess1_sprite,mess2_sprite,mess3_sprite,mess4_sprite,noise_sprite,bfgcell_sprite;
-int shrapnel_sprite[N_SHRAPNELS];
+int shrapnel_sprite[N_SHRAPNELS],bfgbit_sprite[N_SHRAPNELS];
 int nonquitable=0;  /* 1=clients can't abort game pressing F12 (request is ignored) */
 unsigned long_long last_tick;
 unsigned long_long last_player_left=0,last_packet_came=0;
@@ -1828,8 +1828,9 @@ int dynamic_collision(struct it *obj)
 					return 1;
 				}
 				case T_BULLET:
+				case T_BFGCELL:
 				if (p->type!=T_PLAYER)break;
-				b=(obj->type==T_BULLET?FIRE_IMPACT:SHRAPNEL_IMPACT);
+				b=((obj->type==T_BULLET||obj->type==T_BFGCELL)?FIRE_IMPACT:SHRAPNEL_IMPACT);
 				p->status|=128;
 				p->xspeed+=obj->xspeed>0?b:-b;
 				sendall_update_object(p,0,4);  /* update speed + status */
@@ -2005,7 +2006,8 @@ void update_game(void)
 					break;
 
 					case T_GRENADE:
-					packet[0]=P_EXPLODE_GRENADE;
+					case T_BFGCELL:
+					packet[0]=(p->next->member.type==T_GRENADE)?P_EXPLODE_GRENADE:P_EXPLODE_BFG;
 					put_int(packet+1,id);
 					put_int(packet+5,p->next->member.id);
 					sendall_chunked(packet,9,0);
@@ -2019,7 +2021,9 @@ void update_game(void)
 							id,
 							T_SHRAPNEL,
 							SHRAPNEL_TTL,
-							shrapnel_sprite[random()%N_SHRAPNELS],
+							(p->next->member.type==T_GRENADE)?
+							shrapnel_sprite[random()%N_SHRAPNELS]:
+							bfgbit_sprite[random()%N_SHRAPNELS],
 							0,
 							WEAPON_GRENADE,
 							p->next->member.x,
@@ -2113,7 +2117,7 @@ void update_game(void)
 			}
 		}
 
-		if ((p->next->member.type==T_SHRAPNEL||p->next->member.type==T_BULLET)&&(stop_x||stop_y))  /* bullet and shrapnel die crashing into wall */
+		if ((p->next->member.type==T_SHRAPNEL||p->next->member.type==T_BULLET||p->next->member.type==T_BFGCELL)&&(stop_x||stop_y))  /* bullet and shrapnel die crashing into wall */
 		{
 			packet[0]=P_DELETE_OBJECT;
 			put_int(packet+1,p->next->member.id);
@@ -2422,12 +2426,12 @@ void fire_player(struct player *q,int direction)
 	else if (q->current_weapon==WEAPON_BFG) {
 		s=new_obj(  /* straight */
 			id,
-			T_BULLET,
+			T_BFGCELL,
 			weapon[q->current_weapon].ttl,
 			bfgcell_sprite,
 			0,
 			q->current_weapon,
-			add_int(q->obj->x,direction==1?-2:PLAYER_WIDTH+2),
+			add_int(q->obj->x,direction==1?0:PLAYER_WIDTH),
 			q->obj->y+FIRE_YOFFSET,
 			q->obj->xspeed+(direction==1?-weapon[q->current_weapon].speed:weapon[q->current_weapon].speed),
 			0,
@@ -2739,6 +2743,8 @@ int server(void)
 	{
 		snprintf(txt, sizeof(txt), "shrapnel%d",a+1);
 		if (find_sprite(txt,&shrapnel_sprite[a])){char msg[256];snprintf(msg,256,"Can't find sprite \"%s\".\n",txt);ERROR(msg);EXIT(1);}
+		snprintf(txt, sizeof(txt), "bfgbit%d",a+1);
+		if (find_sprite(txt,&bfgbit_sprite[a])){char msg[256];snprintf(msg,256,"Can't find sprite \"%s\".\n",txt);ERROR(msg);EXIT(1);}
 	}
 	
 	LEVEL=load_level(level_number);

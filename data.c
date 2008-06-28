@@ -69,6 +69,7 @@ struct obj_attr_type obj_attr[N_TYPES]=
 	{0,0,0,0,NOBODY,1},  /* killing object */
 	{1,0,0,0,NOBODY,0},  /* teleport */
 	{1,0,0,0,NOBODY,0},  /* BFG */
+	{0,0,0,int2double(1),BOTH,0},  /* BFG cell */
 };
 
 
@@ -81,7 +82,7 @@ struct weapon_type weapon[ARMS]=
 	{"Uzi",3,50,float2double(4*36),float2double(.25*36),15,4,50,50,150,float2double((double).9*36),-float2double((double)1.5*36)},
 	{"Rifle",40,70,float2double(6*36),float2double(.4*36),50,20,1,15,15,0,0},
 	{"Grenades",15,60,float2double((double)3.73*36),0,75,40,0,6,24,float2double(3*36),-float2double((double)1.5*36)},  /* shell speed=grenade throwing speed, bullet speed=shrapnel speed */
-	{"BFG",200,70,float2double(2*36),float2double(1*36),100,100,1,1,1,float2double((double).01*36),-float2double((double)1*36)},
+	{"BFG",200,80,float2double(2*36),float2double(1*36),100,100,10,10,10,float2double((double).1*36),-float2double((double)1.5*36)},
 };
 
 

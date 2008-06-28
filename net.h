@@ -40,6 +40,7 @@
 #define P_BELL 30
 #define P_CHANGE_LEVEL 31
 #define P_LEVEL_ACCEPTED 32
+#define P_EXPLODE_BFG 33
 
 
 /* socket filedescriptor */

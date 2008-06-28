@@ -104,7 +104,7 @@ struct it* hero;
 int hit_sprite;
 int title_sprite;
 int bulge_sprite;
-int shrapnel_sprite[N_SHRAPNELS];
+int shrapnel_sprite[N_SHRAPNELS],bfgbit_sprite[N_SHRAPNELS];
 
 int level_sprites_start;  /* number of first sprite in the level (all other level sprites follow) */
 
@@ -556,7 +556,8 @@ void update_game(void)
 				if ((p->next->member.type)==T_PLAYER)p->next->member.status&=~16;
 				else
 				{
-					if (p->next->member.type!=T_GRENADE){  /* client's waiting for P_EXPLODE_GRENADE and doesn't delete the grenade yet */
+					if (p->next->member.type!=T_GRENADE &&
+					    p->next->member.type!=T_BFGCELL){  /* client's waiting for P_EXPLODE_GRENADE and doesn't delete the grenade yet */
 		                        p=p->prev; 
 					delete_obj(p->next->next->member.id);
 					continue;}
@@ -634,7 +635,7 @@ void update_game(void)
 			}
 		}
 
-		if ((p->next->member.type==T_SHRAPNEL||p->next->member.type==T_BULLET)&&(stop_x||stop_y))  /* bullet and shrapnel die crashing into wall */
+		if ((p->next->member.type==T_SHRAPNEL||p->next->member.type==T_BULLET||p->next->member.type==T_BFGCELL)&&(stop_x||stop_y))  /* bullet and shrapnel die crashing into wall */
 		{
 			p=p->prev;  /* deleting object makes a great mess in for cycle, so we must cheat the cycle */
 			delete_obj(p->next->next->member.id);
@@ -1243,6 +1244,7 @@ level_changed:
 		break;
 
 		case P_EXPLODE_GRENADE:
+		case P_EXPLODE_BFG:
 		{
 			unsigned int i,j;
 			struct object_list *p;
@@ -1264,7 +1266,9 @@ level_changed:
 					i,
 					T_SHRAPNEL,
 					SHRAPNEL_TTL,
-					shrapnel_sprite[random()%N_SHRAPNELS],
+					(*packet==P_EXPLODE_GRENADE)?
+					shrapnel_sprite[random()%N_SHRAPNELS]:
+					bfgbit_sprite[random()%N_SHRAPNELS],
 					0,
 					WEAPON_GRENADE,
 					p->member.x,
@@ -2051,6 +2055,11 @@ int main(int argc,char **argv)
 	{
 		snprintf(txt, sizeof(txt), "shrapnel%d",a+1);
 		if (find_sprite(txt,&shrapnel_sprite[a])) {
+			fprintf(stderr,"Can't find sprite \"%s\".\n",txt);
+			EXIT(1);
+		}
+		snprintf(txt, sizeof(txt), "bfgbit%d",a+1);
+		if (find_sprite(txt,&bfgbit_sprite[a])) {
 			fprintf(stderr,"Can't find sprite \"%s\".\n",txt);
 			EXIT(1);
 		}
