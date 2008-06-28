@@ -27,7 +27,8 @@
 
 int port=DEFAULT_PORT;
 struct sockaddr_in server;
-char *name=0;
+char *name=NULL;
+int time=1;
 int fd;
 
 
@@ -61,7 +62,7 @@ void contact_server(void)
 
         fd_set fds;
         struct timeval tv;
-        tv.tv_sec=1;
+        tv.tv_sec=time;
         tv.tv_usec=0;
         FD_ZERO(&fds);
         FD_SET(fd,&fds);
@@ -70,7 +71,7 @@ void contact_server(void)
 
         send_packet(packet,1,(struct sockaddr*)(&server),0,0);
 
-        if (!select(fd+1,&fds,NULL,NULL,&tv)){fprintf(stderr,"No reply within 1 second.\n");exit(1);}
+        if (!select(fd+1,&fds,NULL,NULL,&tv)){fprintf(stderr,"No reply within %i second%s.\n",time,time==1?"":"s");exit(1);}
 
         if (recv_packet(packet,256,0,0,1,0,0)<0)
         {
@@ -90,7 +91,7 @@ void print_help(void)
 {
 	printf(	"0verkill server testing program.\n"
 		"(c)2000 Brainsoft\n"
-		"Usage: test_server [-h] [-p <port number>] -a <address>\n");
+		"Usage: test_server [-h] [-p <port number>] [-t <timeout>] -a <address>\n");
 }
 
 
@@ -99,26 +100,13 @@ void parse_command_line(int argc,char **argv)
         int a;
 	char *c;
 
-        while(1)
+        while((a=getopt(argc,argv,"hp:a:t:")) != -1)
         {
-                a=getopt(argc,argv,"hp:a:");
                 switch(a)
                 {
-                        case EOF:
-                        return;
-
-                        case '?':
-                        case ':':
-                        exit(1);
-
-                        case 'h':
-                        print_help();
-                        exit(0);
-
                         case 'a':
-			name=mem_realloc(name,strlen(optarg)+1);
-			memcpy(name,optarg,strlen(optarg)+1);
-                        break;
+			name=optarg;
+                    	break;
 
 			case 'p':
 			port=strtoul(optarg,&c,10);
@@ -129,6 +117,23 @@ void parse_command_line(int argc,char **argv)
 				else {fprintf(stderr,"Error: Number overflow.\n");exit(1);}
 			}
 			break;
+
+			case 't':
+			time=strtoul(optarg,&c,10);
+			if (*c){fprintf(stderr,"Error: Not a number.\n");exit(1);}
+			if (errno==ERANGE)
+			{
+				if (!time){fprintf(stderr,"Error: Number underflow.\n");exit(1);}
+				else {fprintf(stderr,"Error: Number overflow.\n");exit(1);}
+			}
+			if(time<1){fprintf(stderr,"Error: Timeout too low.\n");exit(1);}
+			break;
+
+                        case '?':
+                        case ':':
+                        case 'h':
+                        print_help();
+                        exit(0);
                 }
         }
 }
