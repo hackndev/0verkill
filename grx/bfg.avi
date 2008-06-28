@@ -5,4 +5,39 @@ l#>===0== / \ |_____\
 a87aaa0aa f f fffffff
 l `---^---\_/_______/
 a fffffffffffffffffff
-s0
+p0,0
+l     ___________
+a     fffffffffff
+l    #>=0 /\ |_\_\
+a    87a0 ff fffff
+l     `-^-\/___/_/
+a     ffffffffffff
+p0,0
+l         __
+a         ff
+l       (|--|
+a       7ffff
+l        `--'
+a        7fff
+p0,0
+l    ___________
+a    fffffffffff
+l   /_/_| /\ 0=<#
+a   fffff ff 0a78
+l   \_\___\/-^-'
+a   ffffffffffff
+p0,0
+l __________________
+a ffffffffffffffffff
+l/_____| / \ ==0===<#
+afffffff f f aa0aaa78
+l\_______\_/---^---'
+afffffffffffffffffff
+p0,0
+l         __
+a         ff
+l        |()|)
+a        f77f7
+l        '--`
+a        7fff
+s0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,3,3,3,3,5,5,5,5,1,1,1,1
