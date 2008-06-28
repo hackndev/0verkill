@@ -55,7 +55,7 @@ void init_socket(void)
 
 
 /* contact server, send information request and wait for response */
-void contact_server(void)
+int contact_server(void)
 {
         static char packet[256];
         int a;
@@ -71,17 +71,18 @@ void contact_server(void)
 
         send_packet(packet,1,(struct sockaddr*)(&server),0,0);
 
-        if (!select(fd+1,&fds,NULL,NULL,&tv)){fprintf(stderr,"No reply within %i second%s.\n",time,time==1?"":"s");exit(1);}
+        if (!select(fd+1,&fds,NULL,NULL,&tv)){fprintf(stderr,"No reply within %i second%s.\n",time,time==1?"":"s");return 1;}
 
         if (recv_packet(packet,256,0,0,1,0,0)<0)
         {
-                if (errno==EINTR){fprintf(stderr,"Server hung up.\n");exit(1);}
-                else {fprintf(stderr,"Connection refused.\n");exit(1);}
+                if (errno==EINTR){fprintf(stderr,"Server hung up.\n");return 1;}
+                else {fprintf(stderr,"Connection refused.\n");return 1;}
         }
 	
-	if ((*packet)!=P_INFO){fprintf(stderr,"Server error.\n");exit(1);}
+	if ((*packet)!=P_INFO){fprintf(stderr,"Server error.\n");return 1;}
 	a=get_int(packet+1);
 	printf("%d\n",a);
+	return 0;
 }
 
 
@@ -141,6 +142,7 @@ void parse_command_line(int argc,char **argv)
 
 int main(int argc, char **argv)
 {
+	int ret;
 #ifdef WIN32
 	WSADATA wd;
 
@@ -152,6 +154,8 @@ int main(int argc, char **argv)
 
 	init_socket();
 	find_server();
-	contact_server();
-	return 0;
+	ret=contact_server();
+	free_packet_buffer();
+	if(fd) close(fd);
+	return ret;
 }
