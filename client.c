@@ -444,7 +444,7 @@ char * contact_server(int color,char *name)
 		ammo[6]=1;
 		current_weapon=0;
 		weapons=WEAPON_MASK_GUN |
-			WEAPON_MASK_GRENADES |
+			WEAPON_MASK_GRENADE |
 			WEAPON_MASK_CHAINSAW;  /* gun and grenades */
 		hero=new_obj(
 			get_int(packet+1),   /* ID */
