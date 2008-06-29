@@ -70,6 +70,7 @@ struct obj_attr_type obj_attr[N_TYPES]=
 	{1,0,0,0,NOBODY,0},  /* teleport */
 	{1,0,0,0,NOBODY,0},  /* BFG */
 	{0,0,0,int2double(1),BOTH,0},  /* BFG cell */
+	{0,0,0,int2double(1),BOTH,0},  /* chainsaw chain */
 };
 
 
@@ -83,6 +84,7 @@ struct weapon_type weapon[ARMS]=
 	{"Rifle",40,70,float2double(6*36),float2double(.4*36),50,20,1,15,15,0,0},
 	{"Grenades",15,60,float2double((double)3.73*36),0,75,40,0,6,24,float2double(3*36),-float2double((double)1.5*36)},  /* shell speed=grenade throwing speed, bullet speed=shrapnel speed */
 	{"BFG",200,80,float2double(2*36),float2double(1*36),100,100,10,10,10,float2double((double).1*36),-float2double((double)1.5*36)},
+	{"Chainsaw",float2double(.0001),5,float2double(1.8*36),0,10,10,1,1,1,0,0},
 };
 
 

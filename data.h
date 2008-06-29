@@ -17,7 +17,7 @@
 #define TYPE_BIRTHPLACE 666
 
 /* object types */
-#define N_TYPES 25
+#define N_TYPES 26
 
 #define T_PLAYER 0
 #define T_BULLET 1
@@ -44,12 +44,13 @@
 #define T_TELEPORT 22
 #define T_BFG 23
 #define T_BFGCELL 24
-
+#define T_CHAIN 25
 
 #define E_INCOMPATIBLE_VERSION 0
 #define E_PLAYER_REFUSED 1
 
 
+#define WEAPON_CHAINSAW 6
 #define WEAPON_BFG 5
 #define WEAPON_GRENADE 4
 #define WEAPON_RIFLE 3
@@ -57,6 +58,7 @@
 #define WEAPON_SHOTGUN 1
 #define WEAPON_GUN 0
 
+#define WEAPON_MASK_CHAINSAW 64
 #define WEAPON_MASK_BFG 32
 #define WEAPON_MASK_GRENADE 16
 #define WEAPON_MASK_RIFLE 8
@@ -65,7 +67,7 @@
 #define WEAPON_MASK_GUN 1
 
 
-#define ARMS 6
+#define ARMS 7
 
 unsigned char *weapon_name[ARMS];
 

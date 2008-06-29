@@ -62,7 +62,9 @@ int active_players=0;  /* # of players in the game */
 unsigned int id=0;  /* my ID */
 unsigned long_long game_start; /* time of game start */
 /* important sprites */
-int grenade_sprite,bullet_sprite,slug_sprite,shell_sprite,shotgun_shell_sprite,mess1_sprite,mess2_sprite,mess3_sprite,mess4_sprite,noise_sprite,bfgcell_sprite;
+int grenade_sprite,bullet_sprite,slug_sprite,shell_sprite,shotgun_shell_sprite,
+    mess1_sprite,mess2_sprite,mess3_sprite,mess4_sprite,noise_sprite,
+    bfgcell_sprite,chain_sprite;
 int shrapnel_sprite[N_SHRAPNELS],bfgbit_sprite[N_SHRAPNELS];
 int nonquitable=0;  /* 1=clients can't abort game pressing F12 (request is ignored) */
 unsigned long_long last_tick;
@@ -512,11 +514,14 @@ void init_player(struct player* p,int x,int y)
 	p->health=100;
 	p->armor=0;
 	p->current_weapon=0;
-	p->weapons=17; /* he has only gun and grenades */
+	p->weapons= WEAPON_MASK_GUN |
+		    WEAPON_MASK_GRENADE |
+		    WEAPON_MASK_CHAINSAW; /* he has only gun, grenades and chainsaw */
 	p->invisibility_counter=0;
 	for (a=0;a<ARMS;a++)
 		p->ammo[a]=0;
 	p->ammo[0]=weapon[0].basic_ammo;
+	p->ammo[6]=weapon[6].basic_ammo;
 	p->obj->xspeed=0;
 	p->obj->yspeed=0;
 	p->obj->status=0;
@@ -1829,8 +1834,9 @@ int dynamic_collision(struct it *obj)
 				}
 				case T_BULLET:
 				case T_BFGCELL:
+				case T_CHAIN:
 				if (p->type!=T_PLAYER)break;
-				b=((obj->type==T_BULLET||obj->type==T_BFGCELL)?FIRE_IMPACT:SHRAPNEL_IMPACT);
+				b=((obj->type==T_BULLET||obj->type==T_BFGCELL||obj->type==T_CHAIN)?FIRE_IMPACT:SHRAPNEL_IMPACT);
 				p->status|=128;
 				p->xspeed+=obj->xspeed>0?b:-b;
 				sendall_update_object(p,0,4);  /* update speed + status */
@@ -2117,7 +2123,8 @@ void update_game(void)
 			}
 		}
 
-		if ((p->next->member.type==T_SHRAPNEL||p->next->member.type==T_BULLET||p->next->member.type==T_BFGCELL)&&(stop_x||stop_y))  /* bullet and shrapnel die crashing into wall */
+		if ((p->next->member.type==T_SHRAPNEL||p->next->member.type==T_BULLET||
+		p->next->member.type==T_BFGCELL||p->next->member.type==T_CHAIN)&&(stop_x||stop_y))  /* bullet and shrapnel die crashing into wall */
 		{
 			packet[0]=P_DELETE_OBJECT;
 			put_int(packet+1,p->next->member.id);
@@ -2319,7 +2326,8 @@ void fire_player(struct player *q,int direction)
 		if (a==q->current_weapon) return;
 		q->current_weapon=a;
 	}
-	q->ammo[q->current_weapon]--;
+	if (q->current_weapon!=WEAPON_CHAINSAW)
+	    q->ammo[q->current_weapon]--;
 	send_update_player(q);
 	q->obj->status&=~512;
 	if (q->current_weapon==WEAPON_SHOTGUN) /* shotgun */
@@ -2438,6 +2446,37 @@ void fire_player(struct player *q,int direction)
 			(void *)(long)(q->obj->id)); 
 		id++;
 		sendall_new_object(s,0);
+	}
+	else if (q->current_weapon==WEAPON_CHAINSAW) {
+		s=new_obj(
+			id,
+			T_CHAIN,
+			weapon[q->current_weapon].ttl,
+			chain_sprite,
+			0,
+			q->current_weapon,
+			add_int(q->obj->x,direction==1?-2:PLAYER_WIDTH),
+			q->obj->y+FIRE_YOFFSET,
+			1.2*q->obj->xspeed+(direction==1?-weapon[q->current_weapon].speed:weapon[q->current_weapon].speed),
+			0,
+			(void *)(long)(q->obj->id)); 
+		id++;
+		sendall_new_object(s,0);
+		s=new_obj(
+			id,
+			T_CHAIN,
+			weapon[q->current_weapon].ttl,
+			chain_sprite,
+			0,
+			q->current_weapon,
+			add_int(q->obj->x,direction==1?-2:PLAYER_WIDTH),
+			q->obj->y+FIRE_YOFFSET+int2double(1),
+			1.2*q->obj->xspeed+(direction==1?-weapon[q->current_weapon].speed:weapon[q->current_weapon].speed),
+			0,
+			(void *)(long)(q->obj->id)); 
+		id++;
+		sendall_new_object(s,0);
+		q->obj->status|=4096;
 	} else
 	{
 		if (q->current_weapon!=WEAPON_GRENADE)  /* not grenades */
@@ -2739,6 +2778,7 @@ int server(void)
 	if (find_sprite("mess4",&mess4_sprite)){char msg[256];snprintf(msg,256,"Can't find sprite \"mess4\".\n");ERROR(msg);EXIT(1);}
 	if (find_sprite("noise",&noise_sprite)){char msg[256];snprintf(msg,256,"Can't find sprite \"noise\".\n");ERROR(msg);EXIT(1);}
 	if (find_sprite("bfgcell",&bfgcell_sprite)){char msg[256];snprintf(msg,256,"Can't find sprite \"bfgcell\".\n");ERROR(msg);EXIT(1);}
+	if (find_sprite("chain",&chain_sprite)){char msg[256];snprintf(msg,256,"Can't find sprite \"chain\".\n");ERROR(msg);EXIT(1);}
 	for (a=0;a<N_SHRAPNELS;a++)
 	{
 		snprintf(txt, sizeof(txt), "shrapnel%d",a+1);

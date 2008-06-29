@@ -441,8 +441,11 @@ char * contact_server(int color,char *name)
 		for(a=0;a<ARMS;a++)
 			ammo[a]=0;
 		ammo[0]=weapon[0].basic_ammo;
+		ammo[6]=1;
 		current_weapon=0;
-		weapons=17;  /* gun and grenades */
+		weapons=WEAPON_MASK_GUN |
+			WEAPON_MASK_GRENADES |
+			WEAPON_MASK_CHAINSAW;  /* gun and grenades */
 		hero=new_obj(
 			get_int(packet+1),   /* ID */
 			T_PLAYER,   /* type */
@@ -655,10 +658,10 @@ int _next_anim_right(int pos,int status, int ttl)
 	if (pos<=18)start=10;  /* normal */
 	else
 	{
-		if (pos<=46)start=38; /* holding gun */
+		if (pos<=46)start=(status&4096)?97:38; /* holding gun */
 		else 
 		{
-			if (pos<=55)start=47; /* shooting */
+			if (pos<=55)start=(status&4096)?106:47; /* shooting */
 			else start=64;  /* creeping */
 		}
 	}
@@ -669,8 +672,8 @@ int _next_anim_right(int pos,int status, int ttl)
 	{
 		if (status&16)
 		{
-			if (ttl>=FIRE_SHOOTING) start=47;  /* shooting */
-			else start=38; /* holding a gun */
+			if (ttl>=FIRE_SHOOTING) start=(status&4096)?106:47;  /* shooting */
+			else start=(status&4096)?97:38; /* holding a gun */
 		}
 		else start=10; /* normal */
 	}
@@ -687,10 +690,10 @@ int _next_anim_left(int pos,int status, int ttl)
 	if (pos<=8)start=0;  /* normal */
 	else
 	{
-		if (pos<=28)start=20; /* holding gun */
+		if (pos<=28)start=(status&4096)?79:20; /* holding gun */
 		else
 		{
-			if (pos<=37)start=29; /* shooting */
+			if (pos<=37)start=(status&4096)?88:29; /* shooting */
 			else start=56; /* creeping */
 		}
 	}
@@ -701,8 +704,8 @@ int _next_anim_left(int pos,int status, int ttl)
 	{
 		if (status&16)
 		{
-			if (ttl>=FIRE_SHOOTING) start=29;  /* shooting */
-			else start=20; /* holding a gun */
+			if (ttl>=FIRE_SHOOTING) start=(status&4096)?88:29;  /* shooting */
+			else start=(status&4096)?79:20; /* holding a gun */
 		}
 		else start=0; /* normal */
 	}
@@ -735,6 +738,9 @@ void update_anim(struct it* obj)
 							else obj->anim_pos=0;
 						}
 					}
+				} else if (obj->status&4096) { /* maniak ma motorovku */
+					if (obj->ttl>=FIRE_SHOOTING)obj->anim_pos=88;
+					else obj->anim_pos=79;
 				}
 				else
 				{
@@ -760,6 +766,9 @@ void update_anim(struct it* obj)
 							else obj->anim_pos=10;
 						}
 					}
+				} else if (obj->status&4096) { /* maniak ma motorovku */
+					if (obj->ttl>=FIRE_SHOOTING)obj->anim_pos=106;
+					else obj->anim_pos=97;
 				}
 				else
 				{
@@ -1992,6 +2001,8 @@ void play(void)
 			keyboard_status.weapon=5;
 		if (!chat && c_was_pressed('6'))
 			keyboard_status.weapon=6;
+		if (!chat && c_was_pressed('7'))
+			keyboard_status.weapon=7;
 		if (c_pressed(K_LEFT_SHIFT)||c_pressed(K_RIGHT_SHIFT)||autorun)
 		keyboard_status.speed=1;
 		if (c_pressed(K_LEFT))
