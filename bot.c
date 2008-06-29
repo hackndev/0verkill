@@ -398,6 +398,7 @@ void test_object(struct it *obj)
 
 		case T_BULLET:
 		case T_SHRAPNEL:
+		case T_BFGCELL:
 		if ((my_sgn(hero->x-obj->x)==my_sgn(obj->xspeed)||my_abs(hero->x-obj->x)<int2double(20))&&obj->y>=hero->y&&obj->y<hero->y+int2double(PLAYER_HEIGHT))
 			keyboard_status.creep=1;
 		break;
@@ -611,7 +612,7 @@ void update_game(void)
 			}
 		}
 
-		if ((p->next->member.type==T_SHRAPNEL||p->next->member.type==T_BULLET)&&(stop_x||stop_y))  /* bullet and shrapnel die crashing into wall */
+		if ((p->next->member.type==T_SHRAPNEL||p->next->member.type==T_BULLET||p->next->member.type==T_BFGCELL)&&(stop_x||stop_y))  /* bullet and shrapnel die crashing into wall */
 		{
 			p=p->prev;  /* deleting object makes a great mess in for cycle, so we must cheat the cycle */
 			delete_obj(p->next->next->member.id);
@@ -843,16 +844,16 @@ int process_packet(char *packet,int l)
 		break;
 
 		case P_UPDATE_PLAYER:
-		if (l<23)break;  /* invalid packet */
+		if (l<15+2*ARMS)break;  /* invalid packet */
 		health=packet[1];
 		armor=packet[2];
 		for (a=0;a<ARMS;a++)
 			ammo[a]=get_int16(packet+3+(a<<1));
 		frags=get_int(packet+3+ARMS*2);
 		deaths=get_int(packet+7+ARMS*2);
-		current_weapon=packet[11+2*ARMS];
-		weapons=packet[12+2*ARMS];
-		n=23;
+		current_weapon=get_int16(packet+11+2*ARMS);
+		weapons=get_int16(packet+13+2*ARMS);
+		n=15+2*ARMS;
 		break;
 
 		case P_MESSAGE:
@@ -879,6 +880,7 @@ int process_packet(char *packet,int l)
 		break;
 
 		case P_EXPLODE_GRENADE:
+		case P_EXPLODE_BFG:
 		{
 			unsigned int i,j;
 			struct object_list *p;
