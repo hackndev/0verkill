@@ -71,7 +71,7 @@ unsigned long_long last_tick;
 unsigned long_long last_player_left=0,last_packet_came=0;
 
 char *level_checksum=0;   /* MD5 sum of the level */
-
+short meatcounter=0;
 unsigned short weapons_order[ARMS]={4,0,3,1,2,5};
 
 struct birthplace_type
@@ -1891,6 +1891,18 @@ int dynamic_collision(struct it *obj)
 					A=(c>=A)?0:(A-c);   /* armor */
 					sendall_hit(p->id,obj->xspeed<0,OX-PX,OY-PY,0);
 					send_update_player((struct player*)(p->data));
+					/* well ... */
+					if (obj->type == T_CHAIN) {
+					struct it *meat=new_obj(id,T_MESS,MESS_TTL,
+						(meatcounter==0x1)?mess3_sprite:
+						((meatcounter)==0x2)?mess2_sprite:mess4_sprite,
+						0,0,obj->x,obj->y,(meatcounter?-1:1)*float2double(3*36),
+						(meatcounter?-1:1)*float2double((double).5*36),0);
+					if (!meat) return 1;
+					id++;
+					sendall_new_object(meat,0);
+					meatcounter = (meatcounter+1)%3;
+					}
 				}
 				return 1;
 			}
