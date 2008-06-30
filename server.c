@@ -2778,7 +2778,7 @@ int server(void)
 	if (find_sprite("mess4",&mess4_sprite)){char msg[256];snprintf(msg,256,"Can't find sprite \"mess4\".\n");ERROR(msg);EXIT(1);}
 	if (find_sprite("noise",&noise_sprite)){char msg[256];snprintf(msg,256,"Can't find sprite \"noise\".\n");ERROR(msg);EXIT(1);}
 	if (find_sprite("bfgcell",&bfgcell_sprite)){char msg[256];snprintf(msg,256,"Can't find sprite \"bfgcell\".\n");ERROR(msg);EXIT(1);}
-	if (find_sprite("chain",&chain_sprite)){char msg[256];snprintf(msg,256,"Can't find sprite \"chain\".\n");ERROR(msg);EXIT(1);}
+	if (find_sprite("sawchain",&chain_sprite)){char msg[256];snprintf(msg,256,"Can't find sprite \"sawchain\".\n");ERROR(msg);EXIT(1);}
 	for (a=0;a<N_SHRAPNELS;a++)
 	{
 		snprintf(txt, sizeof(txt), "shrapnel%d",a+1);
