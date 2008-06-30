@@ -24,7 +24,7 @@ void print_help_window(void)
 	print2screen(HELP_X+21,HELP_Y+8,7,"toggle creep");
 	print2screen(HELP_X+3,HELP_Y+9,10,"Z,CTRL");
 	print2screen(HELP_X+21,HELP_Y+9,7,"fire");
-	print2screen(HELP_X+3,HELP_Y+10,10,"1,2,3,4,5");
+	print2screen(HELP_X+3,HELP_Y+10,10,"1,2,3,4,5,6,7");
 	print2screen(HELP_X+21,HELP_Y+10,7,"change weapon");
 	print2screen(HELP_X+3,HELP_Y+11,10,"ENTER");
 	print2screen(HELP_X+21,HELP_Y+11,7,"chat");
