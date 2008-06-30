@@ -2330,6 +2330,7 @@ void fire_player(struct player *q,int direction)
 {
 	int a;
 	struct it *s;
+	q->obj->status&=~4096;
 
 	if (!(q->obj->status&6)||(q->obj->status&256)||((q->obj->status&16)&&(q->obj->ttl>HOLD_GUN_AFTER_SHOOT)))return;
 	if (!q->ammo[q->current_weapon])
