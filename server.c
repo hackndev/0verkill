@@ -1896,8 +1896,8 @@ int dynamic_collision(struct it *obj)
 					struct it *meat=new_obj(id,T_MESS,MESS_TTL,
 						(meatcounter==0x1)?mess3_sprite:
 						((meatcounter)==0x2)?mess2_sprite:mess4_sprite,
-						0,0,obj->x,obj->y,(meatcounter?-1:1)*float2double(3*36),
-						(meatcounter?-1:1)*float2double((double).5*36),0);
+						0,0,obj->x,obj->y,-float2double((meatcounter+2)*18),
+						-float2double((meatcounter+2)*18),0);
 					if (!meat) return 1;
 					id++;
 					sendall_new_object(meat,0);
