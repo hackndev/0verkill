@@ -1838,7 +1838,8 @@ int dynamic_collision(struct it *obj)
 				if (p->type!=T_PLAYER)break;
 				b=((obj->type==T_BULLET||obj->type==T_BFGCELL||obj->type==T_CHAIN)?FIRE_IMPACT:SHRAPNEL_IMPACT);
 				p->status|=128;
-				p->xspeed+=obj->xspeed>0?b:-b;
+				if (obj->type != T_CHAIN)
+					p->xspeed+=obj->xspeed>0?b:-b;
 				sendall_update_object(p,0,4);  /* update speed + status */
 				p->status&=~128;
 				a=(1-(double)A/100)*weapon[obj->status].lethalness*(2-double2int(obj->y-p->y)/(double)PLAYER_HEIGHT)*obj->ttl/weapon[obj->status].ttl;
@@ -1896,8 +1897,8 @@ int dynamic_collision(struct it *obj)
 					struct it *meat=new_obj(id,T_MESS,MESS_TTL,
 						(meatcounter==0x1)?mess3_sprite:
 						((meatcounter)==0x2)?mess2_sprite:mess4_sprite,
-						0,0,obj->x,obj->y,-float2double((meatcounter+2)*18),
-						-float2double((meatcounter+2)*18),0);
+						0,0,obj->x,obj->y,-float2double(obj->xspeed/500),
+						-float2double((meatcounter+2)*36),0);
 					if (!meat) return 1;
 					id++;
 					sendall_new_object(meat,0);
