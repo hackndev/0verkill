@@ -1114,7 +1114,7 @@ struct it * add_to_timeq(
         p->member.sprite=sprite;
         p->member.anim_pos=pos;
         p->member.data=data;
-        p->member.status=status|64;
+        p->member.status=status | S_INVISIBLE;
 	p->member.last_updated=t;
         return &(p->member);
 }
@@ -1131,7 +1131,7 @@ void update_timeq(void)
 #define N p->next->member
 	for (p=&time_queue;p->next&&p->next->member.last_updated<=t;)
 	{
-		N.status&=~64;
+		N.status &= ~S_INVISIBLE;
 		o=new_obj(N.id,N.type,N.ttl,N.sprite,N.anim_pos,N.status,N.x,N.y,N.xspeed,N.yspeed,N.data);
 		sendall_update_status(o,0);
 		q=p->next->next;
@@ -1169,7 +1169,7 @@ void create_noise(int x,int y,struct player *p)
 {
 	struct it *o;
 
-	p->obj->status|=4096;
+	p->obj->status |= S_NOISE;
 	o=new_obj(id,T_NOISE,NOISE_TTL,noise_sprite,0,0,int2double(x),int2double(y),0,0,(void *)(long)(p->id));
 	if (!o)return;
 	id++;
@@ -1248,7 +1248,7 @@ void read_data(void)
 				active_players++;
 				n_players++;
 				packet[0]=P_PLAYER_ACCEPTED;
-				last_player->member.obj->status|=1024;
+				last_player->member.obj->status |= S_DEAD;
 				put_int(packet+1,last_player->member.obj->id);
 				put_int16(packet+5,last_player->member.obj->sprite);
 				put_int(packet+7,last_player->member.obj->x);
@@ -1294,7 +1294,8 @@ void read_data(void)
 			case P_REENTER_GAME:
 			q=find_player(&client,s);
 			if (!q)break;
-			if (!(q->member.obj->status&1024)||(q->member.obj->status&4096))break;
+			if (!(q->member.obj->status & S_DEAD) || (q->member.obj->status & S_NOISE))
+				break;
 			find_birthplace(&x,&y);
 			create_noise(x,y,&(q->member));
 			q->member.obj->x=int2double(x);
@@ -1488,7 +1489,8 @@ int dynamic_collision(struct it *obj)
 	for (pl=&players;pl->next;pl=pl->next)
 	{
 		p=pl->next->member.obj;
-		if (p->type==T_PLAYER&&(p->status&1024))continue; /* dead player */
+		if (p->type==T_PLAYER&&(p->status & S_DEAD))
+			continue; /* dead player */
 		if (collision(OX,OY,obj->type,obj->status,sprites[obj->sprite].positions,PX,PY,p->type,p->status,sprites[p->sprite].positions))
 			switch(obj->type)
 			{
@@ -1505,7 +1507,7 @@ int dynamic_collision(struct it *obj)
 					send_message((struct player*)(p->data),0,"You got grenades");
 					snprintf(txt,256,"%s got grenades.\n",((struct player*)(p->data))->name);
 					message(txt,1);
-					obj->status|=64;
+					obj->status |= S_INVISIBLE;
 					add_to_timeq(obj->id,T_AMMO_GRENADE,0,obj->sprite,0,0,obj->x,obj->y,0,0,0,AMMO_RESPAWN_TIME);
         				sendall_update_status(obj,0);
 				}
@@ -1529,7 +1531,7 @@ int dynamic_collision(struct it *obj)
 					send_message((struct player*)(p->data),0,"You got a magazine");
 					snprintf(txt,256,"%s got a magazine.\n",((struct player*)(p->data))->name);
 					message(txt,1);
-					obj->status|=64;
+					obj->status |= S_INVISIBLE;
 					add_to_timeq(obj->id,T_AMMO_GUN,0,obj->sprite,0,0,obj->x,obj->y,0,0,0,AMMO_RESPAWN_TIME);
         				sendall_update_status(obj,0);
 				}
@@ -1553,7 +1555,7 @@ int dynamic_collision(struct it *obj)
 					send_message((struct player*)(p->data),0,"You got shotgun shells");
 					snprintf(txt,256,"%s got shotgun shells.\n",((struct player*)(p->data))->name);
 					message(txt,1);
-					obj->status|=64;
+					obj->status |= S_INVISIBLE;
 					add_to_timeq(obj->id,T_AMMO_SHOTGUN,0,obj->sprite,0,0,obj->x,obj->y,0,0,0,AMMO_RESPAWN_TIME);
         				sendall_update_status(obj,0);
 				}
@@ -1577,7 +1579,7 @@ int dynamic_collision(struct it *obj)
 					send_message((struct player*)(p->data),0,"You got cartridges");
 					snprintf(txt,256,"%s got cartridges.\n",((struct player*)(p->data))->name);
 					message(txt,1);
-					obj->status|=64;
+					obj->status |= S_INVISIBLE;
 					add_to_timeq(obj->id,T_AMMO_RIFLE,0,obj->sprite,0,0,obj->x,obj->y,0,0,0,AMMO_RESPAWN_TIME);
         				sendall_update_status(obj,0);
 				}
@@ -1601,7 +1603,7 @@ int dynamic_collision(struct it *obj)
 					send_message((struct player*)(p->data),0,"You got ammo for Uzi");
 					snprintf(txt,256,"%s got Uzi ammo.\n",((struct player*)(p->data))->name);
 					message(txt,1);
-					obj->status|=64;
+					obj->status |= S_INVISIBLE;
 					add_to_timeq(obj->id,T_AMMO_UZI,0,obj->sprite,0,0,obj->x,obj->y,0,0,0,AMMO_RESPAWN_TIME);
         				sendall_update_status(obj,0);
 				}
@@ -1626,7 +1628,7 @@ int dynamic_collision(struct it *obj)
 					send_message((struct player*)(p->data),0,"You got Uzi");
 					snprintf(txt,256,"%s got Uzi.\n",((struct player*)(p->data))->name);
 					message(txt,1);
-					obj->status|=64;
+					obj->status |= S_INVISIBLE;
 					add_to_timeq(obj->id,T_UZI,0,obj->sprite,0,0,obj->x,obj->y,0,0,0,WEAPON_RESPAWN_TIME);
         				sendall_update_status(obj,0);
 				}
@@ -1651,7 +1653,7 @@ int dynamic_collision(struct it *obj)
 					send_message((struct player*)(p->data),0,"You got sniper rifle");
 					snprintf(txt,256,"%s got sniper rifle.\n",((struct player*)(p->data))->name);
 					message(txt,1);
-					obj->status|=64;
+					obj->status |= S_INVISIBLE;
 					add_to_timeq(obj->id,T_RIFLE,0,obj->sprite,0,0,obj->x,obj->y,0,0,0,WEAPON_RESPAWN_TIME);
         				sendall_update_status(obj,0);
 				}
@@ -1676,7 +1678,7 @@ int dynamic_collision(struct it *obj)
 					send_message((struct player*)(p->data),0,"You got a shotgun");
 					snprintf(txt,256,"%s got a shotgun.\n",((struct player*)(p->data))->name);
 					message(txt,1);
-					obj->status|=64;
+					obj->status |= S_INVISIBLE;
 					add_to_timeq(obj->id,T_SHOTGUN,0,obj->sprite,0,0,obj->x,obj->y,0,0,0,WEAPON_RESPAWN_TIME);
         				sendall_update_status(obj,0);
 				}
@@ -1701,7 +1703,7 @@ int dynamic_collision(struct it *obj)
 					send_message((struct player*)(p->data),0,"You got a BFG");
 					snprintf(txt,256,"%s got a BFG.\n",((struct player*)(p->data))->name);
 					message(txt,1);
-					obj->status|=64;
+					obj->status |= S_INVISIBLE;
 					add_to_timeq(obj->id,T_BFG,0,obj->sprite,0,0,obj->x,obj->y,0,0,0,WEAPON_RESPAWN_TIME);
         				sendall_update_status(obj,0);
 				}
@@ -1713,12 +1715,12 @@ int dynamic_collision(struct it *obj)
 					if (p->type!=T_PLAYER)break;
 
 					((struct player*)(p->data))->invisibility_counter=INVISIBILITY_DURATION;
-					p->status|=64;   /* hide player */
+					p->status |= S_INVISIBLE;   /* hide player */
 					sendall_update_status(p,0);
 					send_message((struct player*)(p->data),0,"You got invisibility dope");
 					snprintf(txt,256,"%s got invisibility.\n",((struct player*)(p->data))->name);
 					message(txt,1);
-					obj->status|=64;
+					obj->status |= S_INVISIBLE;
 					add_to_timeq(obj->id,T_INVISIBILITY,0,obj->sprite,0,0,obj->x,obj->y,0,0,0,INVISIBILITY_RESPAWN_TIME);
         				sendall_update_status(obj,0);
 				}
@@ -1759,7 +1761,7 @@ int dynamic_collision(struct it *obj)
 					send_message((struct player*)(p->data),0,"You got armor");
 					snprintf(txt,256,"%s got armor.\n",((struct player*)(p->data))->name);
 					message(txt,1);
-					obj->status|=64;
+					obj->status |= S_INVISIBLE;
 					add_to_timeq(obj->id,T_ARMOR,0,obj->sprite,0,0,obj->x,obj->y,0,0,0,ARMOR_RESPAWN_TIME);
         				sendall_update_status(obj,0);
 				}
@@ -1776,7 +1778,7 @@ int dynamic_collision(struct it *obj)
 					send_message((struct player*)(p->data),0,"You picked up a medikit");
 					snprintf(txt,256,"%s picked up a medikit.\n",((struct player*)(p->data))->name);
 					message(txt,1);
-					obj->status|=64;
+					obj->status |= S_INVISIBLE;
 					add_to_timeq(obj->id,T_MEDIKIT,0,obj->sprite,0,0,obj->x,obj->y,0,0,0,MEDIKIT_RESPAWN_TIME);
         				sendall_update_status(obj,0);
 				}
@@ -1802,14 +1804,14 @@ int dynamic_collision(struct it *obj)
 					H=0;
 					p->xspeed=0;
 					p->yspeed=0;
-					p->status|=1024;  /* dead flag */
+					p->status |= S_DEAD;  /* dead flag */
 					sendall_update_object(p,0,0); /* update everything */
 					send_update_player((struct player*)(p->data));   /* dead player */
 					send_info(0,0);
 					if (a-h>=OVERKILL)
-						create_mess(px,py+((s&256)?CREEP_HEIGHT:PLAYER_HEIGHT)-MESS_HEIGHT,py);
+						create_mess(px,py+((s & S_CREEP)?CREEP_HEIGHT:PLAYER_HEIGHT)-MESS_HEIGHT,py);
 					else
-						create_corpse(px,py+((s&256)?CREEP_HEIGHT:PLAYER_HEIGHT)-CORPSE_HEIGHT,((struct player*)(p->data))->color);
+						create_corpse(px,py+((s & S_CREEP)?CREEP_HEIGHT:PLAYER_HEIGHT)-CORPSE_HEIGHT,((struct player*)(p->data))->color);
 				}
 				else 
 				{
@@ -1837,11 +1839,11 @@ int dynamic_collision(struct it *obj)
 				case T_CHAIN:
 				if (p->type!=T_PLAYER)break;
 				b=((obj->type==T_BULLET||obj->type==T_BFGCELL||obj->type==T_CHAIN)?FIRE_IMPACT:SHRAPNEL_IMPACT);
-				p->status|=128;
+				p->status |= S_HIT;
 				if (obj->type != T_CHAIN)
 					p->xspeed+=obj->xspeed>0?b:-b;
 				sendall_update_object(p,0,4);  /* update speed + status */
-				p->status&=~128;
+				p->status &= ~S_HIT;
 				a=(1-(double)A/100)*weapon[obj->status].lethalness*(2-double2int(obj->y-p->y)/(double)PLAYER_HEIGHT)*obj->ttl/weapon[obj->status].ttl;
 				c=weapon[obj->status].armor_damage*(2-double2int(obj->y-p->y)/(double)PLAYER_HEIGHT)*obj->ttl/weapon[obj->status].ttl;
 				if (a>=H)  /* player was slain */
@@ -1876,15 +1878,15 @@ int dynamic_collision(struct it *obj)
 					H=0;
 					p->xspeed=0;
 					p->yspeed=0;
-					p->status|=1024;  /* dead flag */
+					p->status |= S_DEAD;  /* dead flag */
 					sendall_update_object(p,0,0); /* update everything */
 					send_update_player((struct player*)(p->data));   /* dead player */
 					send_update_player((struct player*)(o->data));  /* owner of bullet/shrapnel */
 					send_info(0,0);
 					if (a-h>=OVERKILL)
-						create_mess(px,py+((s&256)?CREEP_HEIGHT:PLAYER_HEIGHT)-MESS_HEIGHT,py);
+						create_mess(px,py+((s & S_CREEP)?CREEP_HEIGHT:PLAYER_HEIGHT)-MESS_HEIGHT,py);
 					else
-						create_corpse(px,py+((s&256)?CREEP_HEIGHT:PLAYER_HEIGHT)-CORPSE_HEIGHT,((struct player*)(p->data))->color);
+						create_corpse(px,py+((s & S_CREEP)?CREEP_HEIGHT:PLAYER_HEIGHT)-CORPSE_HEIGHT,((struct player*)(p->data))->color);
 				}
 				else 
 				{
@@ -1942,8 +1944,10 @@ void update_game(void)
 
         for(p=&objects;p->next;p=p->next)
         {
-		if (p->next->member.type==T_NOTHING)continue;
-		if (p->next->member.type==T_PLAYER&&(p->next->member.status&1024))continue;  /* dead player */
+		if (p->next->member.type==T_NOTHING)
+			continue;
+		if (p->next->member.type==T_PLAYER&&(p->next->member.status & S_DEAD))
+			continue;  /* dead player */
 		if (p->next->member.type==T_PLAYER&&(((struct player*)(p->next->member.data))->current_level)<0)  /* player hasn't entered the level yet */
 		{
 			send_change_level((struct player*)p->next->member.data);
@@ -1969,7 +1973,7 @@ void update_game(void)
 			((struct player*)(p->next->member.data))->invisibility_counter--;
 			if (!(((struct player*)(p->next->member.data))->invisibility_counter))
 			{
-				p->next->member.status&=~64;
+				p->next->member.status &= ~S_INVISIBLE;
 				sendall_update_status(&(p->next->member),0);
 			}
 		}
@@ -1987,8 +1991,7 @@ void update_game(void)
 				if (q) /* player is still in the game */
 				{
 					init_player(&(q->member),q->member.obj->x,q->member.obj->y);
-					q->member.obj->status&=~1024;
-					q->member.obj->status&=~4096;
+					q->member.obj->status &= ~(S_DEAD | S_NOISE);
 					sendall_update_object(q->member.obj,0,0);  /* update everything */
 					send_update_player(&(q->member));
 				}
@@ -2006,9 +2009,9 @@ void update_game(void)
 					grenade_sprite,
 					0,
 					WEAPON_GRENADE,
-					add_int(p->next->member.x,p->next->member.status&2?2:PLAYER_WIDTH-2),
+					add_int(p->next->member.x,p->next->member.status & S_LOOKLEFT ? 2 : PLAYER_WIDTH-2),
 					p->next->member.y+GRENADE_FIRE_YOFFSET,
-					p->next->member.xspeed+(p->next->member.status&2?-weapon[WEAPON_GRENADE].shell_xspeed:weapon[WEAPON_GRENADE].shell_xspeed),
+					p->next->member.xspeed+(p->next->member.status & S_LOOKLEFT ? -weapon[WEAPON_GRENADE].shell_xspeed:weapon[WEAPON_GRENADE].shell_xspeed),
 					p->next->member.yspeed+weapon[WEAPON_GRENADE].shell_yspeed,
 					(void *)(long)(p->next->member.id)); 
 				id++;
@@ -2021,7 +2024,7 @@ void update_game(void)
 				switch(p->next->member.type)
 				{
 					case T_PLAYER:
-					p->next->member.status&=~16;
+					p->next->member.status &= ~S_SHOOTING;
 					break;
 
 					case T_GRENADE:
@@ -2072,12 +2075,13 @@ void update_game(void)
 		
 		
 		/* when not falling, slow down x motion */
-		if (!(p->next->member.status&8))p->next->member.xspeed=mul(p->next->member.xspeed,obj_attr[p->next->member.type].slow_down_x);
+		if (!(p->next->member.status & S_FALLING))
+			p->next->member.xspeed=mul(p->next->member.xspeed,obj_attr[p->next->member.type].slow_down_x);
 		
 		/* fall */
 		if (obj_attr[p->next->member.type].fall)
 		{
-			if (p->next->member.type!=T_SHRAPNEL)p->next->member.status|=8;
+			if (p->next->member.type!=T_SHRAPNEL)p->next->member.status |= S_FALLING;
 			p->next->member.yspeed+=FALL_ACCEL;
 			/* but not too fast */
 			if (p->next->member.yspeed>MAX_Y_SPEED)p->next->member.yspeed=MAX_Y_SPEED;
@@ -2094,7 +2098,7 @@ void update_game(void)
 		p->next->member.last_updated=t;
 		
 		/* walk up the stairs */
-		if (stop_x&&p->next->member.type==T_PLAYER&&!(p->next->member.status&256))
+		if (stop_x&&p->next->member.type==T_PLAYER&&!(p->next->member.status & S_CREEP))
 		{
 			x1=p->next->member.x;
 			y1=p->next->member.y;
@@ -2121,7 +2125,7 @@ void update_game(void)
 		if (my_abs(p->next->member.xspeed)<MIN_X_SPEED)
 		{
 			p->next->member.xspeed=0;
-			p->next->member.status&=~1;
+			p->next->member.status &= ~S_WALKING;
 		}
 
 
@@ -2132,7 +2136,7 @@ void update_game(void)
 			if (my_abs(p->next->member.yspeed)<MIN_Y_SPEED)
 			{
 				p->next->member.yspeed=0;
-				if (stop_y==1)p->next->member.status&=~8;
+				if (stop_y==1)p->next->member.status &= ~S_FALLING;
 			}
 		}
 
@@ -2255,36 +2259,38 @@ void walk_player(struct player *q,int direction, int speed, int creep)
 			old_x_speed=q->obj->xspeed,
 			old_y_speed=q->obj->yspeed;
 	
-
-	if ((q->obj->status&(512+16))==(512+16))return;  /* when throwing grenade can't walk */
+	if ((q->obj->status & (S_GRENADE | S_SHOOTING)) == (S_GRENADE | S_SHOOTING))
+		return;  /* when throwing grenade can't walk */
 	if (creep)  /* creep */
 	{
 		a=MAX_SPEED_CREEP;
-		if (!(q->obj->status&256))q->obj->y+=CREEP_YOFFSET;
-		q->obj->status|=256;
+		if (!(q->obj->status & S_CREEP))
+			q->obj->y+=CREEP_YOFFSET;
+		q->obj->status |= S_CREEP;
 		
 	}
 	else 
 	{
 		a=speed?MAX_SPEED_WALK_FAST:MAX_X_SPEED;
-		if (q->obj->status&256)q->obj->y-=CREEP_YOFFSET;
-		q->obj->status&=~256;
+		if (q->obj->status & S_CREEP)
+			q->obj->y-=CREEP_YOFFSET;
+		q->obj->status &= ~S_CREEP;
 	}
 	switch (direction)
 	{
 		case 0:  /* stop */
-		q->obj->status&=~1;
+		q->obj->status &= ~S_WALKING;
 		q->obj->xspeed=0;
 		break;
 
 		case 1:  /* left */
-		q->obj->status|=1;
+		q->obj->status |= S_WALKING;
 		q->obj->xspeed-=WALK_ACCEL;
 		if (q->obj->xspeed<-a)q->obj->xspeed=-a;
 		break;
 
 		case 2:  /* right */
-		q->obj->status|=1;
+		q->obj->status |= S_WALKING;
 		q->obj->xspeed+=WALK_ACCEL;
 		if (q->obj->xspeed>a)q->obj->xspeed=a;
 		break;
@@ -2299,8 +2305,9 @@ void walk_player(struct player *q,int direction, int speed, int creep)
 /* jump with given player */
 void jump_player(struct player *p)
 {
-	if (p->obj->status&8||p->obj->status&256)return;
-	p->obj->status|=8;
+	if (p->obj->status & (S_FALLING | S_CREEP))
+		return;
+	p->obj->status |= S_FALLING;
 	p->obj->yspeed=-SPEED_JUMP;
 	sendall_update_object(p->obj,0,4);   /* update speed + status */
 }
@@ -2331,9 +2338,11 @@ void fire_player(struct player *q,int direction)
 {
 	int a;
 	struct it *s;
-	q->obj->status&=~8192; /* chainsaw */
+	q->obj->status &= ~S_CHAINSAW; /* chainsaw */
 
-	if (!(q->obj->status&6)||(q->obj->status&256)||((q->obj->status&16)&&(q->obj->ttl>HOLD_GUN_AFTER_SHOOT)))return;
+	if (!(q->obj->status & (S_LOOKLEFT | S_LOOKRIGHT))||(q->obj->status & S_CREEP)||
+		((q->obj->status & S_SHOOTING)&&(q->obj->ttl>HOLD_GUN_AFTER_SHOOT)))
+		return;
 	if (!q->ammo[q->current_weapon])
 	{
 		a=select_best_weapon(q);
@@ -2343,7 +2352,7 @@ void fire_player(struct player *q,int direction)
 	if (q->current_weapon!=WEAPON_CHAINSAW)
 	    q->ammo[q->current_weapon]--;
 	send_update_player(q);
-	q->obj->status&=~512;
+	q->obj->status &= ~S_GRENADE;
 	if (q->current_weapon==WEAPON_SHOTGUN) /* shotgun */
 	{
 		s=new_obj(  /* SHELL */
@@ -2490,7 +2499,7 @@ void fire_player(struct player *q,int direction)
 			(void *)(long)(q->obj->id)); 
 		id++;
 		sendall_new_object(s,0);
-		q->obj->status|=8192;
+		q->obj->status |= S_CHAINSAW;
 	} else
 	{
 		if (q->current_weapon!=WEAPON_GRENADE)  /* not grenades */
@@ -2526,16 +2535,16 @@ void fire_player(struct player *q,int direction)
 		}
 		else  /* grenades */
 		{
-			q->obj->status|=512;
-			q->obj->status&=~1;
+			q->obj->status |= S_GRENADE;
+			q->obj->status &= ~S_WALKING;
 		}
 	}
 	q->obj->xspeed+=(direction==1)?weapon[q->current_weapon].impact:-weapon[q->current_weapon].impact;
-	q->obj->status|=16;
-	q->obj->status|=32;
+	q->obj->status |= S_SHOOTING;
+	q->obj->status |= S_HOLDING;
 	q->obj->ttl=weapon[q->current_weapon].cadence+HOLD_GUN_AFTER_SHOOT;
 	sendall_update_object(q->obj,0,6);  /* update speed and status and ttl */
-	q->obj->status&=~32;
+	q->obj->status &= ~S_HOLDING;
 }
 
 
@@ -2544,28 +2553,29 @@ void move_player(struct player *p)
 {
 	int a;
 
-	if (p->obj->status&1024)return;   /* dead player */
+	if (p->obj->status & S_DEAD)
+		return;   /* dead player */
 
 	if (p->keyboard_status.down_ladder)  /* climb down a ladder */
-		p->obj->status|=2048;
+		p->obj->status |= S_CLIMB_DOWN;
 	else
-		p->obj->status&=~2048;
+		p->obj->status &=~ S_CLIMB_DOWN;
 
 	if (p->keyboard_status.jump)
 		jump_player(p);
 	if (p->keyboard_status.right)
 	{
-		if ((p->obj->status&6)==4)   /* walk right */
+		if ((p->obj->status & (S_LOOKLEFT | S_LOOKRIGHT))==S_LOOKRIGHT)   /* walk right */
 			walk_player(p,2,p->keyboard_status.speed,p->keyboard_status.creep);
 		else
 		{
-                        if ((p->obj->status)&1)
+                        if (p->obj->status & S_WALKING)
                                 walk_player(p,0,p->keyboard_status.speed,p->keyboard_status.creep);   /* stop */
                         else
                         {
-                                a=(p->obj->status&6)>>1;
-                                p->obj->status&=~6;
-                                p->obj->status|=(a==1)?0:4;
+                                a=p->obj->status & (S_LOOKLEFT | S_LOOKRIGHT);
+                                p->obj->status &= ~(S_LOOKLEFT | S_LOOKRIGHT);
+                                p->obj->status |= (a == S_LOOKLEFT) ? 0 : S_LOOKRIGHT;
                                 sendall_update_status(p->obj,0);
 			}
 		}
@@ -2573,24 +2583,24 @@ void move_player(struct player *p)
 
 	if (p->keyboard_status.left)
 	{
-		if ((p->obj->status&6)==2)   /* walk right */
+		if ((p->obj->status & (S_LOOKLEFT | S_LOOKRIGHT))==S_LOOKLEFT)   /* walk left */
 			walk_player(p,1,p->keyboard_status.speed,p->keyboard_status.creep);
 		else
 		{
-                        if ((p->obj->status)&1)
+                        if (p->obj->status & S_WALKING)
                                 walk_player(p,0,p->keyboard_status.speed,p->keyboard_status.creep);   /* stop */
                         else
                         {
-                                a=(p->obj->status&6)>>1;
-                                p->obj->status&=~6;
-                                p->obj->status|=(a==2)?0:2;
+                                a=p->obj->status & (S_LOOKLEFT | S_LOOKRIGHT);
+                                p->obj->status &= ~(S_LOOKLEFT | S_LOOKRIGHT);
+                                p->obj->status |= (a == S_LOOKRIGHT) ? 0 : S_LOOKLEFT;
                                 sendall_update_status(p->obj,0);
 			}
 		}
 	}
 	change_weapon_player(p,p->keyboard_status.weapon);
 	if (p->keyboard_status.fire)
-		fire_player(p,(p->obj->status&6)>>1);
+		fire_player(p,(p->obj->status & (S_LOOKLEFT | S_LOOKRIGHT))>>1);
 }
 
 

@@ -66,6 +66,20 @@
 #define WEAPON_MASK_SHOTGUN 2
 #define WEAPON_MASK_GUN 1
 
+#define	S_WALKING	0x0001
+#define S_LOOKLEFT	0x0002
+#define S_LOOKRIGHT	0x0004
+#define S_FALLING	0x0008
+#define S_SHOOTING	0x0010
+#define S_HOLDING	0x0020
+#define	S_INVISIBLE	0x0040
+#define	S_HIT		0x0080
+#define S_CREEP		0x0100
+#define S_GRENADE	0x0200
+#define S_DEAD		0x0400
+#define S_CLIMB_DOWN	0x0800
+#define S_NOISE		0x1000
+#define S_CHAINSAW	0x2000
 
 #define ARMS 7
 

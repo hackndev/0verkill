@@ -387,8 +387,10 @@ void test_object(struct it *obj)
 	switch(obj->type)
 	{
 		case T_PLAYER:
-		if (obj->status&64)break;
-		if (priority>1)break;
+		if (obj->status&S_INVISIBLE)
+			break;
+		if (priority>1)
+			break;
 		priority=1;
 		keyboard_status.fire=1;
 		if (obj->x>hero->x)direction=2;
@@ -523,15 +525,18 @@ void update_game(void)
 
 	for(p=&objects;p->next;p=p->next)
 	{
-		if (p->next->member.type==T_NOTHING)continue;
-		if ((p->next->member.status)&1024)continue;   /* dead player */
+		if (p->next->member.type == T_NOTHING)
+			continue;
+		if (p->next->member.status & S_DEAD)
+			continue;   /* dead player */
 		/* decrement time to live */
 		if (p->next->member.ttl>0)
 		{
 			p->next->member.ttl--;
 			if (!p->next->member.ttl)
 			{
-				if ((p->next->member.type)==T_PLAYER)p->next->member.status&=~16;
+				if ((p->next->member.type)==T_PLAYER)
+					p->next->member.status &= ~S_SHOOTING;
 				else
 				{
 					if (p->next->member.type!=T_GRENADE){  /* client's waiting for P_EXPLODE_GRENADE and doesn't delete the grenade yet */
@@ -547,12 +552,13 @@ void update_game(void)
 		
 		
 		/* if not falling slow down x motion */
-		if (!(p->next->member.status&8))p->next->member.xspeed=mul(p->next->member.xspeed,obj_attr[p->next->member.type].slow_down_x);
+		if (!(p->next->member.status & S_FALLING))
+			p->next->member.xspeed=mul(p->next->member.xspeed,obj_attr[p->next->member.type].slow_down_x);
 		
 		/* fall */
 		if (obj_attr[p->next->member.type].fall)
 		{
-			p->next->member.status|=8;
+			p->next->member.status |= S_FALLING;
 			p->next->member.yspeed+=FALL_ACCEL;
 			/* but not too fast */
 			if (p->next->member.yspeed>MAX_Y_SPEED)p->next->member.yspeed=MAX_Y_SPEED;
@@ -571,7 +577,7 @@ void update_game(void)
 		p->next->member.last_updated=t;
 		
 		/* walk up the stairs */
-		if (stop_x&&p->next->member.type==T_PLAYER&&!(p->next->member.status&256))
+		if (stop_x&&p->next->member.type==T_PLAYER&&!(p->next->member.status & S_CREEP))
 		{
 			x1=p->next->member.x;
 			y1=p->next->member.y;
@@ -598,7 +604,7 @@ void update_game(void)
 		if (my_abs(p->next->member.xspeed)<MIN_X_SPEED)
 		{
 			p->next->member.xspeed=0;
-			p->next->member.status&=~1;
+			p->next->member.status &= ~S_WALKING;
 		}
 
 
@@ -609,7 +615,7 @@ void update_game(void)
 			if (my_abs(p->next->member.yspeed)<MIN_Y_SPEED)
 			{
 				p->next->member.yspeed=0;
-				if (stop_y==1)p->next->member.status&=~8;
+				if (stop_y==1)p->next->member.status &= ~S_FALLING;
 			}
 		}
 
@@ -684,7 +690,7 @@ int process_packet(char *packet,int l)
 			p->member.data=0;
 			p->member.ttl=get_int16(packet+24);
 			/* kdyz tasi, tak se nahodi ttl */
-			if (p->member.type==T_PLAYER&&(p->member.status&32)&&(p->member.status&16))
+			if (p->member.type==T_PLAYER&&(p->member.status & S_HOLDING)&&(p->member.status & S_SHOOTING))
 				p->member.ttl=weapon[current_weapon].cadence+HOLD_GUN_AFTER_SHOOT;
 		}
 		break;
@@ -750,7 +756,7 @@ int process_packet(char *packet,int l)
 			p->member.yspeed=get_int(packet+10);
 			p->member.status=get_int16(packet+14);
 			/* kdyz tasi, tak se nahodi ttl */
-			if (p->member.type==T_PLAYER&&(p->member.status&32)&&(p->member.status&16))
+			if (p->member.type==T_PLAYER&&(p->member.status & S_HOLDING)&&(p->member.status & S_SHOOTING))
 				p->member.ttl=weapon[current_weapon].cadence+HOLD_GUN_AFTER_SHOOT;
 		}
 		break;
@@ -769,7 +775,7 @@ int process_packet(char *packet,int l)
 			p->member.y=get_int(packet+10);
 			p->member.status=get_int16(packet+14);
 			/* kdyz tasi, tak se nahodi ttl */
-			if (p->member.type==T_PLAYER&&(p->member.status&32)&&(p->member.status&16))
+			if (p->member.type==T_PLAYER&&(p->member.status & S_HOLDING)&&(p->member.status & S_SHOOTING))
 				p->member.ttl=weapon[current_weapon].cadence+HOLD_GUN_AFTER_SHOOT;
 		}
 		break;
@@ -789,7 +795,7 @@ int process_packet(char *packet,int l)
 			p->member.status=get_int16(packet+14);
 			p->member.ttl=get_int16(packet+16);
 			/* kdyz tasi, tak se nahodi ttl */
-			if (p->member.type==T_PLAYER&&(p->member.status&32)&&(p->member.status&16))
+			if (p->member.type==T_PLAYER&&(p->member.status & S_HOLDING)&&(p->member.status & S_SHOOTING))
 				p->member.ttl=weapon[current_weapon].cadence+HOLD_GUN_AFTER_SHOOT;
 		}
 		break;
@@ -809,7 +815,7 @@ int process_packet(char *packet,int l)
 			p->member.status=get_int16(packet+14);
 			p->member.ttl=get_int16(packet+16);
 			/* kdyz tasi, tak se nahodi ttl */
-			if (p->member.type==T_PLAYER&&(p->member.status&32)&&(p->member.status&16))
+			if (p->member.type==T_PLAYER&&(p->member.status & S_HOLDING)&&(p->member.status & S_SHOOTING))
 				p->member.ttl=weapon[current_weapon].cadence+HOLD_GUN_AFTER_SHOOT;
 		}
 		break;
@@ -824,7 +830,7 @@ int process_packet(char *packet,int l)
 			if (!p)break;  /* ignore objects we don't have */
 			p->member.status=get_int16(packet+5);
 			/* kdyz tasi, tak se nahodi ttl */
-			if (p->member.type==T_PLAYER&&(p->member.status&32)&&(p->member.status&16))
+			if (p->member.type==T_PLAYER&&(p->member.status & S_HOLDING)&&(p->member.status & S_SHOOTING))
 				p->member.ttl=weapon[current_weapon].cadence+HOLD_GUN_AFTER_SHOOT;
 		}
 		break;
@@ -837,10 +843,10 @@ int process_packet(char *packet,int l)
 			n=8;
 			p=find_in_table(get_int(packet+1));
 			if (!p)break;  /* ignore objects we don't have */
-			p->member.status|=128;
+			p->member.status |= S_HIT;
 			p->member.data=(void*)(long)((packet[5]<<16)+(packet[7]<<8)+(packet[6]));
 			/* kdyz tasi, tak se nahodi ttl */
-			if (p->member.type==T_PLAYER&&(p->member.status&32)&&(p->member.status&16))
+			if (p->member.type==T_PLAYER&&(p->member.status & S_HOLDING)&&(p->member.status & S_SHOOTING))
 				p->member.ttl=weapon[current_weapon].cadence+HOLD_GUN_AFTER_SHOOT;
 		}
 		break;
@@ -1070,7 +1076,8 @@ void where2go(void)
 
 void action(void)
 {
-	if ((hero->status)&1024)send_reenter_game();  /* respawn */
+	if (hero->status & S_DEAD)
+		send_reenter_game();  /* respawn */
 	where2go();
 }
 

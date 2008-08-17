@@ -596,15 +596,18 @@ void update_game(void)
 
 	for(p=&objects;p->next;p=p->next)
 	{
-		if (p->next->member.type==T_NOTHING)continue;
-		if ((p->next->member.status)&1024)continue;   /* dead player */
+		if (p->next->member.type==T_NOTHING)
+			continue;
+		if (p->next->member.status & S_DEAD)
+			continue;   /* dead player */
 		/* decrement time to live */
 		if (p->next->member.ttl>0)
 		{
 			p->next->member.ttl--;
 			if (!p->next->member.ttl)
 			{
-				if ((p->next->member.type)==T_PLAYER)p->next->member.status&=~16;
+				if ((p->next->member.type)==T_PLAYER)
+					p->next->member.status &= ~S_SHOOTING;
 				else
 				{
 					if (p->next->member.type!=T_GRENADE &&
@@ -620,12 +623,13 @@ void update_game(void)
 		
 		
 		/* if not falling slow down x motion */
-		if (!(p->next->member.status&8))p->next->member.xspeed=mul(p->next->member.xspeed,obj_attr[p->next->member.type].slow_down_x);
+		if (!(p->next->member.status & S_FALLING))
+			p->next->member.xspeed=mul(p->next->member.xspeed,obj_attr[p->next->member.type].slow_down_x);
 		
 		/* fall */
 		if (obj_attr[p->next->member.type].fall)
 		{
-			p->next->member.status|=8;
+			p->next->member.status |= S_FALLING;
 			p->next->member.yspeed+=FALL_ACCEL;
 			/* but not too fast */
 			if (p->next->member.yspeed>MAX_Y_SPEED)p->next->member.yspeed=MAX_Y_SPEED;
@@ -644,7 +648,7 @@ void update_game(void)
 		p->next->member.last_updated=t;
 		
 		/* walk up the stairs */
-		if (stop_x&&p->next->member.type==T_PLAYER&&!(p->next->member.status&256))
+		if (stop_x&&p->next->member.type==T_PLAYER&&!(p->next->member.status & S_CREEP))
 		{
 			x1=p->next->member.x;
 			y1=p->next->member.y;
@@ -667,11 +671,12 @@ void update_game(void)
 			}
 		}
 		
-		if (stop_x)p->next->member.xspeed=-mul(p->next->member.xspeed,obj_attr[p->next->member.type].bounce_x);
+		if (stop_x)
+			p->next->member.xspeed=-mul(p->next->member.xspeed,obj_attr[p->next->member.type].bounce_x);
 		if (my_abs(p->next->member.xspeed)<MIN_X_SPEED)
 		{
 			p->next->member.xspeed=0;
-			p->next->member.status&=~1;
+			p->next->member.status &= ~S_WALKING;
 		}
 
 
@@ -682,7 +687,7 @@ void update_game(void)
 			if (my_abs(p->next->member.yspeed)<MIN_Y_SPEED)
 			{
 				p->next->member.yspeed=0;
-				if (stop_y==1)p->next->member.status&=~8;
+				if (stop_y==1)p->next->member.status &= ~S_FALLING;
 			}
 		}
 
@@ -704,30 +709,32 @@ int _next_anim_right(int pos,int status, int ttl)
 {
 	int start,offset;
 	
-	if (pos<=18)start=10;  /* normal */
+	if (pos<=18)
+		start=10;  /* normal */
 	else
 	{
-		if (pos<=46)start=(status&8192)?97:38; /* holding gun */
+		if (pos<=46)start=(status & S_CHAINSAW)?97:38; /* holding gun */
 		else 
 		{
-			if (pos<=55)start=(status&8192)?106:47; /* shooting */
+			if (pos<=55)start=(status & S_CHAINSAW)?106:47; /* shooting */
 			else start=64;  /* creeping */
 		}
 	}
 	offset=pos-start;
 	
-	if (status&256)start=64;  /* creeping */
+	if (status & S_CREEP)
+		start=64;  /* creeping */
 	else
 	{
-		if (status&16)
+		if (status & S_SHOOTING)
 		{
-			if (ttl>=FIRE_SHOOTING) start=(status&8192)?106:47;  /* shooting */
-			else start=(status&8192)?97:38; /* holding a gun */
+			if (ttl>=FIRE_SHOOTING) start=(status & S_CHAINSAW)?106:47;  /* shooting */
+			else start=(status & S_CHAINSAW)?97:38; /* holding a gun */
 		}
 		else start=10; /* normal */
 	}
 	
-	return (status&256)?((offset+1)&7)+start:start+(offset&7)+1;
+	return (status & S_CREEP)?((offset+1)&7)+start:start+(offset&7)+1;
 }
 
 
@@ -739,105 +746,82 @@ int _next_anim_left(int pos,int status, int ttl)
 	if (pos<=8)start=0;  /* normal */
 	else
 	{
-		if (pos<=28)start=(status&8192)?79:20; /* holding gun */
+		if (pos<=28)start=(status & S_CHAINSAW)?79:20; /* holding gun */
 		else
 		{
-			if (pos<=37)start=(status&8192)?88:29; /* shooting */
+			if (pos<=37)start=(status & S_CHAINSAW)?88:29; /* shooting */
 			else start=56; /* creeping */
 		}
 	}
 	offset=pos-start;
 	
-	if (status&256)start=56; /* creeping */
+	if (status & S_CREEP)
+		start=56; /* creeping */
 	else
 	{
-		if (status&16)
+		if (status & S_SHOOTING)
 		{
-			if (ttl>=FIRE_SHOOTING) start=(status&8192)?88:29;  /* shooting */
-			else start=(status&8192)?79:20; /* holding a gun */
+			if (ttl>=FIRE_SHOOTING) start=(status & S_CHAINSAW)?88:29;  /* shooting */
+			else start=(status & S_CHAINSAW)?79:20; /* holding a gun */
 		}
 		else start=0; /* normal */
 	}
 	
-	return (status&256)?((offset+1)&7)+start:start+(offset&7)+1;
+	return (status & S_CREEP)?((offset+1)&7)+start:start+(offset&7)+1;
 }
 
 
 /* update hero animating position */
 void update_anim(struct it* obj)
 {
-	if (!(obj->status&1))  /* not walking */
-		switch((obj->status&6)>>1)
+	if (!(obj->status & S_WALKING))  /* not walking */
+		switch((obj->status & (S_LOOKLEFT | S_LOOKRIGHT)))
 		{
 			case 0:  /* look at me */
-			obj->anim_pos=(obj->status&256)?72:9;
-			break;
-			case 1:   /* look left */
-			if (obj->status&16)
-			{
-				if (obj->status&512)
+				obj->anim_pos=(obj->status & S_CREEP)?72:9;
+				break;
+			case S_LOOKLEFT:   /* look left */
+				if (obj->status & S_SHOOTING)
 				{
-					if (obj->ttl>=((weapon[WEAPON_GRENADE].cadence>>1)+HOLD_GUN_AFTER_SHOOT))obj->anim_pos=73;
-					else 
-					{
-						if (obj->ttl>=((weapon[WEAPON_GRENADE].cadence>>2)+HOLD_GUN_AFTER_SHOOT))obj->anim_pos=74;
-						else
-						{
-							if (obj->ttl>=HOLD_GUN_AFTER_SHOOT)obj->anim_pos=75;
-							else obj->anim_pos=0;
-						}
-					}
-				} else if (obj->status&8192) { /* maniak ma motorovku */
-					if (obj->ttl>=FIRE_SHOOTING)obj->anim_pos=88;
-					else obj->anim_pos=79;
-				}
-				else
+					if (obj->status & S_GRENADE)
+						obj->anim_pos =	(obj->ttl>=((weapon[WEAPON_GRENADE].cadence>>1)+HOLD_GUN_AFTER_SHOOT)) ?
+								73 : (obj->ttl>=((weapon[WEAPON_GRENADE].cadence>>2)+HOLD_GUN_AFTER_SHOOT)) ?
+								74 : ((obj->ttl>=HOLD_GUN_AFTER_SHOOT) ? 75 : 0);
+					else if (obj->status & S_CHAINSAW) /* maniak ma motorovku */
+						obj->anim_pos=(obj->ttl>=FIRE_SHOOTING) ? 88 : 79;
+					else
+						obj->anim_pos=(obj->ttl>=FIRE_SHOOTING) ? 29 : 20;
+				} else
+					obj->anim_pos=0;
+				if (obj->status & S_CREEP)
+					obj->anim_pos=56;
+				break;
+			case S_LOOKRIGHT:   /* look right */
+				if (obj->status & S_SHOOTING)
 				{
-					if (obj->ttl>=FIRE_SHOOTING)obj->anim_pos=29;
-					else obj->anim_pos=20;
-				}
-			}
-			else obj->anim_pos=0;
-			if (obj->status&256)obj->anim_pos=56;
-			break;
-			case 2:   /* look right */
-			if (obj->status&16)
-			{
-				if (obj->status&512)
-				{
-					if (obj->ttl>=((weapon[WEAPON_GRENADE].cadence>>1)+HOLD_GUN_AFTER_SHOOT))obj->anim_pos=76;
-					else 
-					{
-						if (obj->ttl>=((weapon[WEAPON_GRENADE].cadence>>2)+HOLD_GUN_AFTER_SHOOT))obj->anim_pos=77;
-						else
-						{
-							if (obj->ttl>=HOLD_GUN_AFTER_SHOOT)obj->anim_pos=78;
-							else obj->anim_pos=10;
-						}
-					}
-				} else if (obj->status&8192) { /* maniak ma motorovku */
-					if (obj->ttl>=FIRE_SHOOTING)obj->anim_pos=106;
-					else obj->anim_pos=97;
-				}
-				else
-				{
-					if (obj->ttl>=FIRE_SHOOTING)obj->anim_pos=47;
-					else obj->anim_pos=38;
-				}
-			}
-			else obj->anim_pos=10;
-			if (obj->status&256)obj->anim_pos=64;
-			break;
+					if (obj->status & S_GRENADE)
+						obj->anim_pos =	(obj->ttl>=((weapon[WEAPON_GRENADE].cadence>>1)+HOLD_GUN_AFTER_SHOOT)) ?
+								76 : (obj->ttl>=((weapon[WEAPON_GRENADE].cadence>>2)+HOLD_GUN_AFTER_SHOOT)) ?
+								77 : ((obj->ttl>=HOLD_GUN_AFTER_SHOOT) ? 78 : 10);
+					else if (obj->status & S_CHAINSAW) /* maniak ma motorovku */
+						obj->anim_pos=(obj->ttl>=FIRE_SHOOTING) ? 106 : 97;
+					else
+						obj->anim_pos=(obj->ttl>=FIRE_SHOOTING) ? 47 : 38;
+				} else
+					obj->anim_pos=10;
+				if (obj->status & S_CREEP)
+					obj->anim_pos=64;
+				break;
 		}
 	else  /* walking */
 	{
-		switch((obj->status&6)>>1)
+		switch (obj->status & (S_LOOKLEFT | S_LOOKRIGHT))
 		{
-			case 1:  /* walk left */
+			case S_LOOKLEFT:  /* walk left */
 			obj->anim_pos=_next_anim_left(obj->anim_pos,obj->status,obj->ttl);
 			break;
 
-			case 2:   /* walk right */
+			case S_LOOKRIGHT:   /* walk right */
 			obj->anim_pos=_next_anim_right(obj->anim_pos,obj->status,obj->ttl);
 			break;
 		}
@@ -869,7 +853,7 @@ void draw_scene(void)
 			if (&(p->next->member)==hero)continue;
 			if (p->next->member.type==T_PLAYER)update_anim(&(p->next->member));
 			else {p->next->member.anim_pos++;p->next->member.anim_pos%=sprites[p->next->member.sprite].n_steps;}
-			if (!(p->next->member.status&1024)&&!(p->next->member.status&64))   /* don't draw hidden objects and dead players */
+			if (!(p->next->member.status & S_DEAD)&&!(p->next->member.status & S_INVISIBLE))   /* don't draw hidden objects and dead players */
 			{
 #ifdef TRI_D
 				if(TRI_D_ON)
@@ -892,10 +876,10 @@ void draw_scene(void)
 					1
 					);
 			}
-			if (p->next->member.type==T_PLAYER&&p->next->member.status&128) /* hit */
+			if (p->next->member.type==T_PLAYER&&p->next->member.status & S_HIT) /* hit */
 			{
-				p->next->member.status&=~128;
-				if (!(p->next->member.status&1024))   /* don't draw blood splash to dead players */
+				p->next->member.status &= ~S_HIT;
+				if (!(p->next->member.status & S_DEAD))   /* don't draw blood splash to dead players */
 				{
 #ifdef TRI_D
 					if (TRI_D_ON)
@@ -922,7 +906,8 @@ void draw_scene(void)
 		}
 		if (obj_attr[T_PLAYER].foreground!=fore)continue;
 		update_anim(hero);
-		if ((hero->status)&1024)continue;   /* don't draw dead hero */
+		if (hero->status & S_DEAD)
+			continue;   /* don't draw dead hero */
 #ifdef TRI_D
 		if (TRI_D_ON)
 		{
@@ -942,9 +927,9 @@ void draw_scene(void)
 			sprites[hero->sprite].positions+sprites[hero->sprite].steps[hero->anim_pos],
 			1
 			);
-		if (hero->status&128) /* hit */
+		if (hero->status & S_HIT) /* hit */
 		{
-			hero->status&=~128;
+			hero->status &= ~S_HIT;
 #ifdef TRI_D
 			if (TRI_D_ON)
 			{
@@ -1046,7 +1031,7 @@ int process_packet(char *packet,int l)
 			p->member.data=0;
 			p->member.ttl=get_int16(packet+24);
 			/* kdyz tasi, tak se nahodi ttl */
-			if (p->member.type==T_PLAYER&&(p->member.status&32)&&(p->member.status&16))
+			if (p->member.type==T_PLAYER&&(p->member.status & S_HOLDING)&&(p->member.status & S_SHOOTING))
 				p->member.ttl=weapon[current_weapon].cadence+HOLD_GUN_AFTER_SHOOT;
 		}
 		break;
@@ -1112,7 +1097,7 @@ int process_packet(char *packet,int l)
 			p->member.yspeed=get_int(packet+10);
 			p->member.status=get_int16(packet+14);
 			/* kdyz tasi, tak se nahodi ttl */
-			if (p->member.type==T_PLAYER&&(p->member.status&32)&&(p->member.status&16))
+			if (p->member.type==T_PLAYER&&(p->member.status & S_HOLDING)&&(p->member.status & S_SHOOTING))
 				p->member.ttl=weapon[current_weapon].cadence+HOLD_GUN_AFTER_SHOOT;
 		}
 		break;
@@ -1131,7 +1116,7 @@ int process_packet(char *packet,int l)
 			p->member.y=get_int(packet+10);
 			p->member.status=get_int16(packet+14);
 			/* kdyz tasi, tak se nahodi ttl */
-			if (p->member.type==T_PLAYER&&(p->member.status&32)&&(p->member.status&16))
+			if (p->member.type==T_PLAYER&&(p->member.status & S_HOLDING)&&(p->member.status & S_SHOOTING))
 				p->member.ttl=weapon[current_weapon].cadence+HOLD_GUN_AFTER_SHOOT;
 		}
 		break;
@@ -1151,7 +1136,7 @@ int process_packet(char *packet,int l)
 			p->member.status=get_int16(packet+14);
 			p->member.ttl=get_int16(packet+16);
 			/* kdyz tasi, tak se nahodi ttl */
-			if (p->member.type==T_PLAYER&&(p->member.status&32)&&(p->member.status&16))
+			if (p->member.type==T_PLAYER&&(p->member.status & S_HOLDING)&&(p->member.status & S_SHOOTING))
 				p->member.ttl=weapon[current_weapon].cadence+HOLD_GUN_AFTER_SHOOT;
 		}
 		break;
@@ -1171,7 +1156,7 @@ int process_packet(char *packet,int l)
 			p->member.status=get_int16(packet+14);
 			p->member.ttl=get_int16(packet+16);
 			/* kdyz tasi, tak se nahodi ttl */
-			if (p->member.type==T_PLAYER&&(p->member.status&32)&&(p->member.status&16))
+			if (p->member.type==T_PLAYER&&(p->member.status & S_HOLDING)&&(p->member.status & S_SHOOTING))
 				p->member.ttl=weapon[current_weapon].cadence+HOLD_GUN_AFTER_SHOOT;
 		}
 		break;
@@ -1186,7 +1171,7 @@ int process_packet(char *packet,int l)
 			if (!p)break;  /* ignore objects we don't have */
 			p->member.status=get_int16(packet+5);
 			/* kdyz tasi, tak se nahodi ttl */
-			if (p->member.type==T_PLAYER&&(p->member.status&32)&&(p->member.status&16))
+			if (p->member.type==T_PLAYER&&(p->member.status & S_HOLDING)&&(p->member.status & S_SHOOTING))
 				p->member.ttl=weapon[current_weapon].cadence+HOLD_GUN_AFTER_SHOOT;
 		}
 		break;
@@ -1199,10 +1184,10 @@ int process_packet(char *packet,int l)
 			n=8;
 			p=find_in_table(get_int(packet+1));
 			if (!p)break;  /* ignore objects we don't have */
-			p->member.status|=128;
+			p->member.status|=S_HIT;
 			p->member.data=(void*)(long)((packet[5]<<16)+(packet[7]<<8)+(packet[6]));
 			/* kdyz tasi, tak se nahodi ttl */
-			if (p->member.type==T_PLAYER&&(p->member.status&32)&&(p->member.status&16))
+			if (p->member.type==T_PLAYER&&(p->member.status & S_HOLDING)&&(p->member.status & S_SHOOTING))
 				p->member.ttl=weapon[current_weapon].cadence+HOLD_GUN_AFTER_SHOOT;
 		}
 		break;
@@ -1275,9 +1260,11 @@ level_changed:
 		break;
 
 		case P_END:
-		if (l<2)snprintf(error_message,1024,"Game terminated. Press ENTER.");
-		else snprintf(error_message,1024,"Game terminated by %s. Press ENTER.",packet+1);
-		return -1;
+			if (l<2)
+				snprintf(error_message,1024,"Game terminated. Press ENTER.");
+			else
+				snprintf(error_message,1024,"Game terminated by %s. Press ENTER.",packet+1);
+			return -1;
 
 		case P_BELL:
 		n=1;
@@ -1419,7 +1406,7 @@ void draw_board(void)
 	print2screen(49+5*space,SCREEN_Y-1,7,"ARMOR");
 	snprintf(txt, sizeof(txt), "% 4d%%",armor);
 	print2screen(49+5+5*space,SCREEN_Y-1,select_color(armor,100),txt);
-	if ((hero->status)&64)print2screen(SCREEN_X-14,SCREEN_Y-2,11,"INVISIBILITY");
+	if (hero->status & S_INVISIBLE)print2screen(SCREEN_X-14,SCREEN_Y-2,11,"INVISIBILITY");
 	if (autorun)print2screen(2,SCREEN_Y-2,15,"AUTORUN");
 	if (autocreep)print2screen(10,SCREEN_Y-2,15,"AUTOCREEP");
 }

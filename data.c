@@ -519,7 +519,7 @@ get_dimensions(int type,int status,struct pos *s,int *w,int *h)
 	switch(type)
 	{
 		case T_PLAYER:
-		if (status&256)
+		if (status & S_CREEP)
 		{
 			*w=CREEP_WIDTH;
 			*h=CREEP_HEIGHT;
@@ -557,7 +557,8 @@ void update_position(struct it* obj,int new_x,int new_y,int width, int height,un
 	unsigned char down_ladder=0;
 
 	/* player is climbing ladder down */
-	if (obj->type==T_PLAYER&&obj->status&2048) down_ladder=1;
+	if (obj->type == T_PLAYER && obj->status & S_CLIMB_DOWN)
+		down_ladder = 1;
 	
 	if (obj->xspeed>0)
 		obj->x=sub_int(can_go_x(add_int(obj->x,width-1),add_int(new_x,width-1),double2int(obj->y),round_up(obj->y)+height-1,fx),width-1);
