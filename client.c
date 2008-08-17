@@ -76,6 +76,16 @@
 	int consoleApp=1;
 #endif
 
+/* settings */
+struct config {
+	int	argc;
+	char	**argv;
+	char	host[MAX_HOST_LEN+1];
+	char	name[MAX_NAME_LEN+1];
+	int	port;
+	int	color;
+};
+
 /* my health, armor, frags, deaths, ammo, ... and ID */
 unsigned char health,armor;
 unsigned int frags,deaths;
@@ -184,7 +194,7 @@ void wait_for_enter(void)
 
 
 /* load configure file from player's home directory */
-void load_cfg(char *host,char *name,int *color)
+void load_cfg(struct config *cfg)
 {
 	FILE *stream;
 	int a;
@@ -202,22 +212,22 @@ void load_cfg(char *host,char *name,int *color)
 		return;
 	a=strlen(txt);
 	if (txt[a-1]==10)txt[a-1]=0;
-	memcpy(host,txt,strlen(txt)+1);
+	memcpy(cfg->host,txt,strlen(txt)+1);
 	
 	if (!fgets(txt,MAX_NAME_LEN+2,stream))
 		return;
 	a=strlen(txt);
 	if (txt[a-1]==10)txt[a-1]=0;
-	memcpy(name,txt,strlen(txt)+1);
+	memcpy(cfg->name,txt,strlen(txt)+1);
 	if (!fgets(txt,256,stream))
 		return;
-	*color=strtol(txt,0,10);
+	cfg->color=strtol(txt,0,10);
 	fclose(stream);
 }
 
 
 /* save configure file to player's home */
-void save_cfg(char *host,char *name,int color)
+void save_cfg(struct config *cfg)
 {
 	FILE *stream;
 	char txt[256];
@@ -229,7 +239,7 @@ void save_cfg(char *host,char *name,int color)
 #endif
 	stream=fopen(txt,"w");
 	if (!stream)return;
-	fprintf(stream,"%s\n%s\n%d\n",host,name,color);
+	fprintf(stream,"%s\n%s\n%d\n",cfg->host,cfg->name,cfg->color);
 	fclose(stream);
 }
 
@@ -330,15 +340,16 @@ void shut_down(int x)
 
 
 /* find address of server and fill the server address structure */
-char * find_server(char *name,unsigned short port)
+char * find_server(struct config *cfg)
 {
 	struct hostent *h;
-	
-	h=gethostbyname(name);
-	if (!h)return "Error: Can't resolve server address.";
+
+	h=gethostbyname(cfg->host);
+	if (!h)
+		return "Error: Can't resolve server address.";
 
 	server.sin_family=AF_INET;
-	server.sin_port=htons(port);
+	server.sin_port=htons(cfg->port);
 	server.sin_addr=*((struct in_addr*)(h->h_addr_list[0]));
 	return 0;
 }
@@ -1512,7 +1523,7 @@ void load_banner(char **banner)
 
 
 /* draw initial screen */
-void menu_screen(char *host,char *name,unsigned short *p,int *color)
+void menu_screen(struct config *cfg)
 {
 	char txt[8];
 	int sprite,anim=0,title_anim=0,bulge_anim=0;
@@ -1527,8 +1538,8 @@ void menu_screen(char *host,char *name,unsigned short *p,int *color)
 	
 	load_banner(&banner);
 	l=strlen(banner);
-	snprintf(port, sizeof(port), "%d",*p);
-	snprintf(txt, sizeof(txt), "hero%d",*color);
+	snprintf(port, sizeof(port), "%d",cfg->port);
+	snprintf(txt, sizeof(txt), "hero%d",cfg->color);
 	if (find_sprite(txt,&sprite))
 	{
 		char msg[256];
@@ -1557,12 +1568,12 @@ cycle:
 	put_sprite(SCREEN_XOFFSET,TITLE_HEIGHT+((SCREEN_Y-3-PLAYER_HEIGHT-TITLE_HEIGHT)>>1),sprites[sprite].positions+sprites[sprite].steps[(anim<2?48:39)+(anim&7)],0);
 	print2screen(0,TITLE_HEIGHT+4,11,"N:");
 	print2screen(1,TITLE_HEIGHT+4,2,"AME:");
-	print2screen(6,TITLE_HEIGHT+4,7,name);
+	print2screen(6,TITLE_HEIGHT+4,7,cfg->name);
 	print2screen(0,TITLE_HEIGHT+6,2,"COLOR:");
-	print2screen(7,TITLE_HEIGHT+6,7,color_name[(*color-1)%15]);
+	print2screen(7,TITLE_HEIGHT+6,7,color_name[(cfg->color-1)%15]);
 	print2screen(0,TITLE_HEIGHT+0,11,"S");
 	print2screen(1,TITLE_HEIGHT+0,2,"ERVER ADDRESS:");
-	print2screen(16,TITLE_HEIGHT+0,7,host);
+	print2screen(16,TITLE_HEIGHT+0,7,cfg->host);
 	print2screen(0,TITLE_HEIGHT+2,11,"P");
 	print2screen(1,TITLE_HEIGHT+2,2,"ORT:");
 	print2screen(6,TITLE_HEIGHT+2,7,port);
@@ -1599,12 +1610,12 @@ cycle:
 	switch(a)
 	{
 		case 1:
-		if (read_str_online(SCREEN_Y-1,name,"Enter your name: ",MAX_NAME_LEN))
+		if (read_str_online(SCREEN_Y-1,cfg->name,"Enter your name: ",MAX_NAME_LEN))
 			a=0;
 		break;
 
 		case 3:
-		if (read_str_online(SCREEN_Y-1,host,"Enter address: ",MAX_HOST_LEN))
+		if (read_str_online(SCREEN_Y-1,cfg->host,"Enter address: ",MAX_HOST_LEN))
 			a=0;
 		break;
 
@@ -1629,18 +1640,20 @@ cycle:
 	{
 		if (c_was_pressed('+')||c_was_pressed('=')||c_was_pressed(K_UP)||c_was_pressed(K_RIGHT)||c_was_pressed(K_NUM_PLUS))
 		{
-			(*color)++;
-			if (*color>30)(*color)=1;
-			snprintf(txt, sizeof(txt), "hero%d",*color);
+			(cfg->color)++;
+			if (cfg->color>30)
+				cfg->color=1;
+			snprintf(txt, sizeof(txt), "hero%d",cfg->color);
 			if (find_sprite(txt,&sprite))
 				{shut_down(0);mem_free(banner);fprintf(stderr,"Error: Can't find sprite \"%s\".\n",txt);}
 		}
 		
 		if (c_was_pressed('-')||c_was_pressed(K_NUM_MINUS)||c_was_pressed(K_DOWN)||c_was_pressed(K_LEFT))
 		{
-			(*color)--;
-			if (*color<1)(*color)=30;
-			snprintf(txt, sizeof(txt), "hero%d",*color);
+			cfg->color--;
+			if (cfg->color<1)
+				cfg->color=30;
+			snprintf(txt, sizeof(txt), "hero%d",cfg->color);
 			if (find_sprite(txt,&sprite))
 				{shut_down(0);mem_free(banner);fprintf(stderr,"Error: Can't find sprite \"%s\".\n",txt);}
 		}
@@ -1648,9 +1661,9 @@ cycle:
 		if (c_was_pressed('h'))help^=1;
 		if (c_was_pressed(K_ENTER))
 		{
-			save_cfg(host,name,*color);
-			*p=strtol(port,0,10);
-			if ((m=find_server(host,*p)))
+			save_cfg(cfg);
+			cfg->port=strtol(port,0,10);
+			if ((m=find_server(cfg)))
 			{
 				print2screen(((SCREEN_X-strlen(m))>>1),SCREEN_Y-1,9,m);
 #ifdef TRI_D
@@ -1680,7 +1693,7 @@ cycle:
 				wait_for_enter();
 				goto cc1;
 			}
-			if ((m=contact_server(*color,name)))
+			if ((m=contact_server(cfg->color,cfg->name)))
 			{
 				print2screen(((SCREEN_X-strlen(m))>>1),SCREEN_Y-1,9,m);
 #ifdef TRI_D
@@ -1701,7 +1714,7 @@ cycle:
 cc1:
 		if (c_was_pressed('q')||c_was_pressed(K_ESCAPE))
 		{
-			save_cfg(host,name,*color);
+			save_cfg(cfg);
 			mem_free(banner);
 			shut_down(1);
 		}
@@ -2019,13 +2032,9 @@ void play(void)
 /*----------------------------------------------------------------------------*/
 int main(int argc,char **argv)
 {
-	unsigned short port=DEFAULT_PORT;
-	int color=1;
-	char host[MAX_HOST_LEN+1];
-	char name[MAX_NAME_LEN+1];
 	int a;
 	char txt[256];
-	
+	struct config cfg = {argc, argv, "", "", DEFAULT_PORT, 1};
 	
 #ifdef WIN32
 	WSADATA wd;
@@ -2043,9 +2052,9 @@ int main(int argc,char **argv)
 	last_message=-1;
 	autorun=0;
 	autocreep=0;
-	memset(host,0,MAX_HOST_LEN+1);
-	memset(name,0,MAX_NAME_LEN+1);
-	load_cfg(host,name,&color);
+	memset(cfg.host,0,MAX_HOST_LEN+1);
+	memset(cfg.name,0,MAX_NAME_LEN+1);
+	load_cfg(&cfg);
 	last_obj=&objects;
 	*error_message=0;
 
@@ -2098,7 +2107,7 @@ int main(int argc,char **argv)
 	{
 		level_number=-1;
 		connected=0;
-		menu_screen(host,name,&port,&color);
+		menu_screen(&cfg);
 		connected=1;
 		play();
 		clean_memory();
