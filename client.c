@@ -194,6 +194,17 @@ void wait_for_enter(void)
 
 
 /* load configure file from player's home directory */
+int read_cfg_entry(FILE *stream, char *retval, int len)
+{
+	int l;
+	if (!fgets(retval,len+2,stream))
+		return 0;
+	l = strlen(retval);
+	if (retval[l-1] == 10)
+		retval[l-1] = 0;
+	return l;
+}
+
 void load_cfg(struct config *cfg)
 {
 	FILE *stream;
@@ -208,20 +219,24 @@ void load_cfg(struct config *cfg)
 	stream=fopen(txt,"r");
 	if (!stream)return;
 	
-	if (!fgets(txt,MAX_HOST_LEN+2,stream))
+	if (a = read_cfg_entry(stream, txt, MAX_HOST_LEN))
+		memcpy(cfg->host,txt,a+1);
+	else
 		return;
-	a=strlen(txt);
-	if (txt[a-1]==10)txt[a-1]=0;
-	memcpy(cfg->host,txt,strlen(txt)+1);
 	
-	if (!fgets(txt,MAX_NAME_LEN+2,stream))
+	if (a = read_cfg_entry(stream, txt, MAX_NAME_LEN))
+		memcpy(cfg->name,txt,a+1);
+	else
 		return;
-	a=strlen(txt);
-	if (txt[a-1]==10)txt[a-1]=0;
-	memcpy(cfg->name,txt,strlen(txt)+1);
+
+	if (a = read_cfg_entry(stream, txt, MAX_PORT_LEN))
+		cfg->port = strtol(txt,0,10);
+	else
+		return;
+
 	if (!fgets(txt,256,stream))
 		return;
-	cfg->color=strtol(txt,0,10);
+	cfg->color = strtol(txt,0,10);
 	fclose(stream);
 }
 
@@ -238,8 +253,10 @@ void save_cfg(struct config *cfg)
 	snprintf(txt, sizeof(txt), "./%s",CFG_FILE);
 #endif
 	stream=fopen(txt,"w");
-	if (!stream)return;
-	fprintf(stream,"%s\n%s\n%d\n",cfg->host,cfg->name,cfg->color);
+	if (!stream)
+		return;
+	fprintf(stream, "%s\n%s\n%d\n%d\n", cfg->host, cfg->name,
+					cfg->port, cfg->color);
 	fclose(stream);
 }
 
@@ -1620,8 +1637,10 @@ cycle:
 		break;
 
 		case 2:
-		if (read_num_online(SCREEN_Y-1,port,"Enter port: ",MAX_PORT_LEN))
+		if (read_num_online(SCREEN_Y-1,port,"Enter port: ",MAX_PORT_LEN)) {
+			cfg->port = strtol(port, 0, 10);
 			a=0;
+		}
 		break;
 	}
 	c_update_kbd();
