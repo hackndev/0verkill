@@ -707,10 +707,10 @@ int _next_anim_right(int pos,int status, int ttl)
 	if (pos<=18)start=10;  /* normal */
 	else
 	{
-		if (pos<=46)start=(status&4096)?97:38; /* holding gun */
+		if (pos<=46)start=(status&8192)?97:38; /* holding gun */
 		else 
 		{
-			if (pos<=55)start=(status&4096)?106:47; /* shooting */
+			if (pos<=55)start=(status&8192)?106:47; /* shooting */
 			else start=64;  /* creeping */
 		}
 	}
@@ -721,8 +721,8 @@ int _next_anim_right(int pos,int status, int ttl)
 	{
 		if (status&16)
 		{
-			if (ttl>=FIRE_SHOOTING) start=(status&4096)?106:47;  /* shooting */
-			else start=(status&4096)?97:38; /* holding a gun */
+			if (ttl>=FIRE_SHOOTING) start=(status&8192)?106:47;  /* shooting */
+			else start=(status&8192)?97:38; /* holding a gun */
 		}
 		else start=10; /* normal */
 	}
@@ -739,10 +739,10 @@ int _next_anim_left(int pos,int status, int ttl)
 	if (pos<=8)start=0;  /* normal */
 	else
 	{
-		if (pos<=28)start=(status&4096)?79:20; /* holding gun */
+		if (pos<=28)start=(status&8192)?79:20; /* holding gun */
 		else
 		{
-			if (pos<=37)start=(status&4096)?88:29; /* shooting */
+			if (pos<=37)start=(status&8192)?88:29; /* shooting */
 			else start=56; /* creeping */
 		}
 	}
@@ -753,8 +753,8 @@ int _next_anim_left(int pos,int status, int ttl)
 	{
 		if (status&16)
 		{
-			if (ttl>=FIRE_SHOOTING) start=(status&4096)?88:29;  /* shooting */
-			else start=(status&4096)?79:20; /* holding a gun */
+			if (ttl>=FIRE_SHOOTING) start=(status&8192)?88:29;  /* shooting */
+			else start=(status&8192)?79:20; /* holding a gun */
 		}
 		else start=0; /* normal */
 	}
@@ -787,7 +787,7 @@ void update_anim(struct it* obj)
 							else obj->anim_pos=0;
 						}
 					}
-				} else if (obj->status&4096) { /* maniak ma motorovku */
+				} else if (obj->status&8192) { /* maniak ma motorovku */
 					if (obj->ttl>=FIRE_SHOOTING)obj->anim_pos=88;
 					else obj->anim_pos=79;
 				}
@@ -815,7 +815,7 @@ void update_anim(struct it* obj)
 							else obj->anim_pos=10;
 						}
 					}
-				} else if (obj->status&4096) { /* maniak ma motorovku */
+				} else if (obj->status&8192) { /* maniak ma motorovku */
 					if (obj->ttl>=FIRE_SHOOTING)obj->anim_pos=106;
 					else obj->anim_pos=97;
 				}

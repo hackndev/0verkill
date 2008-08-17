@@ -2331,7 +2331,7 @@ void fire_player(struct player *q,int direction)
 {
 	int a;
 	struct it *s;
-	q->obj->status&=~4096;
+	q->obj->status&=~8192; /* chainsaw */
 
 	if (!(q->obj->status&6)||(q->obj->status&256)||((q->obj->status&16)&&(q->obj->ttl>HOLD_GUN_AFTER_SHOOT)))return;
 	if (!q->ammo[q->current_weapon])
@@ -2490,7 +2490,7 @@ void fire_player(struct player *q,int direction)
 			(void *)(long)(q->obj->id)); 
 		id++;
 		sendall_new_object(s,0);
-		q->obj->status|=4096;
+		q->obj->status|=8192;
 	} else
 	{
 		if (q->current_weapon!=WEAPON_GRENADE)  /* not grenades */
