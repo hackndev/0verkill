@@ -399,6 +399,7 @@ void test_object(struct it *obj)
 		case T_BULLET:
 		case T_SHRAPNEL:
 		case T_BFGCELL:
+		case T_CHAIN:
 		if ((my_sgn(hero->x-obj->x)==my_sgn(obj->xspeed)||my_abs(hero->x-obj->x)<int2double(20))&&obj->y>=hero->y&&obj->y<hero->y+int2double(PLAYER_HEIGHT))
 			keyboard_status.creep=1;
 		break;
@@ -612,8 +613,9 @@ void update_game(void)
 			}
 		}
 
-		if ((p->next->member.type==T_SHRAPNEL||p->next->member.type==T_BULLET||p->next->member.type==T_BFGCELL)&&(stop_x||stop_y))  /* bullet and shrapnel die crashing into wall */
-		{
+		if ((p->next->member.type == T_SHRAPNEL || p->next->member.type == T_BULLET ||
+			p->next->member.type == T_BFGCELL || p->next->member.type == T_CHAIN) &&
+			(stop_x || stop_y)) { /* bullet and shrapnel die crashing into wall */
 			p=p->prev;  /* deleting object makes a great mess in for cycle, so we must cheat the cycle */
 			delete_obj(p->next->next->member.id);
 			continue;
