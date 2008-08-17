@@ -77,6 +77,11 @@
 #endif
 
 /* settings */
+#define OVERRIDE_FLAG_HOST	0x01
+#define OVERRIDE_FLAG_NAME	0x02
+#define OVERRIDE_FLAG_PORT	0x04
+#define OVERRIDE_FLAG_COLOR	0x08
+
 struct config {
 	int	argc;
 	char	**argv;
@@ -84,6 +89,7 @@ struct config {
 	char	name[MAX_NAME_LEN+1];
 	int	port;
 	int	color;
+	char	override;
 };
 
 /* my health, armor, frags, deaths, ammo, ... and ID */
@@ -246,17 +252,31 @@ void save_cfg(struct config *cfg)
 {
 	FILE *stream;
 	char txt[256];
+	struct config dcfg;
+	memcpy(&dcfg, cfg, sizeof(struct config));
 
 #ifndef WIN32
 	snprintf(txt, sizeof(txt), "%s/%s",getenv("HOME"),CFG_FILE);
 #else
 	snprintf(txt, sizeof(txt), "./%s",CFG_FILE);
 #endif
+	if (cfg->override) {
+		load_cfg(&dcfg);
+		if (!(cfg->override & OVERRIDE_FLAG_HOST))
+			memcpy(dcfg.host, cfg->host, strlen(cfg->host));
+		if (!(cfg->override & OVERRIDE_FLAG_NAME))
+			memcpy(dcfg.name, cfg->name, strlen(cfg->name));
+		if (!(cfg->override & OVERRIDE_FLAG_PORT))
+			dcfg.port = cfg->port;
+		if (!(cfg->override & OVERRIDE_FLAG_COLOR))
+			dcfg.color = cfg->color;
+	}
+
 	stream=fopen(txt,"w");
 	if (!stream)
 		return;
-	fprintf(stream, "%s\n%s\n%d\n%d\n", cfg->host, cfg->name,
-					cfg->port, cfg->color);
+	fprintf(stream, "%s\n%s\n%d\n%d\n", dcfg.host, dcfg.name,
+					dcfg.port, dcfg.color);
 	fclose(stream);
 }
 
@@ -1627,17 +1647,22 @@ cycle:
 	switch(a)
 	{
 		case 1:
-		if (read_str_online(SCREEN_Y-1,cfg->name,"Enter your name: ",MAX_NAME_LEN))
+		if (read_str_online(SCREEN_Y-1,cfg->name,"Enter your name: ",MAX_NAME_LEN)) {
+			cfg->override &= ~OVERRIDE_FLAG_NAME;
 			a=0;
+		}
 		break;
 
 		case 3:
-		if (read_str_online(SCREEN_Y-1,cfg->host,"Enter address: ",MAX_HOST_LEN))
+		if (read_str_online(SCREEN_Y-1,cfg->host,"Enter address: ",MAX_HOST_LEN)) {
+			cfg->override &= ~OVERRIDE_FLAG_HOST;
 			a=0;
+		}
 		break;
 
 		case 2:
 		if (read_num_online(SCREEN_Y-1,port,"Enter port: ",MAX_PORT_LEN)) {
+			cfg->override &= ~OVERRIDE_FLAG_PORT;
 			cfg->port = strtol(port, 0, 10);
 			a=0;
 		}
@@ -1665,6 +1690,7 @@ cycle:
 			snprintf(txt, sizeof(txt), "hero%d",cfg->color);
 			if (find_sprite(txt,&sprite))
 				{shut_down(0);mem_free(banner);fprintf(stderr,"Error: Can't find sprite \"%s\".\n",txt);}
+			cfg->override &= ~OVERRIDE_FLAG_COLOR;
 		}
 		
 		if (c_was_pressed('-')||c_was_pressed(K_NUM_MINUS)||c_was_pressed(K_DOWN)||c_was_pressed(K_LEFT))
@@ -1675,6 +1701,7 @@ cycle:
 			snprintf(txt, sizeof(txt), "hero%d",cfg->color);
 			if (find_sprite(txt,&sprite))
 				{shut_down(0);mem_free(banner);fprintf(stderr,"Error: Can't find sprite \"%s\".\n",txt);}
+			cfg->override &= ~OVERRIDE_FLAG_COLOR;
 		}
 		
 		if (c_was_pressed('h'))help^=1;
@@ -1799,7 +1826,9 @@ void print_help(void)
 		"0verkill client%s"
 		".\n"
                 "(c)2000 Brainsoft\n"
-                "Usage: 0verkill [-h] [-3] [-s <width>x<height>]%s"
+                "Usage: 0verkill [-h] [-3] [-i <server address>] \n"
+                "[-c <color>] [-n <player name>] [-p <port>] \n"
+                "[-s <width>x<height>]%s"
 		"\n", x, y
 	);
 }
@@ -1823,7 +1852,7 @@ void parse_dimensions(char *txt)
 }
 
 
-void parse_command_line(int argc,char **argv)
+void parse_command_line(struct config *cfg)
 {
         int a;
 
@@ -1832,17 +1861,17 @@ void parse_command_line(int argc,char **argv)
 #ifdef TRI_D
 
 	#ifdef XWINDOW
-		a=getopt(argc,argv,"3hl:f:d:s:");
+		a=getopt(cfg->argc,cfg->argv,"3hl:f:d:s:n:i:p:c:");
 	#endif
 	#ifndef XWINDOW
-		a=getopt(argc,argv,"3hl:s:");
+		a=getopt(cfg->argc,cfg->argv,"3hl:s:n:i:p:c:");
 	#endif
 #else
 	#ifdef XWINDOW
-		a=getopt(argc,argv,"hf:d:s:");
+		a=getopt(cfg->argc,cfg->argv,"hf:d:s:n:i:p:c:");
 	#endif
 	#ifndef XWINDOW
-		a=getopt(argc,argv,"hs:");
+		a=getopt(cfg->argc,cfg->argv,"hs:n:i:p:c:");
 	#endif
 #endif
                 switch(a)
@@ -1876,6 +1905,25 @@ void parse_command_line(int argc,char **argv)
 			x_font_name=optarg;
 			break;
 #endif
+			case 'i':
+				memcpy(cfg->host, optarg, strlen(optarg) + 1);
+				cfg->override |= OVERRIDE_FLAG_HOST;
+				break;
+
+			case 'n':
+				memcpy(cfg->name, optarg, strlen(optarg) + 1);
+				cfg->override |= OVERRIDE_FLAG_NAME;
+				break;
+
+			case 'p':
+				cfg->port = strtol(optarg, 0, 10);
+				cfg->override |= OVERRIDE_FLAG_PORT;
+				break;
+
+			case 'c':
+				cfg->color = strtol(optarg, 0, 10);
+				cfg->override |= OVERRIDE_FLAG_COLOR;
+				break;
                 }
         }
 }
@@ -2053,7 +2101,7 @@ int main(int argc,char **argv)
 {
 	int a;
 	char txt[256];
-	struct config cfg = {argc, argv, "", "", DEFAULT_PORT, 1};
+	struct config cfg = {argc, argv, "", "", DEFAULT_PORT, 1, 0};
 	
 #ifdef WIN32
 	WSADATA wd;
@@ -2077,7 +2125,7 @@ int main(int argc,char **argv)
 	last_obj=&objects;
 	*error_message=0;
 
-	parse_command_line(argc,argv);
+	parse_command_line(&cfg);
 	hash_table_init();
 	if (!set_size)c_get_size(&SCREEN_X,&SCREEN_Y);
 	init_sprites();
