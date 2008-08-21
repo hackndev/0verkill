@@ -148,7 +148,6 @@ struct  /* keyboard status */
 struct msgline_type
 {
 	unsigned long_long time;
-	char color;
 	char *msg;
 }msg_line[N_MESSAGES];
 
@@ -290,7 +289,6 @@ void scroll_messages(void)
 	for (a=0;a<=last_message-1;a++)
 	{
 		msg_line[a].time=msg_line[a+1].time;
-		msg_line[a].color=msg_line[a+1].color;
 		msg_line[a].msg=mem_realloc(msg_line[a].msg,strlen(msg_line[a+1].msg)+1);
 		memcpy(msg_line[a].msg,msg_line[a+1].msg,strlen(msg_line[a+1].msg)+1);
 	}
@@ -300,27 +298,23 @@ void scroll_messages(void)
 }
 
 
-void add_message(char *message, char flags)
+void add_message(char *message)
 {
-	int last;
-	if (last_message == N_MESSAGES - 1)
-		scroll_messages();
-	last = last_message + 1;
-	msg_line[last].time = get_time() + MESSAGE_TTL;
-	msg_line[last].color = (flags == M_CHAT) ? C_GREEN : MESSAGE_COLOR;
-	msg_line[last].msg = mem_alloc(strlen(message) + 1);
-	if (!msg_line[last].msg)
-		return;	/* not such a fatal errror */
-	memcpy(msg_line[last].msg, message, strlen(message) + 1);
-	last_message = last;
+	if (last_message==N_MESSAGES-1)scroll_messages();
+	msg_line[last_message+1].time=get_time()+MESSAGE_TTL;
+	msg_line[last_message+1].msg=mem_alloc(strlen(message)+1);
+	if (!msg_line[last_message+1].msg)return;	/* not such a fatal errror */
+	memcpy(msg_line[last_message+1].msg,message,strlen(message)+1);
+	last_message++;
 }
 
 
 void print_messages(void)
 {
 	int a;
+	
 	for (a=0;a<=last_message;a++)
-		print2screen(0,a,msg_line[a].color,msg_line[a].msg);
+		print2screen(0,a,MESSAGE_COLOR,msg_line[a].msg);
 }
 
 
@@ -550,16 +544,15 @@ void end_game(void)
 
 
 /* send chat message */
-void send_message(char *msg, char flags)
+void send_message(char *msg)
 {
-	static char packet[MAX_MESSAGE_LENGTH + 2];
-	int len;
+	static char packet[MAX_MESSAGE_LENGTH+2];
+	int a;
 
-	len = strlen(msg) + 1;
-	packet[0] = P_MESSAGE;
-	packet[1] = flags;
-	memcpy(packet + 2, msg, len);
-	send_packet(packet, len + 2, (struct sockaddr *)(&server), my_id, 0);
+	a=strlen(msg)+1;
+	packet[0]=P_MESSAGE;
+	memcpy(packet+1,msg,a);
+	send_packet(packet,a+1,(struct sockaddr *)(&server),my_id,0);
 }
 
 
@@ -1213,11 +1206,10 @@ int process_packet(char *packet,int l)
 		break;
 
 		case P_MESSAGE:
-			if (l < 3)
-				break;   /* invalid packet */
-			add_message(packet + 2, packet[1]);
-			n = 3 + strlen(packet + 2);
-			break;
+		if (l<2)break;   /* invalid packet */
+		add_message(packet+1);
+		n=2+strlen(packet+1);
+		break;
 
 		case P_CHANGE_LEVEL:
 		{
@@ -1233,7 +1225,7 @@ int process_packet(char *packet,int l)
 			level_number=a;
 			snprintf(txt,256, "Trying to change level to number %d",
 				level_number);
-			add_message(txt, M_DEFAULT);
+			add_message(txt);
 			name=load_level(level_number);
 			if (!name) {
 				snprintf(error_message,1024,"Cannot find level "
@@ -1244,14 +1236,14 @@ int process_packet(char *packet,int l)
 			}
 			snprintf(txt,256,"Changing level to \"%s\"",name);
 			mem_free(name);
-			add_message(txt, M_DEFAULT);
+			add_message(txt);
 			
 			md5=md5_level(level_number);
 			if (strcmp((char *)md5,packet+5))   /* MD5s differ */
 			{
 				mem_free(md5);
 				snprintf(error_message,1024,"Invalid MD5 sum. Can't change level. Game terminated. Press ENTER.");
-				add_message("Invalid MD5 sum. Can't change level. Exiting...", M_DEFAULT);
+				add_message("Invalid MD5 sum. Can't change level. Exiting...");
 				send_quit();
 				return -1;
 			}
@@ -1998,7 +1990,7 @@ void play(void)
 			
 				case 1:
 				chat=0;
-				send_message(string, M_CHAT);
+				send_message(string);
 				break;
 			}
 		}

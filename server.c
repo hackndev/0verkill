@@ -904,40 +904,28 @@ void send_info(struct sockaddr *addr,int id)
 
 /* send message to a player */
 /* name is name of player who sent the message (chat), NULL means it's from server */
-void send_message(struct player* player, char *name, char *msg, char flags)
+void send_message(struct player* player, char *name, char *msg)
 {
 	static char packet[256];
-	int len = 2;
+	int len;
 
-	packet[0] = P_MESSAGE;
-	packet[1] = flags;
-	if (!name) {
-		snprintf(packet + len, sizeof(packet) - 1, "%s", msg);
-		len += strlen(msg) + 1;
-	} else {
-		snprintf(packet + len, sizeof(packet) - 1, "%s> %s", name, msg);
-		len += strlen(name) + strlen(msg) + 3;
-	}
+	packet[0]=P_MESSAGE;
+	if (!name){snprintf(packet+1,sizeof(packet)-1,"%s",msg);len=strlen(msg)+1+1;}
+	else {snprintf(packet+1,sizeof(packet)-1,"%s> %s",name,msg);len=strlen(name)+strlen(msg)+1+3;}
 	send_chunk_packet_to_player(packet,len,player);
 }
 
 
 /* similar to send_message but sends to all except one or two players */
-void sendall_message(char *name, char *msg,struct player *not1,struct player* not2, char flags)
+void sendall_message(char *name, char *msg,struct player *not1,struct player* not2)
 {
 	static char packet[256];
-	int len = 2;
+	int len;
 	struct player_list* p;
 
-	packet[0] = P_MESSAGE;
-	packet[1] = flags;
-	if (!name) {
-		snprintf(packet + len, 255, "%s", msg);
-		len += strlen(msg) + 1;
-	} else {
-		snprintf(packet + len, 255, "%s> %s", name, msg);
-		len += strlen(name) + strlen(msg) + 3;
-	}
+	packet[0]=P_MESSAGE;
+	if (!name){snprintf(packet+1,255,"%s",msg);len=strlen(msg)+1+1;}
+	else {snprintf(packet+1,255,"%s> %s",name,msg);len=strlen(name)+strlen(msg)+1+3;}
 	for (p=&players;p->next;p=p->next)
 		if ((!not1||(&(p->next->member))!=not1)&&(!not2||(&(p->next->member))!=not2))
  			send_chunk_packet_to_player(packet,len,&(p->next->member));
@@ -1276,9 +1264,9 @@ void read_data(void)
 				send_packet(packet,39,(struct sockaddr*)(&client),0,0);
 				send_change_level(&(last_player->member));
 				sendall_bell();
-				sendall_message(0,txt,0,0, M_DEFAULT);
+				sendall_message(0,txt,0,0);
 				snprintf(txt,256,"There'%s %d %s in the game.",active_players==1?"s":"re",active_players,active_players==1?"player":"players");
-				sendall_message(0,txt,0,0, M_DEFAULT);
+				sendall_message(0,txt,0,0);
 				send_info(0,0);
 			}
 			break;
@@ -1340,7 +1328,7 @@ void read_data(void)
 			packet[0]=P_PLAYER_DELETED;
 			send_packet((char *)packet,1,(struct sockaddr*)(&client),0,last_player->member.id);
 			snprintf(txt,256,"%s left the game.",q->member.name);
-			sendall_message(0,txt,0,0, M_DEFAULT);
+			sendall_message(0,txt,0,0);
 			delete_player(q);
 			send_info(0,0);
 			break;
@@ -1361,15 +1349,13 @@ void read_data(void)
 			break;
 			
 			case P_MESSAGE:
-				if (l < 3)
-					break;   /* invalid packet */
-				q = find_player(&client, s);
-				if (!q)
-					break;
-				sendall_message(q->member.name, packet + 2, 0, 0, M_CHAT);
-				snprintf(txt, 256, "%s> %s\n", q->member.name, packet + 2);
-				message(txt, 1);
-				break;
+			if (l<2)break;   /* invalid packet */
+			q=find_player(&client,s);
+			if (!q)break;
+			sendall_message(q->member.name,packet+1,0,0);
+			snprintf(txt,256,"%s> %s\n",q->member.name,packet+1);
+			message(txt,1);
+			break;
 
 			default:
 			snprintf(txt,256,"Unknown packet: head=%d\n",*packet);
@@ -1518,7 +1504,7 @@ int dynamic_collision(struct it *obj)
 						((struct player*)(p->data))->ammo[WEAPON_GRENADE]=MAX_AMMO(WEAPON_GRENADE);
 /*					P->current_weapon=select_best_weapon(P);  */
 					send_update_player((struct player*)(p->data));
-					send_message((struct player*)(p->data),0,"You got grenades", M_DEFAULT);
+					send_message((struct player*)(p->data),0,"You got grenades");
 					snprintf(txt,256,"%s got grenades.\n",((struct player*)(p->data))->name);
 					message(txt,1);
 					obj->status |= S_INVISIBLE;
@@ -1542,7 +1528,7 @@ int dynamic_collision(struct it *obj)
 						((struct player*)(p->data))->ammo[WEAPON_GUN]=MAX_AMMO(WEAPON_GUN);
 /*					P->current_weapon=select_best_weapon(P);  */
 					send_update_player((struct player*)(p->data));
-					send_message((struct player*)(p->data),0,"You got a magazine", M_DEFAULT);
+					send_message((struct player*)(p->data),0,"You got a magazine");
 					snprintf(txt,256,"%s got a magazine.\n",((struct player*)(p->data))->name);
 					message(txt,1);
 					obj->status |= S_INVISIBLE;
@@ -1566,7 +1552,7 @@ int dynamic_collision(struct it *obj)
 						((struct player*)(p->data))->ammo[WEAPON_SHOTGUN]=MAX_AMMO(WEAPON_SHOTGUN);
 /*					P->current_weapon=select_best_weapon(P);  */
 					send_update_player((struct player*)(p->data));
-					send_message((struct player*)(p->data),0,"You got shotgun shells", M_DEFAULT);
+					send_message((struct player*)(p->data),0,"You got shotgun shells");
 					snprintf(txt,256,"%s got shotgun shells.\n",((struct player*)(p->data))->name);
 					message(txt,1);
 					obj->status |= S_INVISIBLE;
@@ -1590,7 +1576,7 @@ int dynamic_collision(struct it *obj)
 						((struct player*)(p->data))->ammo[WEAPON_RIFLE]=MAX_AMMO(WEAPON_RIFLE);
 /*					P->current_weapon=select_best_weapon(P);  */
 					send_update_player((struct player*)(p->data));
-					send_message((struct player*)(p->data),0,"You got cartridges", M_DEFAULT);
+					send_message((struct player*)(p->data),0,"You got cartridges");
 					snprintf(txt,256,"%s got cartridges.\n",((struct player*)(p->data))->name);
 					message(txt,1);
 					obj->status |= S_INVISIBLE;
@@ -1614,7 +1600,7 @@ int dynamic_collision(struct it *obj)
 						((struct player*)(p->data))->ammo[WEAPON_UZI]=MAX_AMMO(WEAPON_UZI);
 /*					P->current_weapon=select_best_weapon(P); */
 					send_update_player((struct player*)(p->data));
-					send_message((struct player*)(p->data),0,"You got ammo for Uzi", M_DEFAULT);
+					send_message((struct player*)(p->data),0,"You got ammo for Uzi");
 					snprintf(txt,256,"%s got Uzi ammo.\n",((struct player*)(p->data))->name);
 					message(txt,1);
 					obj->status |= S_INVISIBLE;
@@ -1639,7 +1625,7 @@ int dynamic_collision(struct it *obj)
 						((struct player*)(p->data))->ammo[WEAPON_UZI]=MAX_AMMO(WEAPON_UZI);
 //					P->current_weapon=select_best_weapon(P);
 					send_update_player((struct player*)(p->data));
-					send_message((struct player*)(p->data),0,"You got Uzi", M_DEFAULT);
+					send_message((struct player*)(p->data),0,"You got Uzi");
 					snprintf(txt,256,"%s got Uzi.\n",((struct player*)(p->data))->name);
 					message(txt,1);
 					obj->status |= S_INVISIBLE;
@@ -1664,7 +1650,7 @@ int dynamic_collision(struct it *obj)
 						((struct player*)(p->data))->ammo[WEAPON_RIFLE]=MAX_AMMO(WEAPON_RIFLE);
 //					P->current_weapon=select_best_weapon(P);
 					send_update_player((struct player*)(p->data));
-					send_message((struct player*)(p->data),0,"You got sniper rifle", M_DEFAULT);
+					send_message((struct player*)(p->data),0,"You got sniper rifle");
 					snprintf(txt,256,"%s got sniper rifle.\n",((struct player*)(p->data))->name);
 					message(txt,1);
 					obj->status |= S_INVISIBLE;
@@ -1689,7 +1675,7 @@ int dynamic_collision(struct it *obj)
 						((struct player*)(p->data))->ammo[WEAPON_SHOTGUN]=MAX_AMMO(WEAPON_SHOTGUN);
 //					P->current_weapon=select_best_weapon(P);
 					send_update_player((struct player*)(p->data));
-					send_message((struct player*)(p->data),0,"You got a shotgun", M_DEFAULT);
+					send_message((struct player*)(p->data),0,"You got a shotgun");
 					snprintf(txt,256,"%s got a shotgun.\n",((struct player*)(p->data))->name);
 					message(txt,1);
 					obj->status |= S_INVISIBLE;
@@ -1714,7 +1700,7 @@ int dynamic_collision(struct it *obj)
 						((struct player*)(p->data))->ammo[WEAPON_BFG]=MAX_AMMO(WEAPON_BFG);
 //					P->current_weapon=select_best_weapon(P);
 					send_update_player((struct player*)(p->data));
-					send_message((struct player*)(p->data),0,"You got a BFG", M_DEFAULT);
+					send_message((struct player*)(p->data),0,"You got a BFG");
 					snprintf(txt,256,"%s got a BFG.\n",((struct player*)(p->data))->name);
 					message(txt,1);
 					obj->status |= S_INVISIBLE;
@@ -1731,7 +1717,7 @@ int dynamic_collision(struct it *obj)
 					((struct player*)(p->data))->invisibility_counter=INVISIBILITY_DURATION;
 					p->status |= S_INVISIBLE;   /* hide player */
 					sendall_update_status(p,0);
-					send_message((struct player*)(p->data),0,"You got invisibility dope", M_DEFAULT);
+					send_message((struct player*)(p->data),0,"You got invisibility dope");
 					snprintf(txt,256,"%s got invisibility.\n",((struct player*)(p->data))->name);
 					message(txt,1);
 					obj->status |= S_INVISIBLE;
@@ -1756,7 +1742,7 @@ int dynamic_collision(struct it *obj)
 					sendall_update_object(((struct player*)p->data)->obj,0,3);
 
 					sendall_update_status(p,0);
-					send_message((struct player*)(p->data),0,"You teleported", M_DEFAULT);
+					send_message((struct player*)(p->data),0,"You teleported");
 					snprintf(txt,256,"%s teleported.\n",((struct player*)(p->data))->name);
 					message(txt,1);
 					add_to_timeq(obj->id,T_TELEPORT,0,obj->sprite,0,0,obj->x,obj->y,0,0,0,0);
@@ -1772,7 +1758,7 @@ int dynamic_collision(struct it *obj)
 					((struct player*)(p->data))->armor+=ARMOR_ADD;
 					if (((struct player*)(p->data))->armor>100)((struct player*)(p->data))->armor=100;
 					send_update_player((struct player*)(p->data));
-					send_message((struct player*)(p->data),0,"You got armor", M_DEFAULT);
+					send_message((struct player*)(p->data),0,"You got armor");
 					snprintf(txt,256,"%s got armor.\n",((struct player*)(p->data))->name);
 					message(txt,1);
 					obj->status |= S_INVISIBLE;
@@ -1789,7 +1775,7 @@ int dynamic_collision(struct it *obj)
 					((struct player*)(p->data))->health+=MEDIKIT_HEALTH_ADD;
 					if (((struct player*)(p->data))->health>100)((struct player*)(p->data))->health=100;
 					send_update_player((struct player*)(p->data));
-					send_message((struct player*)(p->data),0,"You picked up a medikit", M_DEFAULT);
+					send_message((struct player*)(p->data),0,"You picked up a medikit");
 					snprintf(txt,256,"%s picked up a medikit.\n",((struct player*)(p->data))->name);
 					message(txt,1);
 					obj->status |= S_INVISIBLE;
@@ -1805,9 +1791,9 @@ int dynamic_collision(struct it *obj)
 				if (a>=H)  /* player died */
 				{
 					((struct player*)(p->data))->deaths++;
-					send_message((struct player*)(p->data),0,"You killed yourself", M_DEFAULT);
+					send_message((struct player*)(p->data),0,"You killed yourself");
 					snprintf(txt,256,"%s suicides",((struct player*)(p->data))->name);
-					sendall_message(0,txt,(struct player*)(p->data),0, M_DEFAULT);
+					sendall_message(0,txt,(struct player*)(p->data),0);
 					snprintf(txt,256,"%s suicides.\n",((struct player*)(p->data))->name);
 					message(txt,2);
 
@@ -1867,9 +1853,9 @@ int dynamic_collision(struct it *obj)
 					if (o->data==p->data) /* suicide */
 					{
 						((struct player*)(o->data))->frags-=!!(((struct player*)(o->data))->frags);
-						send_message((struct player*)(o->data),0,"You killed yourself", M_DEFAULT);
+						send_message((struct player*)(o->data),0,"You killed yourself");
 						snprintf(txt,256,"%s suicides",((struct player*)(o->data))->name);
-						sendall_message(0,txt,(struct player*)(o->data),0, M_DEFAULT);
+						sendall_message(0,txt,(struct player*)(o->data),0);
 						snprintf(txt,256,"%s suicides.\n",((struct player*)(o->data))->name);
 						message(txt,2);
 					}
@@ -1877,11 +1863,11 @@ int dynamic_collision(struct it *obj)
 					{
 						((struct player*)(o->data))->frags++;
 						snprintf(txt,256,"%s killed %s.",((struct player*)(o->data))->name,((struct player*)(p->data))->name);
-						sendall_message(0,txt,(struct player*)(o->data),(struct player*)(p->data), M_DEFAULT);
+						sendall_message(0,txt,(struct player*)(o->data),(struct player*)(p->data));
 						snprintf(txt,256,"%s killed you",((struct player*)(o->data))->name);
-						send_message((struct player*)(p->data),0,txt, M_DEFAULT);  /* the dead */
+						send_message((struct player*)(p->data),0,txt);  /* the dead */
 						snprintf(txt,256,"You killed %s",((struct player*)(p->data))->name);
-						send_message((struct player*)(o->data),0,txt, M_DEFAULT);  /* the dead */
+						send_message((struct player*)(o->data),0,txt);  /* the dead */
 						snprintf(txt,256,"%s killed %s.\n",((struct player*)(o->data))->name,((struct player*)(p->data))->name);
 						message(txt,2);
 					}
@@ -2336,9 +2322,9 @@ void change_weapon_player(struct player *q,int w)
 	w--;
 	if (q->current_weapon==w)return;
 	if (!(q->weapons&(1<<w)))
-		{send_message(q,0,"No weapon.", M_DEFAULT);return;}
+		{send_message(q,0,"No weapon.");return;}
 	if (!(q->ammo[w]))
-		{send_message(q,0,"Not enough ammo.", M_DEFAULT);return;}
+		{send_message(q,0,"Not enough ammo.");return;}
 	q->current_weapon=w;
 	snprintf(txt,256,"%s takes %s.\n",q->name,weapon[w].name);
 	message(txt,1);
@@ -2636,7 +2622,7 @@ void update_players(void)
 			packet=P_PLAYER_DELETED;
 			send_packet((char *)&packet,1,(struct sockaddr*)(&(p->next->member.address)),0,last_player->member.id);
 			snprintf(txt,256,"%s was kicked out of the game.",p->next->member.name);
-			sendall_message(0,txt,0,0, M_DEFAULT);
+			sendall_message(0,txt,0,0);
 			delete_player(p->next);
 			if (!(p->next))break;
 		}
