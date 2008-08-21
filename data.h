@@ -49,7 +49,6 @@
 #define E_INCOMPATIBLE_VERSION 0
 #define E_PLAYER_REFUSED 1
 
-
 #define WEAPON_CHAINSAW 6
 #define WEAPON_BFG 5
 #define WEAPON_GRENADE 4
@@ -80,6 +79,26 @@
 #define S_CLIMB_DOWN	0x0800
 #define S_NOISE		0x1000
 #define S_CHAINSAW	0x2000
+
+#define M_DEFAULT	0x00
+#define M_CHAT		0x01
+
+#define	C_BLACK		0x00
+#define	C_D_RED		0x01
+#define	C_D_GREEN	0x02
+#define	C_BROWN		0x03
+#define	C_D_BLUE	0x04
+#define	C_D_MAGENTA	0x05
+#define	C_D_CYAN	0x06
+#define	C_GREY		0x07
+#define	C_D_GREY	0x08
+#define	C_RED		0x09
+#define	C_GREEN		0x0a
+#define	C_YELLOW	0x0b
+#define	C_BLUE		0x0c
+#define	C_MAGENTA	0x0d
+#define	C_CYAN		0x0e
+#define	C_WHITE		0x0f
 
 #define ARMS 7
 

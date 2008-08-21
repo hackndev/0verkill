@@ -340,13 +340,14 @@ void send_reenter_game(void)
 /* send chat message */
 void send_message(char *msg)
 {
-	static char packet[MAX_MESSAGE_LENGTH+2];
-	int a;
+	static char packet[MAX_MESSAGE_LENGTH + 2];
+	int len;
 
-	a=strlen(msg)+1;
-	packet[0]=P_MESSAGE;
-	memcpy(packet+1,msg,a);
-	send_packet(packet,a+1,(struct sockaddr *)(&server),my_id,0);
+	len = strlen(msg) + 1;
+	packet[0] = P_MESSAGE;
+	packet[1] = 0x00;
+	memcpy(packet + 2, msg, len);
+	send_packet(packet, len + 2, (struct sockaddr *)(&server), my_id, 0);
 }
 
 
@@ -865,9 +866,10 @@ int process_packet(char *packet,int l)
 		break;
 
 		case P_MESSAGE:
-		if (l<2)break;   /* invalid packet */
-		n=2+strlen(packet+1);
-		break;
+			if (l < 3)
+				break;   /* invalid packet */
+			n = 3 + strlen(packet + 2);
+			break;
 
 		case P_END:
 		if (l<2)printf("Game terminated.\n");
