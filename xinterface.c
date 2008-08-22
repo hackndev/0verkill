@@ -279,9 +279,8 @@ void c_setcolor_3b(unsigned char a)
 	x_current_color=(x_current_color&8)|(a&7);
 }
 
-
 /* print on the cursor position */
-void c_print(char * text)
+void _c_print(char * text)
 {
 	int l=strlen(text);
 
@@ -301,6 +300,64 @@ void c_print(char * text)
 		l
 	);
 	x_current_x+=l;
+}
+
+#define SCREEN_CACHE
+#ifdef SCREEN_CACHE
+struct {
+	int start;
+	int color;
+	int bgcolor;
+	int pos;
+	char buf[256];
+} tb = { 0,15,15,0," ", };
+int prev = 0;
+char scc[256];
+#endif
+
+#ifndef SCREEN_CACHE
+inline
+#endif
+void c_print(char * text)
+{
+#ifdef SCREEN_CACHE
+	int c_color, c_bgcolor, c_x, err;
+	if (!(x_current_x == prev && scc[x_current_x] == text[0]))
+		scc[x_current_x] = text[0];
+	else
+		return;
+	err = (x_current_x != ++prev);
+	if (x_current_color == tb.color && x_current_bgcolor == tb.bgcolor && !err)
+		tb.buf[tb.pos++] = text[0];
+	else {
+		c_color = x_current_color;
+		c_bgcolor = x_current_bgcolor;
+		c_x = x_current_x;
+
+		x_current_color = tb.color;
+		x_current_bgcolor = tb.bgcolor;
+		x_current_x = tb.start;
+
+		tb.buf[tb.pos] = 0;
+		_c_print(tb.buf);
+
+		x_current_color = c_color;
+		x_current_bgcolor = c_bgcolor;
+		x_current_x = c_x;
+
+		tb.color = x_current_color;
+		tb.bgcolor = x_current_bgcolor;
+		tb.start = x_current_x;
+		tb.pos = 1;
+		tb.buf[0] = text[0];
+		if (err) {
+			tb.pos = 0;
+			_c_print(text);
+		}
+	}
+#else
+			_c_print(text);
+#endif
 }
 
 
