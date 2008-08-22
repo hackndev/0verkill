@@ -300,7 +300,7 @@ void _c_print(char * text, int l)
 	x_current_x+=l;
 }
 
-#define SCREEN_CACHE
+#undef SCREEN_CACHE
 #ifdef SCREEN_CACHE
 struct {
 	int start;
@@ -368,12 +368,17 @@ void c_print(char *text)
 
 /* print char on the cursor position */
 #ifdef SCREEN_CACHE
-inline
-#endif
-void c_putc(char c)
+inline void c_putc(char c)
 {
 	c_print(&c);
 }
+#else
+inline void c_putc(char c)
+{
+	char s[2] = {c, 0};
+	c_print(s);
+}
+#endif
 
 
 /* clear the screen */
