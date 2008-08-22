@@ -371,13 +371,13 @@ void load_dynamic(char * filename)
 }
 
 
-void print_ip(char * txt,struct in_addr ip)
+void print_ip(char * txt, int txtsz, struct in_addr ip)
 {
 	unsigned int a;
-
-	snprintf(txt, sizeof(txt), "%d",*((unsigned char *)&ip));
+	memset(txt,0,txtsz);
+	snprintf(txt, txtsz, "%d",*((unsigned char *)&ip));
 	for (a=1;a<sizeof(ip);a++)
-		snprintf(txt+strlen(txt),sizeof(txt)-strlen(txt),".%d",((unsigned char *)&ip)[a]);
+		snprintf(txt+strlen(txt),txtsz-strlen(txt),".%d",((unsigned char *)&ip)[a]);
 }
 
 
@@ -1235,7 +1235,7 @@ void read_data(void)
 				}
 				maj=packet[2];
 				min=packet[3];
-				print_ip(txt1,client.sin_addr);
+				print_ip(txt1,sizeof(txt),client.sin_addr);
 				snprintf(txt,256,"Request for player #%d (client version %d.%d) from %s.\n",n_players,maj,min,txt1);
 				message(txt,2);
 				if (maj!=VERSION_MAJOR||min<MIN_CLIENT_VERSION_MINOR)
