@@ -280,10 +280,8 @@ void c_setcolor_3b(unsigned char a)
 }
 
 /* print on the cursor position */
-void _c_print(char * text)
+void _c_print(char * text, int l)
 {
-	int l=strlen(text);
-
 	XSetForeground(display,gc,(x_color[x_current_color]).pixel);
 	XSetBackground(display,gc,(x_color[x_current_bgcolor]).pixel);
 	XDrawImageString(
@@ -309,42 +307,49 @@ struct {
 	int color;
 	int bgcolor;
 	int pos;
-	char buf[256];
+	char buf[512];
 } tb = { 0,15,15,0," ", };
 int prev = 0;
-char scc[256];
+char scc[512];
 #endif
 
 #ifndef SCREEN_CACHE
 inline
 #endif
-void c_print(char * text)
+void c_print(char *text)
 {
 #ifdef SCREEN_CACHE
-	int c_color, c_bgcolor, c_x, err;
+	int c_color, c_bgcolor, c_x, err, l;
+	char *offset;
 	if (!(x_current_x == prev && scc[x_current_x] == text[0]))
 		scc[x_current_x] = text[0];
 	else
 		return;
 	err = (x_current_x != ++prev);
 	if (x_current_color == tb.color && x_current_bgcolor == tb.bgcolor && !err)
-		tb.buf[tb.pos++] = text[0];
+		tb.buf[x_current_x] = text[0];
 	else {
-		c_color = x_current_color;
-		c_bgcolor = x_current_bgcolor;
-		c_x = x_current_x;
+		if (l = strlen(offset = tb.buf + tb.start + 1)) {
+			/* backup */
+			c_color = x_current_color;
+			c_bgcolor = x_current_bgcolor;
+			c_x = x_current_x;
 
-		x_current_color = tb.color;
-		x_current_bgcolor = tb.bgcolor;
-		x_current_x = tb.start;
+			/* set draw area */
+			x_current_color = tb.color;
+			x_current_bgcolor = tb.bgcolor;
+			x_current_x = tb.start;
 
-		tb.buf[tb.pos] = 0;
-		_c_print(tb.buf);
+			/* finish buffer and print it */
+			tb.buf[tb.pos] = 0;
+			_c_print(offset, l);
 
-		x_current_color = c_color;
-		x_current_bgcolor = c_bgcolor;
-		x_current_x = c_x;
-
+			/* restore */
+			x_current_color = c_color;
+			x_current_bgcolor = c_bgcolor;
+			x_current_x = c_x;
+		}
+		/* set up new */
 		tb.color = x_current_color;
 		tb.bgcolor = x_current_bgcolor;
 		tb.start = x_current_x;
@@ -352,20 +357,22 @@ void c_print(char * text)
 		tb.buf[0] = text[0];
 		if (err) {
 			tb.pos = 0;
-			_c_print(text);
+			_c_print(text, strlen(text));
 		}
 	}
 #else
-			_c_print(text);
+	_c_print(text, strlen(text));
 #endif
 }
 
 
 /* print char on the cursor position */
+#ifdef SCREEN_CACHE
+inline
+#endif
 void c_putc(char c)
 {
-	char s[2]={c,0};
-	c_print(s);
+	c_print(&c);
 }
 
 
