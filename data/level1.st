@@ -118,7 +118,6 @@ bedna b 52 488
 sud b 132 486
 sud f 152 486
 sud f 123 486
-lebzuka b 315 488
 lamp b 78 86
 kameni w 32 172
 kameni2 w 6 209

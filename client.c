@@ -1442,7 +1442,8 @@ void draw_board(void)
 	print2screen(49+5*space,SCREEN_Y-1,7,"ARMOR");
 	snprintf(txt, sizeof(txt), "% 4d%%",armor);
 	print2screen(49+5+5*space,SCREEN_Y-1,select_color(armor,100),txt);
-	if (hero->status & S_INVISIBLE)print2screen(SCREEN_X-14,SCREEN_Y-2,11,"INVISIBILITY");
+	if (hero->status & S_INVISIBLE)print2screen(SCREEN_X-14,SCREEN_Y-2,C_YELLOW,"INVISIBILITY");
+	if (hero->status & S_ILL)print2screen(SCREEN_X-14,SCREEN_Y-2,C_RED,"! INFECTED !");
 	if (autorun)print2screen(2,SCREEN_Y-2,15,"AUTORUN");
 	if (autocreep)print2screen(10,SCREEN_Y-2,15,"AUTOCREEP");
 }

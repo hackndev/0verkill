@@ -1798,6 +1798,14 @@ int dynamic_collision(struct it *obj)
 				}
 				return 2;
 
+				case T_BIOSKULL:
+					if (p->type!=T_PLAYER)
+						break;
+					((struct player*)(p->data))->obj->status |= S_ILL;
+					sendall_update_object(p,0,0); /* update everything */
+					send_update_player((struct player*)(p->data));
+					return 0;
+
 				case T_KILL:
 				if (p->type!=T_PLAYER)break;
 				a=(1-(double)A/100)*KILL_LETHALNESS;
@@ -1941,6 +1949,7 @@ int dynamic_collision(struct it *obj)
 void update_game(void)
 {
 	static char packet[64];
+	char txt[256];
         struct object_list *p;
 	struct player_list *q;
         int w,h,b,a;
@@ -1992,6 +2001,28 @@ void update_game(void)
 			}
 		}
 
+		/* decrease life of ill player */
+		if ((p->next->member.type==T_PLAYER)&&(((struct player*)(p->next->member.data))->obj->status & S_ILL))
+		{
+			((struct player*)(p->next->member.data))->health--;
+			send_update_player((struct player*)(p->next->member.data));
+			if (!(((struct player*)(p->next->member.data))->health))
+			{
+				p->next->member.status &= ~S_ILL;	/* idea - maybe we can have infected corpses */
+				p->next->member.status |= S_DEAD;	/* which will make other players ill too ? */
+				((struct player*)(p->next->member.data))->frags-=!!(((struct player*)(p->next->member.data))->frags);
+
+				send_message((struct player*)(p->next->member.data),0,"You died on illness", M_DEATH);
+				snprintf(txt,256,"%s died on illness",((struct player*)(p->next->member.data))->name);
+				sendall_message(0,txt,(struct player*)(p->next->member.data),0, M_DEATH);
+				snprintf(txt,256,"%s died on illness.\n",((struct player*)(p->next->member.data))->name);
+				message(txt,2);
+
+				send_update_player((struct player*)(p->next->member.data)); /* dead player */
+				sendall_update_status(&(p->next->member),0);
+				send_info(0,0);
+			}
+		}
 
 		/* decrement time to live */
 		if (p->next->member.ttl>0)

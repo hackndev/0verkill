@@ -185,6 +185,8 @@ int _convert_type(unsigned char c)
   
   case 'T': return T_TELEPORT;
   
+  case 'X': return T_BIOSKULL;
+  
   /* birthplace */
   case 'B': return TYPE_BIRTHPLACE;
 

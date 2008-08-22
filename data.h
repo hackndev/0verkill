@@ -17,34 +17,35 @@
 #define TYPE_BIRTHPLACE 666
 
 /* object types */
-#define N_TYPES 26
+#define N_TYPES 27
 
-#define T_PLAYER 0
-#define T_BULLET 1
-#define T_CORPSE 2
-#define T_MEDIKIT 3
-#define T_SHOTGUN 4
-#define T_UZI 5
-#define T_RIFLE 6
-#define T_SHELL 7
-#define T_AMMO_GUN 8
-#define T_AMMO_SHOTGUN 9
-#define T_AMMO_UZI 10
-#define T_AMMO_RIFLE 11
-#define T_NOTHING 12
-#define T_MESS 13
-#define T_GRENADE 14
-#define T_AMMO_GRENADE 15
-#define T_SHRAPNEL 16
-#define T_ARMOR 17
-#define T_INVISIBILITY 18
-#define T_NOISE 19
-#define T_NOTHING_FORE 20
-#define T_KILL 21
-#define T_TELEPORT 22
-#define T_BFG 23
-#define T_BFGCELL 24
-#define T_CHAIN 25
+#define T_PLAYER	0
+#define T_BULLET	1
+#define T_CORPSE	2
+#define T_MEDIKIT	3
+#define T_SHOTGUN	4
+#define T_UZI		5
+#define T_RIFLE		6
+#define T_SHELL		7
+#define T_AMMO_GUN	8
+#define T_AMMO_SHOTGUN	9
+#define T_AMMO_UZI	10
+#define T_AMMO_RIFLE	11
+#define T_NOTHING	12
+#define T_MESS		13
+#define T_GRENADE	14
+#define T_AMMO_GRENADE	15
+#define T_SHRAPNEL	16
+#define T_ARMOR		17
+#define T_INVISIBILITY	18
+#define T_NOISE		19
+#define T_NOTHING_FORE	20
+#define T_KILL		21
+#define T_TELEPORT	22
+#define T_BFG		23
+#define T_BFGCELL	24
+#define T_CHAIN		25
+#define T_BIOSKULL	26
 
 #define E_INCOMPATIBLE_VERSION 0
 #define E_PLAYER_REFUSED 1
@@ -79,6 +80,7 @@
 #define S_CLIMB_DOWN	0x0800
 #define S_NOISE		0x1000
 #define S_CHAINSAW	0x2000
+#define S_ILL		0x4000
 
 #define	M_DEFAULT	0x00
 #define	M_CHAT		0x01
