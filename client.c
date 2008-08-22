@@ -300,42 +300,14 @@ void scroll_messages(void)
 }
 
 
-void add_message(char *message, unsigned char flags)
+void add_message(char *message, char flags)
 {
 	int last;
 	if (last_message == N_MESSAGES - 1)
 		scroll_messages();
 	last = last_message + 1;
 	msg_line[last].time = get_time() + MESSAGE_TTL;
-	switch (flags) {
-	case M_CHAT:
-		msg_line[last].color = C_YELLOW;
-		break;	
-	case M_INFO:
-		msg_line[last].color = C_CYAN;
-		break;	
-	case M_ENTER:
-		msg_line[last].color = C_GREEN;
-		break;	
-	case M_LEAVE:
-		msg_line[last].color = C_D_RED;
-		break;	
-	case M_AMMO:
-		msg_line[last].color = C_GREY;
-		break;	
-	case M_WEAPON:
-		msg_line[last].color = C_BLUE;
-		break;	
-	case M_ITEM:
-		msg_line[last].color = C_MAGENTA;
-		break;	
-	case M_DEATH:
-		msg_line[last].color = C_RED;
-		break;	
-	default:
-		msg_line[last].color = MESSAGE_COLOR;
-		break;
-	}
+	msg_line[last].color = (flags == M_CHAT) ? C_GREEN : MESSAGE_COLOR;
 	msg_line[last].msg = mem_alloc(strlen(message) + 1);
 	if (!msg_line[last].msg)
 		return;	/* not such a fatal errror */
@@ -1261,7 +1233,7 @@ int process_packet(char *packet,int l)
 			level_number=a;
 			snprintf(txt,256, "Trying to change level to number %d",
 				level_number);
-			add_message(txt, M_INFO);
+			add_message(txt, M_DEFAULT);
 			name=load_level(level_number);
 			if (!name) {
 				snprintf(error_message,1024,"Cannot find level "
@@ -1272,14 +1244,14 @@ int process_packet(char *packet,int l)
 			}
 			snprintf(txt,256,"Changing level to \"%s\"",name);
 			mem_free(name);
-			add_message(txt, M_INFO);
+			add_message(txt, M_DEFAULT);
 			
 			md5=md5_level(level_number);
 			if (strcmp((char *)md5,packet+5))   /* MD5s differ */
 			{
 				mem_free(md5);
 				snprintf(error_message,1024,"Invalid MD5 sum. Can't change level. Game terminated. Press ENTER.");
-				add_message("Invalid MD5 sum. Can't change level. Exiting...", M_INFO);
+				add_message("Invalid MD5 sum. Can't change level. Exiting...", M_DEFAULT);
 				send_quit();
 				return -1;
 			}
