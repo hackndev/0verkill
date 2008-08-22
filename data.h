@@ -80,8 +80,15 @@
 #define S_NOISE		0x1000
 #define S_CHAINSAW	0x2000
 
-#define M_DEFAULT	0x00
-#define M_CHAT		0x01
+#define	M_DEFAULT	0x00
+#define	M_CHAT		0x01
+#define	M_INFO		0x02
+#define	M_ENTER		0x04
+#define	M_LEAVE		0x08
+#define	M_AMMO		0x10
+#define	M_WEAPON	0x20
+#define	M_ITEM		0x40
+#define	M_DEATH		0x80
 
 #define	C_BLACK		0x00
 #define	C_D_RED		0x01
