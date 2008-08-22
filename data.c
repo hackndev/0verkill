@@ -187,6 +187,8 @@ int _convert_type(unsigned char c)
   
   case 'X': return T_BIOSKULL;
   
+  case 'x': return T_BIOMED;
+  
   /* birthplace */
   case 'B': return TYPE_BIRTHPLACE;
 

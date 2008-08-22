@@ -17,7 +17,7 @@
 #define TYPE_BIRTHPLACE 666
 
 /* object types */
-#define N_TYPES 27
+#define N_TYPES 28
 
 #define T_PLAYER	0
 #define T_BULLET	1
@@ -46,6 +46,7 @@
 #define T_BFGCELL	24
 #define T_CHAIN		25
 #define T_BIOSKULL	26
+#define T_BIOMED	27
 
 #define E_INCOMPATIBLE_VERSION 0
 #define E_PLAYER_REFUSED 1
