@@ -1405,7 +1405,7 @@ int collision(int x1,int y1,int t1,int s1,struct pos* p1,int x2,int y2,int t2,in
 
 /* create corpse on given position and with color num */
 /* num is number of dead player */
-void create_corpse(int x,int y,int num)
+void create_corpse(int x,int y,int num, int status)
 {
 	struct it *o;
 	static char txt[32];
@@ -1416,7 +1416,7 @@ void create_corpse(int x,int y,int num)
 	snprintf(txt, sizeof(txt), "corpse%d",num);
 	if (find_sprite(txt,&a))return;
 	
-	o=new_obj(id,T_CORPSE,CORPSE_TTL,a,0,0,int2double(x+xoffs),int2double(y+yoffs),0,0,0);
+	o=new_obj(id,T_CORPSE,CORPSE_TTL,a,0,status,int2double(x+xoffs),int2double(y+yoffs),0,0,0);
 	if (!o)return;
 	id++;
 	sendall_new_object(o,0);
@@ -1825,9 +1825,29 @@ int dynamic_collision(struct it *obj)
 						sendall_message(0,txt,(struct player*)(obj->data),(struct player*)(p->data), M_INFO);
 						snprintf(txt,256,"%s infected you",((struct player*)(obj->data))->name);
 						send_message((struct player*)(p->data),0,txt, M_INFO);  /* the dead */
-						snprintf(txt,256,"You infected %s",((struct player*)(p->data))->name);
+						snprintf(txt,256,"You got infected from %s",((struct player*)(p->data))->name);
 						send_message((struct player*)(obj->data),0,txt, M_INFO);  /* the dead */
 						snprintf(txt,256,"%s infected %s.\n",((struct player*)(obj->data))->name,((struct player*)(p->data))->name);
+						message(txt,2);
+
+						sendall_update_object(p,0,0); /* update everything */
+						send_update_player((struct player*)(p->data));
+						send_info(0,0);
+					}
+					return 0;
+
+				case T_CORPSE:	/* illness is spreading from corpses too */
+					if (p->type!=T_PLAYER || p->data == obj->data ||
+						((struct player*)(p->data))->obj->status & S_ILL)
+						break;
+					if (obj->status & S_ILL) {
+						((struct player*)(p->data))->obj->status |= S_ILL;
+
+						snprintf(txt,256,"%s got infected from a corpse.",((struct player*)(p->data))->name);
+						sendall_message(0,txt,(struct player*)(obj->data),(struct player*)(p->data), M_INFO);
+						snprintf(txt,256,"You got infected from a corpse");
+						send_message((struct player*)(p->data),0,txt, M_INFO);  /* the dead */
+						snprintf(txt,256,"%s got infected from a corpse.\n",((struct player*)(p->data))->name);
 						message(txt,2);
 
 						sendall_update_object(p,0,0); /* update everything */
@@ -1863,7 +1883,7 @@ int dynamic_collision(struct it *obj)
 					if (a-h>=OVERKILL)
 						create_mess(px,py+((s & S_CREEP)?CREEP_HEIGHT:PLAYER_HEIGHT)-MESS_HEIGHT,py);
 					else
-						create_corpse(px,py+((s & S_CREEP)?CREEP_HEIGHT:PLAYER_HEIGHT)-CORPSE_HEIGHT,((struct player*)(p->data))->color);
+						create_corpse(px,py+((s & S_CREEP)?CREEP_HEIGHT:PLAYER_HEIGHT)-CORPSE_HEIGHT,((struct player*)(p->data))->color,0);
 				}
 				else 
 				{
@@ -1938,7 +1958,7 @@ int dynamic_collision(struct it *obj)
 					if (a-h>=OVERKILL)
 						create_mess(px,py+((s & S_CREEP)?CREEP_HEIGHT:PLAYER_HEIGHT)-MESS_HEIGHT,py);
 					else
-						create_corpse(px,py+((s & S_CREEP)?CREEP_HEIGHT:PLAYER_HEIGHT)-CORPSE_HEIGHT,((struct player*)(p->data))->color);
+						create_corpse(px,py+((s & S_CREEP)?CREEP_HEIGHT:PLAYER_HEIGHT)-CORPSE_HEIGHT,((struct player*)(p->data))->color,0);
 				}
 				else 
 				{
@@ -2055,6 +2075,9 @@ void update_game(void)
 				send_update_player((struct player*)(p->next->member.data)); /* dead player */
 				sendall_update_status(&(p->next->member),0);
 				send_info(0,0);
+
+				create_corpse(double2int(p->next->member.x),double2int(p->next->member.y)+((p->next->member.status & S_CREEP)?
+						CREEP_HEIGHT:PLAYER_HEIGHT)-CORPSE_HEIGHT,((struct player*)(p->next->member.data))->color,S_ILL);
 			}
 		}
 
