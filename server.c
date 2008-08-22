@@ -1800,11 +1800,40 @@ int dynamic_collision(struct it *obj)
 				return 2;
 
 				case T_BIOSKULL:
-					if (p->type!=T_PLAYER)
+					if (p->type!=T_PLAYER || ((struct player*)(p->data))->obj->status & S_ILL)
 						break;
 					((struct player*)(p->data))->obj->status |= S_ILL;
+					send_message((struct player*)(p->data),0,"You got infected from skull", M_INFO);
+					snprintf(txt,256,"%s got infected",((struct player*)(p->data))->name);
+					sendall_message(0,txt,(struct player*)(p->data),0, M_INFO);
+					snprintf(txt,256,"%s got infected.\n",((struct player*)(p->data))->name);
+					message(txt,2);
+
 					sendall_update_object(p,0,0); /* update everything */
 					send_update_player((struct player*)(p->data));
+					send_info(0,0);
+					return 0;
+
+				case T_PLAYER:	/* illness is spreading :-) */
+					if (p->type!=T_PLAYER || p->data == obj->data ||
+						((struct player*)(p->data))->obj->status & S_ILL)
+						break;
+					if (((struct player*)(obj->data))->obj->status & S_ILL) {
+						((struct player*)(p->data))->obj->status |= S_ILL;
+
+						snprintf(txt,256,"%s infected %s.",((struct player*)(obj->data))->name,((struct player*)(p->data))->name);
+						sendall_message(0,txt,(struct player*)(obj->data),(struct player*)(p->data), M_INFO);
+						snprintf(txt,256,"%s infected you",((struct player*)(obj->data))->name);
+						send_message((struct player*)(p->data),0,txt, M_INFO);  /* the dead */
+						snprintf(txt,256,"You infected %s",((struct player*)(p->data))->name);
+						send_message((struct player*)(obj->data),0,txt, M_INFO);  /* the dead */
+						snprintf(txt,256,"%s infected %s.\n",((struct player*)(obj->data))->name,((struct player*)(p->data))->name);
+						message(txt,2);
+
+						sendall_update_object(p,0,0); /* update everything */
+						send_update_player((struct player*)(p->data));
+						send_info(0,0);
+					}
 					return 0;
 
 				case T_KILL:
