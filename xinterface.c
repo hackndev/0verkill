@@ -373,7 +373,7 @@ inline void c_putc(char c)
 	c_print(&c);
 }
 #else
-inline void c_putc(char c)
+void c_putc(char c)
 {
 	char s[2] = {c, 0};
 	c_print(s);
