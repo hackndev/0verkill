@@ -512,6 +512,7 @@ void init_player(struct player* p,int x,int y)
 	int a;
 	
 	p->health=100;
+	p->health_ep=ILLNESS_SPEED;
 	p->armor=0;
 	p->current_weapon=0;
 	p->weapons= WEAPON_MASK_GUN |
@@ -2004,7 +2005,11 @@ void update_game(void)
 		/* decrease life of ill player */
 		if ((p->next->member.type==T_PLAYER)&&(((struct player*)(p->next->member.data))->obj->status & S_ILL))
 		{
-			((struct player*)(p->next->member.data))->health--;
+			/* hack - health with extended precision */
+			if (!((struct player*)(p->next->member.data))->health_ep--) {
+				((struct player*)(p->next->member.data))->health_ep=ILLNESS_SPEED;
+				((struct player*)(p->next->member.data))->health--;
+			}
 			send_update_player((struct player*)(p->next->member.data));
 			if (!(((struct player*)(p->next->member.data))->health))
 			{

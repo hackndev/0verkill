@@ -17,7 +17,7 @@ struct player
 	struct sockaddr_in address;
 	char *name;
 	unsigned char color;
-	unsigned char health,armor;
+	unsigned char health,armor,health_ep;
 	unsigned int frags;
 	unsigned int deaths;
 	unsigned short ammo[ARMS];

@@ -118,7 +118,7 @@
 #define MEDIKIT_HEALTH_ADD 30
 #define ARMOR_ADD 50
 #define INVISIBILITY_DURATION 2000
-
+#define ILLNESS_SPEED 40	/* player's suffering duration */
 
 #define INVISIBILITY_RESPAWN_TIME 200000000   /* in microseconds */
 #define ARMOR_RESPAWN_TIME 50000000  /* in microseconds */
