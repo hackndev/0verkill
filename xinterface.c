@@ -280,8 +280,10 @@ void c_setcolor_3b(unsigned char a)
 }
 
 /* print on the cursor position */
-void _c_print(char * text, int l)
+void c_print(char *text)
 {
+	int l = strlen(text);
+
 	XSetForeground(display,gc,(x_color[x_current_color]).pixel);
 	XSetBackground(display,gc,(x_color[x_current_bgcolor]).pixel);
 	XDrawImageString(
@@ -300,103 +302,12 @@ void _c_print(char * text, int l)
 	x_current_x+=l;
 }
 
-/* dont turn this on ! */
-#undef SCREEN_CACHE
-#undef SCREEN_SCC
-
-#ifdef SCREEN_CACHE
-struct {
-	int start;
-	int color;
-	int bgcolor;
-	int pos;
-	char buf[512];
-} tb = { 0,15,15,0," ", };
-int prev = 0;
-struct {
-	char scc[512];
-	int color[512];
-	int bgcolor[512];
-} scc = {"", {0}, {0}};
-
-#endif
-
-#ifndef SCREEN_CACHE
-inline
-#endif
-void c_print(char *text)
-{
-#ifdef SCREEN_CACHE
-	int c_color, c_bgcolor, c_x, err, l;
-	char *offset;
-
-#ifdef SCREEN_SCC
-	if (!(x_current_x == prev && scc.scc[x_current_x] == text[0] &&
-		scc.color[x_current_x] == x_current_color &&
-		scc.bgcolor[x_current_x] == x_current_bgcolor)) {
-
-		scc.scc[x_current_x] = text[0];
-		scc.color[x_current_x] = x_current_color;
-		scc.bgcolor[x_current_x] = x_current_bgcolor;
-	} else
-		return;
-#endif
-
-	err = (x_current_x != ++prev);
-	if (x_current_color == tb.color && x_current_bgcolor == tb.bgcolor && !err)
-		tb.buf[x_current_x] = text[0];
-	else {
-		if ((l = strlen(offset = tb.buf + tb.start + 1))) {
-			/* backup */
-			c_color = x_current_color;
-			c_bgcolor = x_current_bgcolor;
-			c_x = x_current_x;
-
-			/* set draw area */
-			x_current_color = tb.color;
-			x_current_bgcolor = tb.bgcolor;
-			x_current_x = tb.start;
-
-			/* finish buffer and print it */
-			tb.buf[tb.pos] = 0;
-			_c_print(offset, l);
-
-			/* restore */
-			x_current_color = c_color;
-			x_current_bgcolor = c_bgcolor;
-			x_current_x = c_x;
-		}
-		/* set up new */
-		tb.color = x_current_color;
-		tb.bgcolor = x_current_bgcolor;
-		tb.start = x_current_x;
-		tb.pos = 1;
-		tb.buf[0] = text[0];
-		if (err) {
-			tb.pos = 0;
-			if ((l = strlen(text) - 1))
-				_c_print(text, l);
-		}
-	}
-#else
-	_c_print(text, strlen(text));
-#endif
-}
-
-
 /* print char on the cursor position */
-#ifdef SCREEN_CACHE
-inline void c_putc(char c)
-{
-	c_print(&c);
-}
-#else
 void c_putc(char c)
 {
 	char s[2] = {c, 0};
 	c_print(s);
 }
-#endif
 
 
 /* clear the screen */
