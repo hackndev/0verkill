@@ -58,15 +58,11 @@ my_putc(char c)
 
 
 #ifdef HAVE_INLINE
-inline void
-#else
-void
+inline
 #endif
-my_print(char *str)
+void my_print_l(char *str, int l)
 {
 #ifdef SCREEN_BUFFERING
-	int l=strlen(str);
-
 	if (screen_buffer_pos+l>screen_buffer_size)
 	{
 		while(screen_buffer_pos+l>screen_buffer_size)
@@ -81,6 +77,19 @@ my_print(char *str)
 #endif
 }
 
+#ifdef HAVE_INLINE
+inline
+#endif
+void my_print(char *str)
+{
+	my_print_l(str, 
+#ifdef SCREEN_BUFFERING
+	strlen(str)
+#else
+	0
+#endif
+	);
+}
 
 void c_refresh(void)
 {
@@ -225,6 +234,11 @@ void c_setcolor_3b_bg(unsigned char fg,unsigned char bg)
 void c_print(char * text)
 {
 	my_print(text);
+}
+
+void c_print_l(char * text, int len)
+{
+	my_print_l(text, len);
 }
 
 

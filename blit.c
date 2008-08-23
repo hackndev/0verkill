@@ -27,7 +27,7 @@ unsigned char *screen2;
 unsigned char *screen2_old;
 #endif
 
-
+char *line_buf;
 
 /* attributes:
 	lower 4 bits=foreground
@@ -46,6 +46,8 @@ unsigned char *screen2_a_old;
 /* requires SCREEN_X and SCREEN_Y as screen size */
 void init_blit(void)
 {
+	line_buf=mem_alloc(SCREEN_X);
+	if (!line_buf){ERROR("Not enough memory!\n");EXIT(1);}
 	screen=mem_alloc(SCREEN_X*SCREEN_Y);
 	if (!screen){ERROR("Not enough memory!\n");EXIT(1);}
 	screen_a=mem_alloc(SCREEN_X*SCREEN_Y);
@@ -79,6 +81,7 @@ void init_blit(void)
 
 void shutdown_blit(void)
 {
+	mem_free(line_buf);
 	mem_free(screen);
 	mem_free(screen_a);
 	mem_free(screen_old);
@@ -105,6 +108,8 @@ void clear_screen(void)
 void resize_screen(void)
 {
 	c_get_size(&SCREEN_X,&SCREEN_Y);
+	line_buf=mem_realloc(line_buf,SCREEN_X);
+	if (!line_buf){ERROR("Not enough memory!\n");EXIT(1);}
 	screen=mem_realloc(screen,SCREEN_X*SCREEN_Y);
 	if (!screen){ERROR("Not enough memory!\n");EXIT(1);}
 	screen_a=mem_realloc(screen_a,SCREEN_X*SCREEN_Y);
@@ -188,8 +193,8 @@ void print2screen(int x,int y,unsigned char color,char *message)
 #endif
 blit_screen(unsigned char ignore_bg)
 {
-	int x,y;
-	int yof;
+	int x,y,s;
+	int yof, off;
 	unsigned char a;
 	int changed=1;
 	int status_flag;
@@ -228,9 +233,9 @@ blit_screen(unsigned char ignore_bg)
 			changed=1;
 
 			a=(last_color^attribute);
-			status_flag=	(!!(a&7))|   /* foreground */
-					(((a>>3)&1)<<1)|   /* foreground highlight */
-					((!!((a>>4)&7))<<2);  /* background */
+			status_flag=	!!(a&0x07) |	/* foreground */
+					((a&0x08)>>2) |	/* foreground highlight */
+					(!!(a&0x70)<<2);/* background */
 
 			switch(status_flag)  /* what changed: */
 			{
@@ -262,9 +267,13 @@ blit_screen(unsigned char ignore_bg)
 				c_setcolor_3b_bg(attribute,attribute>>4);
 				break;
 			}
-					
-			last_color=attribute;
-			c_putc(sc[x+SCREEN_X*y]?sc[x+SCREEN_X*y]:32);
+			/* draw bigger pieces to screen */
+			line_buf[x] = sc[off = x + yof] ? : 32;
+			for (s = x++; x < SCREEN_X && at[off = x + yof] == attribute &&
+					at_old[off] == attribute_old; x++)
+					line_buf[x] = sc[off] ? : 32;
+			last_color = attribute;
+			c_print_l(line_buf + s, x---s);
 		}
 	}
 	memcpy(sc_old,sc,SCREEN_X*SCREEN_Y);

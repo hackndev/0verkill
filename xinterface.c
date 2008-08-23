@@ -280,10 +280,11 @@ void c_setcolor_3b(unsigned char a)
 }
 
 /* print on the cursor position */
-void c_print(char *text)
+#ifdef HAVE_INLINE
+inline
+#endif
+void c_print_l(char *text, int l)
 {
-	int l = strlen(text);
-
 	XSetForeground(display,gc,(x_color[x_current_color]).pixel);
 	XSetBackground(display,gc,(x_color[x_current_bgcolor]).pixel);
 	XDrawImageString(
@@ -300,6 +301,11 @@ void c_print(char *text)
 		l
 	);
 	x_current_x+=l;
+}
+
+void c_print(char *text)
+{
+	c_print_l(text, strlen(text));
 }
 
 /* print char on the cursor position */

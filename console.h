@@ -15,6 +15,7 @@ extern void c_init(int w,int h);
 extern void c_shutdown(void);
 extern void c_cls(void);
 extern void c_print(char *text);
+extern void c_print_l(char *text, int len);
 extern void c_putc(char c);
 extern void c_goto(int x, int y);
 extern void c_clear(int x1,int y1,int x2, int y2);
