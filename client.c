@@ -595,7 +595,13 @@ int contact_server(struct config *cfg)
 			server_error("Connection error. Press ENTER.", E_CONN);
 			return 1;
 	}
-	server_error("", E_CONN_SUCC);
+	server_error("",
+#ifdef HAVE_LIBPTHREAD
+	E_CONN_SUCC
+#else
+	E_NONE
+#endif
+	);
 	return 0;
 }
 
@@ -1661,10 +1667,11 @@ void menu_screen(struct config *cfg)
 	int l,banner_pos=0;
 	int help=0;
 #ifdef HAVE_LIBPTHREAD
-	pthread_t pt = 0;
+	pthread_t
 #else
-	int pt = 0;
+	int
 #endif
+	pt = 0;
 	
 	load_banner(&banner);
 	l=strlen(banner);
@@ -1737,10 +1744,16 @@ cycle:
 		goto cc1;
 	}
 	if (help)print_help_window();
+#ifdef HAVE_LIBPTHREAD
+	if (pt && errormsg.flags) {
+		pthread_kill(pt, 9); /* good bye */
+		pt = 0;
+	}
 	if (!pt && errormsg.flags == E_CONN_SUCC) {
 		mem_free(banner);
 		return;
 	}
+#endif
 	if (errormsg.flags)
 		print_error(errormsg.text);
 
@@ -1780,7 +1793,7 @@ cycle:
 #endif
 
 	blit_screen(1);
-	if (!a)
+	if (!a && !pt)
 	{
 		if ((c_was_pressed('+')||c_was_pressed('=')||c_was_pressed(K_UP)||c_was_pressed(K_RIGHT)||c_was_pressed(K_NUM_PLUS)) && !errormsg.flags)
 		{
@@ -1805,13 +1818,9 @@ cycle:
 		}
 		
 		if (c_was_pressed('h') && !errormsg.flags)help^=1;
-		if (c_was_pressed(K_ENTER) && (!pt || errormsg.flags))
+		if (c_was_pressed(K_ENTER))
 		{
 			if (errormsg.flags) {
-#ifdef HAVE_LIBPTHREAD
-				if (errormsg.flags == E_CONN)
-					pt = 0;
-#endif
 				errormsg.flags = E_NONE;
 				goto cycle;
 			}
@@ -1854,8 +1863,12 @@ cycle:
 				goto cycle;
 			}
 #else
-			if (contact_server(cfg))
+			if(contact_server(cfg))
 				goto cycle;
+			else {
+				mem_free(banner);
+				return;
+			}
 #endif
 		}
 cc1:
