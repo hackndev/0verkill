@@ -303,6 +303,9 @@ void c_print_l(char *text, int l)
 	x_current_x+=l;
 }
 
+#ifdef HAVE_INLINE
+inline
+#endif
 void c_print(char *text)
 {
 	c_print_l(text, strlen(text));
