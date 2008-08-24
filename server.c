@@ -909,6 +909,8 @@ void send_message(struct player* player, char *name, char *msg, char flags)
 {
 	static char packet[256];
 	int len = strlen(name ? : "") + strlen(msg ? : "") + 3;
+	if (len > 250)
+		len = 255;
 
 	memset(packet, 0, sizeof(packet));
 	packet[0] = P_MESSAGE;
@@ -928,6 +930,8 @@ void sendall_message(char *name, char *msg,struct player *not1,struct player* no
 	static char packet[256];
 	int len = strlen(name ? : "") + strlen(msg ? : "") + 3;
 	struct player_list* p;
+	if (len > 250)
+		len = 255;
 
 	memset(packet, 0, sizeof(packet));
 	packet[0] = P_MESSAGE;
