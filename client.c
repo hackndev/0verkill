@@ -1750,6 +1750,7 @@ cycle:
 		pt = 0;
 	}
 	if (!pt && errormsg.flags == E_CONN_SUCC) {
+		errormsg.flags = 0;
 		mem_free(banner);
 		return;
 	}
@@ -1858,7 +1859,7 @@ cycle:
 			}
 #ifdef HAVE_LIBPTHREAD
 			if (!pt) {
-				pthread_create(&pt, NULL, (void *)contact_server, &cfg);
+				pthread_create(&pt, NULL, (void *)contact_server, cfg);
 				pthread_detach(pt);
 				goto cycle;
 			}
