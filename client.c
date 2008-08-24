@@ -212,7 +212,18 @@ int read_cfg_entry(FILE *stream, char *retval, int len)
 	return l;
 }
 
-void load_cfg(struct config *cfg)
+void load_default_cfg(struct config *cfg)
+{
+	char *host = "localhost";
+	char *name = "Player";
+	/* we dont want to loose argc and argv here ... */
+	memcpy(cfg->host, host, strlen(host));
+	memcpy(cfg->name, name, strlen(name));
+	cfg->port = 6666;
+	cfg->color = C_D_GREY;
+}
+
+int load_cfg(struct config *cfg)
 {
 	FILE *stream;
 	int a;
@@ -224,27 +235,41 @@ void load_cfg(struct config *cfg)
 	snprintf(txt, sizeof(txt), "./%s",CFG_FILE);
 #endif
 	stream=fopen(txt,"r");
-	if (!stream)return;
+	if (!stream) {
+		load_default_cfg(cfg);
+		return 1;
+	}
 	
 	if (a = read_cfg_entry(stream, txt, MAX_HOST_LEN))
 		memcpy(cfg->host,txt,a+1);
-	else
-		return;
-	
+	else {
+		load_default_cfg(cfg);
+		return 2;
+	}
+
 	if (a = read_cfg_entry(stream, txt, MAX_NAME_LEN))
 		memcpy(cfg->name,txt,a+1);
-	else
-		return;
+	else {
+		load_default_cfg(cfg);
+		return 3;
+	}
 
 	if (a = read_cfg_entry(stream, txt, MAX_PORT_LEN))
 		cfg->port = strtol(txt,0,10);
-	else
-		return;
+	else {
+		load_default_cfg(cfg);
+		return 4;
+	}
 
-	if (!fgets(txt,256,stream))
-		return;
-	cfg->color = strtol(txt,0,10);
+	if (a = read_cfg_entry(stream, txt, 4))
+		cfg->color = strtol(txt,0,10);
+	else {
+		load_default_cfg(cfg);
+		return 5;
+	}
+
 	fclose(stream);
+	return 0;
 }
 
 
