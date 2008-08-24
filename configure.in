@@ -70,6 +70,18 @@ if test "$cf_result" = no; then
 	fi
 fi
 
+AC_CHECK_HEADERS(pthread.h)
+AC_CHECK_FUNC(pthread_create, cf_result=yes, cf_result=no)
+if test "$cf_result" = no; then
+	AC_CHECK_LIB(pthread, pthread_create, cf_result=yes, cf_result=no)
+	if test "$cf_result" = no; then
+		AC_CHECK_LIB(pthread, pthread_create)
+	else
+		test -z "`echo $LIBS | grep -- -lpthread`" && LIBS="$LIBS -lpthread"
+		AC_DEFINE(HAVE_LIBPTHREAD)
+	fi
+fi
+
 if test "$with_x" = yes ; then
 	if test "$ac_cv_have_emx" = yes && test -n "$X11ROOT"; then
 		CFLAGS="$CFLAGS -I$X11ROOT/XFree86/include"

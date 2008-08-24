@@ -8,6 +8,10 @@
 #include <signal.h>
 #include <math.h>
 
+#ifdef HAVE_PTHREAD_H
+	#include <pthread.h>
+#endif
+
 #ifdef HAVE_FLOAT_H
 	#include <float.h>
 #endif
@@ -485,17 +489,23 @@ send_again:
 
 #undef MAX_COUNT
 
-
-/* initiate connection with server */
-char * contact_server(int color,char *name)
+void server_error(char *msg, int err)
 {
+	errormsg.text = msg;
+	errormsg.flags = err;
+}
+/* initiate connection with server */
+int contact_server(struct config *cfg)
+{
+	char *name = cfg->name;
+	int color = cfg->color;
 	static char packet[256];
 	int l=strlen(name)+1;
 	int a,r;
 	int min,maj;
-
         fd_set fds;
         struct timeval tv;
+
         tv.tv_sec=4;
         tv.tv_usec=0;
         FD_ZERO(&fds);
@@ -510,13 +520,20 @@ char * contact_server(int color,char *name)
 
 	send_packet(packet,l+5,(struct sockaddr*)(&server),my_id,0);
 
-
-        if (!select(fd+1,&fds,NULL,NULL,&tv))return "No reply within 4 seconds. Press ENTER.";
+	if (!select(fd+1,&fds,NULL,NULL,&tv)) {
+		server_error("No reply within 4 seconds. Press ENTER.", E_CONN);
+        	return 1;
+        }
 
 	if ((r=recv_packet(packet,256,0,0,1,0,0))<0)
 	{
-		if (errno==EINTR)return "Server hung up. Press ENTER.";
-		else return "Connection error. Press ENTER.";
+		if (errno==EINTR) {
+			server_error("Server hung up. Press ENTER.", E_CONN);
+			return 1;
+		} else {
+			server_error("Connection error. Press ENTER.", E_CONN);
+			return 1;
+		}
 	}
 
 	switch(*packet)
@@ -525,19 +542,28 @@ char * contact_server(int color,char *name)
 		switch(packet[1])
 		{
 			case E_INCOMPATIBLE_VERSION:
-			return "Incompatible client version. Connection refused. Press Enter.";
+				server_error("Incompatible client version. Connection refused. Press Enter.", E_CONN);
+				return 1;
 
 			default:
-			return "Connection refused. Press ENTER.";
+				server_error("Connection refused. Press ENTER.", E_CONN);
+				return 1;
 		}
 		
 		case P_PLAYER_ACCEPTED:
 		my_id=get_int(packet+33);
-		if (r<39){send_quit();return "Incompatible server version. Givin' up. Press Enter.";}
+		if (r<39) {
+			send_quit();
+			server_error("Incompatible server version. Givin' up. Press Enter.", E_CONN);
+			return 1;
+		}
 		maj=packet[37];
 		min=packet[38];
-		if (maj!=VERSION_MAJOR||min<MIN_SERVER_VERSION_MINOR)
-		{send_quit();return "Incompatible server version. Givin' up. Press Enter.";}
+		if (maj!=VERSION_MAJOR||min<MIN_SERVER_VERSION_MINOR) {
+			send_quit();
+			server_error("Incompatible server version. Givin' up. Press Enter.", E_CONN);
+			return 1;
+		}
 		game_start_offset=get_time();
 		game_start_offset-=get_long_long(packet+25);
 		health=100;
@@ -566,8 +592,10 @@ char * contact_server(int color,char *name)
 		break;
 		
 		default:
-		return "Connection error. Press ENTER.";
+			server_error("Connection error. Press ENTER.", E_CONN);
+			return 1;
 	}
+	server_error("", E_CONN_SUCC);
 	return 0;
 }
 
@@ -1632,6 +1660,11 @@ void menu_screen(struct config *cfg)
 	char *banner;
 	int l,banner_pos=0;
 	int help=0;
+#ifdef HAVE_LIBPTHREAD
+	pthread_t pt = 0;
+#else
+	int pt = 0;
+#endif
 	
 	load_banner(&banner);
 	l=strlen(banner);
@@ -1704,6 +1737,10 @@ cycle:
 		goto cc1;
 	}
 	if (help)print_help_window();
+	if (!pt && errormsg.flags == E_CONN_SUCC) {
+		mem_free(banner);
+		return;
+	}
 	if (errormsg.flags)
 		print_error(errormsg.text);
 
@@ -1768,9 +1805,13 @@ cycle:
 		}
 		
 		if (c_was_pressed('h') && !errormsg.flags)help^=1;
-		if (c_was_pressed(K_ENTER))
+		if (c_was_pressed(K_ENTER) && (!pt || errormsg.flags))
 		{
 			if (errormsg.flags) {
+#ifdef HAVE_LIBPTHREAD
+				if (errormsg.flags == E_CONN)
+					pt = 0;
+#endif
 				errormsg.flags = E_NONE;
 				goto cycle;
 			}
@@ -1806,14 +1847,16 @@ cycle:
 				wait_for_enter();
 				goto cc1;
 			}
-			if ((m=contact_server(cfg->color,cfg->name)))
-			{
-				errormsg.text = m;
-				errormsg.flags = E_CONN;
+#ifdef HAVE_LIBPTHREAD
+			if (!pt) {
+				pthread_create(&pt, NULL, (void *)contact_server, &cfg);
+				pthread_detach(pt);
 				goto cycle;
 			}
-			mem_free(banner);
-			return;
+#else
+			if (contact_server(cfg))
+				goto cycle;
+#endif
 		}
 cc1:
 		if ((c_was_pressed('q')||c_was_pressed(K_ESCAPE)) && !errormsg.flags)
