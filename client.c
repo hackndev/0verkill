@@ -91,6 +91,10 @@ struct config {
 	int	color;
 	char	override;
 };
+struct {
+	int flags;
+	char *text;
+} errormsg = {0, ""};
 
 /* my health, armor, frags, deaths, ammo, ... and ID */
 unsigned char health,armor;
@@ -212,7 +216,7 @@ int read_cfg_entry(FILE *stream, char *retval, int len)
 	return l;
 }
 
-void load_default_cfg(struct config *cfg)
+int load_default_cfg(struct config *cfg, char state)
 {
 	char *host = "localhost";
 	char *name = "Player";
@@ -221,6 +225,9 @@ void load_default_cfg(struct config *cfg)
 	memcpy(cfg->name, name, strlen(name));
 	cfg->port = 6666;
 	cfg->color = C_D_GREY;
+	errormsg.flags = (state >> 1) ? E_DEFAULTS : 0;
+	errormsg.text = "Error loading configuration file, defaults loaded. Press ENTER.";
+	return state;
 }
 
 int load_cfg(struct config *cfg)
@@ -235,38 +242,28 @@ int load_cfg(struct config *cfg)
 	snprintf(txt, sizeof(txt), "./%s",CFG_FILE);
 #endif
 	stream=fopen(txt,"r");
-	if (!stream) {
-		load_default_cfg(cfg);
-		return 1;
-	}
+	if (!stream)
+		return load_default_cfg(cfg, 1);
 	
 	if (a = read_cfg_entry(stream, txt, MAX_HOST_LEN))
 		memcpy(cfg->host,txt,a+1);
-	else {
-		load_default_cfg(cfg);
-		return 2;
-	}
+	else
+		return load_default_cfg(cfg, 2);
 
 	if (a = read_cfg_entry(stream, txt, MAX_NAME_LEN))
 		memcpy(cfg->name,txt,a+1);
-	else {
-		load_default_cfg(cfg);
-		return 3;
-	}
+	else
+		return load_default_cfg(cfg, 3);
 
 	if (a = read_cfg_entry(stream, txt, MAX_PORT_LEN))
 		cfg->port = strtol(txt,0,10);
-	else {
-		load_default_cfg(cfg);
-		return 4;
-	}
+	else
+		return load_default_cfg(cfg, 4);
 
 	if (a = read_cfg_entry(stream, txt, 4))
 		cfg->color = strtol(txt,0,10);
-	else {
-		load_default_cfg(cfg);
-		return 5;
-	}
+	else
+		return load_default_cfg(cfg, 5);
 
 	fclose(stream);
 	return 0;
@@ -1607,6 +1604,20 @@ void load_banner(char **banner)
 	fclose(s);
 }
 
+#define ERRBOX_HEIGHT 1
+#define ERRBOX_Y ((SCREEN_Y-2-ERRBOX_HEIGHT)>>1)
+
+/* draw error box */
+void print_error(char *text)
+{
+	int width = strlen(text) + 6;
+	int x = (SCREEN_X-2-width) >> 1;
+
+	draw_frame(x, ERRBOX_Y, width, ERRBOX_HEIGHT, 15);
+	print2screen(x + 2, ERRBOX_Y + 1, C_RED, "/!\\");
+	print2screen(x + 6, ERRBOX_Y + 1, C_YELLOW, text);
+}
+
 
 /* draw initial screen */
 void menu_screen(struct config *cfg)
@@ -1693,6 +1704,9 @@ cycle:
 		goto cc1;
 	}
 	if (help)print_help_window();
+	if (errormsg.flags)
+		print_error(errormsg.text);
+
 	switch(a)
 	{
 		case 1:
@@ -1731,7 +1745,7 @@ cycle:
 	blit_screen(1);
 	if (!a)
 	{
-		if (c_was_pressed('+')||c_was_pressed('=')||c_was_pressed(K_UP)||c_was_pressed(K_RIGHT)||c_was_pressed(K_NUM_PLUS))
+		if ((c_was_pressed('+')||c_was_pressed('=')||c_was_pressed(K_UP)||c_was_pressed(K_RIGHT)||c_was_pressed(K_NUM_PLUS)) && !errormsg.flags)
 		{
 			(cfg->color)++;
 			if (cfg->color>30)
@@ -1742,7 +1756,7 @@ cycle:
 			cfg->override &= ~OVERRIDE_FLAG_COLOR;
 		}
 		
-		if (c_was_pressed('-')||c_was_pressed(K_NUM_MINUS)||c_was_pressed(K_DOWN)||c_was_pressed(K_LEFT))
+		if ((c_was_pressed('-')||c_was_pressed(K_NUM_MINUS)||c_was_pressed(K_DOWN)||c_was_pressed(K_LEFT)) && !errormsg.flags)
 		{
 			cfg->color--;
 			if (cfg->color<1)
@@ -1753,9 +1767,13 @@ cycle:
 			cfg->override &= ~OVERRIDE_FLAG_COLOR;
 		}
 		
-		if (c_was_pressed('h'))help^=1;
+		if (c_was_pressed('h') && !errormsg.flags)help^=1;
 		if (c_was_pressed(K_ENTER))
 		{
+			if (errormsg.flags) {
+				errormsg.flags = E_NONE;
+				goto cycle;
+			}
 			save_cfg(cfg);
 			cfg->port=strtol(port,0,10);
 			if ((m=find_server(cfg)))
@@ -1790,37 +1808,28 @@ cycle:
 			}
 			if ((m=contact_server(cfg->color,cfg->name)))
 			{
-				print2screen(((SCREEN_X-strlen(m))>>1),SCREEN_Y-1,9,m);
-#ifdef TRI_D
-				if (TRI_D_ON)
-				{
-					tri_d=1;
-					blit_screen(1);
-					tri_d=0;
-				}
-#endif
-				blit_screen(1);
-				wait_for_enter();
-				goto cc1;
+				errormsg.text = m;
+				errormsg.flags = E_CONN;
+				goto cycle;
 			}
 			mem_free(banner);
 			return;
 		}
 cc1:
-		if (c_was_pressed('q')||c_was_pressed(K_ESCAPE))
+		if ((c_was_pressed('q')||c_was_pressed(K_ESCAPE)) && !errormsg.flags)
 		{
 			save_cfg(cfg);
 			mem_free(banner);
 			shut_down(1);
 		}
 		
-		if (c_was_pressed('n'))
+		if (c_was_pressed('n') && !errormsg.flags)
 			a=1;
 		
-		if (c_was_pressed('a')||c_was_pressed('s'))
+		if ((c_was_pressed('a')||c_was_pressed('s')) && !errormsg.flags)
 			a=3;
 		
-		if (c_was_pressed('p'))
+		if (c_was_pressed('p') && !errormsg.flags)
 			a=2;
 	}
 	sleep_until(t+MENU_PERIOD_USEC);
@@ -1977,13 +1986,11 @@ void parse_command_line(struct config *cfg)
         }
 }
 
-
 #define HALL_FAME_WIDTH (MAX_NAME_LEN+17)
 #define HALL_FAME_HEIGHT ((active_players>TOP_PLAYERS_N?TOP_PLAYERS_N:active_players)+5)
 #define HALL_FAME_X ((SCREEN_X-2-HALL_FAME_WIDTH)>>1)
 #define HALL_FAME_Y ((SCREEN_Y-2-HALL_FAME_HEIGHT)>>1)
 
-/* draw window with top players */
 void print_hall_of_fame(void)
 {
 	int a;

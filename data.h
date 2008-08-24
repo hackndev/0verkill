@@ -110,6 +110,10 @@
 #define	C_CYAN		0x0e
 #define	C_WHITE		0x0f
 
+#define E_NONE		0x00
+#define E_DEFAULTS	0x01
+#define E_CONN		0x02
+
 #define ARMS 7
 
 unsigned char *weapon_name[ARMS];
