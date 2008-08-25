@@ -1,12 +1,49 @@
-CFLAGS=@CFLAGS@ -O3 @X_CFLAGS@ -Wall -W -Wstrict-prototypes -Wno-parentheses -fomit-frame-pointer 
+bindir = @bindir@
+build_alias = @build_alias@
+builddir = @builddir@
+datadir = @datadir@
+datarootdir = @datarootdir@
+docdir = @docdir@
+dvidir = @dvidir@
+exec_prefix = @exec_prefix@
+host_alias = @host_alias@
+htmldir = @htmldir@
+includedir = @includedir@
+infodir = @infodir@
+libdir = @libdir@
+libexecdir = @libexecdir@
+localedir = @localedir@
+localstatedir = @localstatedir@
+mandir = @mandir@
+oldincludedir = @oldincludedir@
+pdfdir = @pdfdir@
+prefix = @prefix@
+BASEDIR=@datadir@/0verkill
+CFLAGS=@CFLAGS@ -O3 @X_CFLAGS@ -DBASE_DIR="\"$(BASEDIR)\"" -Wall -W -Wstrict-prototypes -Wno-parentheses
 #-malign-functions=0
 LDFLAGS=@LDFLAGS@
 LIBS=@LIBS@ 
 XLIBS=@X_LIBS@
 CC=@CC@
+INSTALL=@INSTALL@
 
+MAIN=0verkill @X0VERKILL@
+HELPER=server @XEDITOR@ editor test_server avi bot @XAVI@
 
-all: server 0verkill @X0VERKILL@ @XEDITOR@ editor test_server avi bot @XAVI@
+all: $(HELPER) $(MAIN)
+
+install: all
+	for i in $(HELPER); do\
+		$(INSTALL) -D -m 755 $$i "$(DESTDIR)$(bindir)"/`echo $$i | sed -n 's|^x.*|x|p'`0verkill-$$i;\
+	done
+	for i in $(MAIN); do\
+		$(INSTALL) -D -m 755 $$i "$(DESTDIR)$(bindir)"/$$i;\
+	done
+	$(INSTALL) -d -m 755 "$(DESTDIR)$(BASEDIR)"/data
+	$(INSTALL) -d -m 755 "$(DESTDIR)$(BASEDIR)"/grx
+	$(INSTALL) -m 644 data/* "$(DESTDIR)$(BASEDIR)"/data
+	$(INSTALL) -m 644 grx/* "$(DESTDIR)$(BASEDIR)"/grx
+
 
 clean:
 	rm -f *.o server 0verkill editor test_server x0verkill xeditor avi xavi bot core
