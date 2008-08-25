@@ -539,9 +539,7 @@ void init_player(struct player* p,int x,int y)
 int add_player(unsigned char color, char *name,struct sockaddr_in *address,int x, int y)
 {
 	int h;
-#define cp last_player->next
-
-	cp=last_player->next;
+	struct player_list *cp;
 
 	/* alloc memory for new player */
 	cp=mem_alloc(sizeof(struct player_list));
@@ -581,8 +579,8 @@ int add_player(unsigned char color, char *name,struct sockaddr_in *address,int x
 	/* that's all */
 	cp->prev=last_player;
 	cp->next=0;
+	last_player->next=cp;
 	last_player=cp;
-#undef cp 
 	return 0;
 }
 
