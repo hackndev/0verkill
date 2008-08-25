@@ -1,0 +1,30 @@
+#!/bin/sh
+
+name=0verkill
+version="$1"
+
+if [ -z "$version" ]; then
+	echo "Tags a version in git, adds a configure script to a clean"
+	echo "git checkout and makes a tarball for release."
+	echo
+	echo "Usage:"
+	echo "$0 <version string>"
+	exit 1
+fi
+
+echo "Tagging as v$version."
+# XXX: signed tag would be better
+git tag -a -m "Released version $version." "v$version"
+WORKDIR=`mktemp -d `
+echo "Checking out to $WORKDIR"
+git archive --format=tar --prefix=$name-$version/ "v$version" | tar -x -C "$WORKDIR"
+echo "Running autotools"
+SRCDIR=`pwd`
+cd "$WORKDIR/$name-$version"
+autoreconf
+rm -rf autom4te.cache
+cd "$SRCDIR"
+echo "Packing as $name-$version.tar.bz2"
+tar -cjf "$name-$version.tar.bz2" -C "$WORKDIR" "$name-$version/"
+echo "Cleaning $WORKDIR"
+rm -rf "WORKDIR"
