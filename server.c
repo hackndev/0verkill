@@ -893,22 +893,34 @@ void send_info(struct sockaddr *addr,int id)
 	mem_free(t);
 }
 
+/* returns the actual length of the packet to be sent */
+static int build_message_packet(char packet[], int maxlen, char *name, char *msg, char flags)
+{
+	int n, len = 0;
+
+	/* assert(maxlen > 2); */
+	packet[0] = P_MESSAGE;
+	packet[1] = flags;
+	len += 2;
+
+	if (!name)
+		n = snprintf(packet + len, maxlen - len, "%s", msg);
+	else
+		n = snprintf(packet + len, maxlen - len, "%s> %s", name, msg);
+	/* account for the space the text consumed in the packet; could have been truncated */
+	len += min(n + 1, maxlen - len);
+
+	return len;
+}
+
 /* send message to a player */
 /* name is name of player who sent the message (chat), NULL means it's from server */
 void send_message(struct player* player, char *name, char *msg, char flags)
 {
 	static char packet[256];
-	int len = strlen(name ? : "") + strlen(msg ? : "") + 3;
-	if (len > 250)
-		len = 255;
+	int len;
 
-	packet[0] = P_MESSAGE;
-	packet[1] = flags;
-	if (!name)
-		snprintf(packet + 2, len, "%s", msg);
-	else
-		snprintf(packet + 2, len += 2, "%s> %s", name, msg);
-
+	len = build_message_packet(packet, sizeof(packet), name, msg, flags);
 	send_chunk_packet_to_player(packet, len, player);
 }
 
@@ -917,18 +929,10 @@ void send_message(struct player* player, char *name, char *msg, char flags)
 void sendall_message(char *name, char *msg,struct player *not1,struct player* not2, char flags)
 {
 	static char packet[256];
-	int len = strlen(name ? : "") + strlen(msg ? : "") + 3;
+	int len;
 	struct player_list* p;
-	if (len > 250)
-		len = 255;
 
-	packet[0] = P_MESSAGE;
-	packet[1] = flags;
-	if (!name)
-		snprintf(packet + 2, len, "%s", msg);
-	else
-		snprintf(packet + 2, len += 2, "%s> %s", name, msg);
-
+	len = build_message_packet(packet, sizeof(packet), name, msg, flags);
 	for (p=&players;p->next;p=p->next)
 		if ((!not1||(&(p->next->member))!=not1)&&(!not2||(&(p->next->member))!=not2))
  			send_chunk_packet_to_player(packet, len, &(p->next->member));
