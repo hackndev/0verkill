@@ -1,6 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(console.c)
-AM_CONFIG_HEADER(config.h)
+AC_INIT
+AC_CONFIG_SRCDIR([console.c])
+AC_CONFIG_HEADERS([config.h])
 
 dnl Checks for programs.
 AC_PROG_CC
@@ -50,6 +51,10 @@ AC_CHECK_FUNC(socket, cf_result=yes, cf_result=no)
 if test "$cf_result" = no; then
 	AC_CHECK_LIB(socket, socket)
 fi
+
+AH_TEMPLATE([HAVE_LIBX11], [Define if you have the X11 library (-lX11).])
+AH_TEMPLATE([HAVE_LIBXPM], [Define if you have the Xpm library (-lXpm).])
+AH_TEMPLATE([HAVE_TYPEOF], [Define if you have the typeof function.])
 
 AC_CACHE_CHECK([for typeof], ac_cv_have_typeof,
 	AC_TRY_COMPILE(, [int a;
@@ -106,4 +111,5 @@ if test "$ac_cv_have_emx" = yes; then
 fi
 AC_SUBST(OVERKILL_SPECIAL)
 
-AC_OUTPUT(Makefile)
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT
