@@ -5,6 +5,7 @@ AC_CONFIG_HEADERS([config.h])
 
 dnl Checks for programs.
 AC_PROG_CC
+AC_PROG_INSTALL
 
 AC_CACHE_CHECK([for EMX], ac_cv_have_emx,
 	AC_TRY_COMPILE(, [#ifndef __EMX__
