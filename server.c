@@ -333,7 +333,7 @@ Cleanup:
 
 
 /* load dynamic data */
-void load_dynamic(char * filename)
+static void load_dynamic(char * filename)
 {
 	FILE * stream;
 	static char line[1024];
@@ -373,7 +373,7 @@ void load_dynamic(char * filename)
 }
 
 /* write a message to stdout or stderr */
-void message(char *msg,int output)
+static void message(char *msg,int output)
 {
 	time_t t;
 	struct tm tm;
@@ -405,7 +405,7 @@ void message(char *msg,int output)
 
 
 /* switch weapon to the player's best one */
-int select_best_weapon(struct player* p)
+static int select_best_weapon(struct player* p)
 {
 	unsigned short t[ARMS]={4,0,1,3,2,5}; 
 	int a;
@@ -419,7 +419,7 @@ int select_best_weapon(struct player* p)
 
 /* Bakta modify - better weapon selection routines */
 /* test if weapon is better than the one he wields */
-int is_weapon_better(struct player* p, int weapon)
+static int is_weapon_better(struct player* p, int weapon)
 {
 	int i;
 	int cur=0, test=0;
@@ -436,21 +436,21 @@ int is_weapon_better(struct player* p, int weapon)
 
 
 /* test if player p has weapon and can use it (has ammo for it) */
-int is_weapon_usable(struct player* p, int weapon)
+static int is_weapon_usable(struct player* p, int weapon)
 {
 	return !!((p->weapons&(1<<weapon))&&p->ammo[weapon]);
 }
 
 
 /* test if player p has weapon and has no ammo for it */
-int is_weapon_empty(struct player* p, int weapon)
+static int is_weapon_empty(struct player* p, int weapon)
 {
 	return !!((p->weapons&(1<<weapon))&&!p->ammo[weapon]);
 }
 
 
 /* initialize socket */
-void init_socket(void)
+static void init_socket(void)
 {
 	struct sockaddr_in server;
 	fd=socket(PF_INET,SOCK_DGRAM,IPPROTO_UDP);
@@ -475,7 +475,7 @@ void init_socket(void)
 
 
 /* selects random birthplace and returns */
-void find_birthplace(int *x,int *y)
+static void find_birthplace(int *x,int *y)
 {
 	int a=random()%n_birthplaces;
 	
@@ -486,7 +486,7 @@ void find_birthplace(int *x,int *y)
 
 /* return index of hero with color num in sprites field */
 /* if there's not such color, returns -1 */
-int select_hero(int num)
+static int select_hero(int num)
 {
 	static char txt[32];
 	int a;
@@ -498,7 +498,7 @@ int select_hero(int num)
 
 
 /* initialize player */
-void init_player(struct player* p,int x,int y)
+static void init_player(struct player* p,int x,int y)
 {
 	int a;
 	
@@ -527,7 +527,7 @@ void init_player(struct player* p,int x,int y)
 
 /* completely add player to server's database */
 /* player starts on x,y coordinates */
-int add_player(unsigned char color, char *name,struct sockaddr_in *address,int x, int y)
+static int add_player(unsigned char color, char *name,struct sockaddr_in *address,int x, int y)
 {
 	int h;
 	struct player_list *cp;
@@ -576,7 +576,7 @@ int add_player(unsigned char color, char *name,struct sockaddr_in *address,int x
 }
 
 
-void send_chunk_to_player(struct player *player)
+static void send_chunk_to_player(struct player *player)
 {
 	static char p[MAX_PACKET_LENGTH];
 
@@ -589,7 +589,7 @@ void send_chunk_to_player(struct player *player)
 }
 
 
-void send_chunk_packet_to_player(char *packet, int len, struct player *player)
+static void send_chunk_packet_to_player(char *packet, int len, struct player *player)
 {
 	if (len>MAX_PACKET_LENGTH-1)return;
 	if ((player->packet_pos)+len>MAX_PACKET_LENGTH-1)send_chunk_to_player(player);
@@ -598,7 +598,7 @@ void send_chunk_packet_to_player(char *packet, int len, struct player *player)
 }
 
 
-void send_chunks(void)
+static void send_chunks(void)
 {
 	struct player_list* p;
 
@@ -609,7 +609,7 @@ void send_chunks(void)
 
 /* send a packet to all players except one */
 /* if not_this_player is null, sends to all players */
-void sendall(char *packet,int len, struct player * not_this_player)
+static void sendall(char *packet,int len, struct player * not_this_player)
 {
 	struct player_list* p;
 
@@ -625,7 +625,7 @@ void sendall(char *packet,int len, struct player * not_this_player)
 
 /* send a packet to all players except one */
 /* if not_this_player is null, sends to all players */
-void sendall_chunked(char *packet,int len, struct player * not_this_player)
+static void sendall_chunked(char *packet,int len, struct player * not_this_player)
 {
 	struct player_list* p;
 
@@ -639,7 +639,7 @@ void sendall_chunked(char *packet,int len, struct player * not_this_player)
 }
 
 
-int which_update(struct it *obj,int old_x,int old_y,int old_x_speed,int old_y_speed,unsigned int old_status,int old_ttl)
+static int which_update(struct it *obj,int old_x,int old_y,int old_x_speed,int old_y_speed,unsigned int old_status,int old_ttl)
 {
 	int a=0;
 	
@@ -675,7 +675,7 @@ int which_update(struct it *obj,int old_x,int old_y,int old_x_speed,int old_y_sp
 		6=update speed + status + ttl
 		7=update coordinates + status + ttl
 */
-void sendall_update_object(struct it* obj, struct player * not_this_player,int type)
+static void sendall_update_object(struct it* obj, struct player * not_this_player,int type)
 {
 	struct player_list* p;
 	int l;
@@ -785,7 +785,7 @@ void sendall_update_object(struct it* obj, struct player * not_this_player,int t
 
 
 /* send update status packet to all players (except not_this_player if this is !NULL)*/
-void sendall_update_status(struct it* obj, struct player * not_this_player)
+static void sendall_update_status(struct it* obj, struct player * not_this_player)
 {
 	struct player_list* p;
 	static char packet[8];
@@ -805,7 +805,7 @@ void sendall_update_status(struct it* obj, struct player * not_this_player)
 
 
 /* send hit packet to all players except not_this player (if !NULL)*/
-void sendall_hit(unsigned long id,unsigned char direction,unsigned char xoffs,unsigned char yoffs,struct player* not_this_player)
+static void sendall_hit(unsigned long id,unsigned char direction,unsigned char xoffs,unsigned char yoffs,struct player* not_this_player)
 {
 	struct player_list* p;
 	static char packet[8];
@@ -827,7 +827,7 @@ void sendall_hit(unsigned long id,unsigned char direction,unsigned char xoffs,un
 
 
 /* sort players according to frags */
-int _qsort_cmp(const void *a,const void *b)
+static int _qsort_cmp(const void *a,const void *b)
 {
 	int fa,fb,da,db;
 	fa=(*((struct player**)a))->frags;
@@ -849,7 +849,7 @@ int _qsort_cmp(const void *a,const void *b)
 /* send info how many players are in the game and top score */
 /* id=recipient's id */
 /* if addr is NULL info is sent to all */
-void send_info(struct sockaddr *addr,int id)
+static void send_info(struct sockaddr *addr,int id)
 {
 	char *packet;
 	int p=active_players>TOP_PLAYERS_N?TOP_PLAYERS_N:active_players;
@@ -915,7 +915,7 @@ static int build_message_packet(char packet[], int maxlen, char *name, char *msg
 
 /* send message to a player */
 /* name is name of player who sent the message (chat), NULL means it's from server */
-void send_message(struct player* player, char *name, char *msg, char flags)
+static void send_message(struct player* player, char *name, char *msg, char flags)
 {
 	static char packet[256];
 	int len;
@@ -926,7 +926,7 @@ void send_message(struct player* player, char *name, char *msg, char flags)
 
 
 /* similar to send_message but sends to all except one or two players */
-void sendall_message(char *name, char *msg,struct player *not1,struct player* not2, char flags)
+static void sendall_message(char *name, char *msg,struct player *not1,struct player* not2, char flags)
 {
 	static char packet[256];
 	int len;
@@ -939,7 +939,7 @@ void sendall_message(char *name, char *msg,struct player *not1,struct player* no
 }
 
 
-void sendall_bell(void)
+static void sendall_bell(void)
 {
 	static char packet;
 	struct player_list* p;
@@ -951,8 +951,9 @@ void sendall_bell(void)
 }
 
 
+#if 0
 /* send new object information to given address */
-void send_new_obj(struct sockaddr* address, struct it* obj,int id)
+static void send_new_obj(struct sockaddr* address, struct it* obj,int id)
 {
 	static char packet[32];
 
@@ -968,10 +969,10 @@ void send_new_obj(struct sockaddr* address, struct it* obj,int id)
 	put_int16(packet+26,obj->ttl);
 	send_packet(packet,28,address,0,id);
 }
-
+#endif
 
 /* send new object information to given address */
-void send_new_obj_chunked(struct player* player, struct it* obj)
+static void send_new_obj_chunked(struct player* player, struct it* obj)
 {
 	static char packet[32];
 
@@ -990,7 +991,7 @@ void send_new_obj_chunked(struct player* player, struct it* obj)
 
 
 /* send player update to given player */
-void send_update_player(struct player* p)
+static void send_update_player(struct player* p)
 {
 	static char packet[32];
 	int a;
@@ -1009,7 +1010,7 @@ void send_update_player(struct player* p)
 
 /* send a packet to all players except one */
 /* if not_this_player is null, sends to all players */
-void sendall_new_object(struct it* obj, struct player * not_this_player)
+static void sendall_new_object(struct it* obj, struct player * not_this_player)
 {
 	struct player_list* p;
 
@@ -1026,7 +1027,7 @@ void sendall_new_object(struct it* obj, struct player * not_this_player)
 
 /* send all objects except one to specified player */
 /* if not_this_object is null, sends all objects */
-void send_objects(struct player* player,struct it* not_this_object)
+static void send_objects(struct player* player,struct it* not_this_object)
 {
 	struct object_list *p;
 
@@ -1042,7 +1043,7 @@ void send_objects(struct player* player,struct it* not_this_object)
 
 /* send all objects except one to specified player */
 /* if not_this_object is null, sends all objects */
-void send_change_level(struct player* player)
+static void send_change_level(struct player* player)
 {
 	char packet[64];
 
@@ -1054,7 +1055,7 @@ void send_change_level(struct player* player)
 
 
 /* send all objects in time queue to given player */
-void send_timeq_objects(struct player *player)
+static void send_timeq_objects(struct player *player)
 {
 	struct queue_list *p;
 	
@@ -1065,7 +1066,7 @@ void send_timeq_objects(struct player *player)
 
 /* remove player from server's list */
 /* delete player's hero and send message */
-void delete_player(struct player_list *q)
+static void delete_player(struct player_list *q)
 {
 	char packet[5];
 	
@@ -1086,7 +1087,7 @@ void delete_player(struct player_list *q)
 
 
 /* create a new object and fill with data and adds to hash table */
-struct it * add_to_timeq(
+static struct it * add_to_timeq(
 	unsigned int id,
         unsigned char type,
         int ttl,
@@ -1129,7 +1130,7 @@ struct it * add_to_timeq(
 
 /* update time queue (respawning objects) */
 /* add objects timed out to the game */
-void update_timeq(void)
+static void update_timeq(void)
 {
 	unsigned long_long t=get_time();
 	struct queue_list *p,*q;
@@ -1151,7 +1152,7 @@ void update_timeq(void)
 
 /* find player with given address */
 /* on unsuccess return 0 */
-struct player_list* find_player(struct sockaddr_in *address,int id)
+static struct player_list* find_player(struct sockaddr_in *address,int id)
 {
 	struct player_list *p;
 
@@ -1172,7 +1173,7 @@ struct player_list* find_player(struct sockaddr_in *address,int id)
 
 
 /* create noise on given position */
-void create_noise(int x,int y,struct player *p)
+static void create_noise(int x,int y,struct player *p)
 {
 	struct it *o;
 
@@ -1186,7 +1187,7 @@ void create_noise(int x,int y,struct player *p)
 
 
 /* read packet from socket */
-void read_data(void)
+static void read_data(void)
 {
 	char txt[256];
 	char txt1[256];
@@ -1378,7 +1379,7 @@ void read_data(void)
 /* compute collision of two objects */
 /* return value: 0=nothing */
 /*               1=collision */
-int collision(int x1,int y1,int t1,int s1,struct pos* p1,int x2,int y2,int t2,int s2,struct pos *p2)
+static int collision(int x1,int y1,int t1,int s1,struct pos* p1,int x2,int y2,int t2,int s2,struct pos *p2)
 {
 	int w1,w2,h1,h2;
 	unsigned char h=0,v=0;
@@ -1399,7 +1400,7 @@ int collision(int x1,int y1,int t1,int s1,struct pos* p1,int x2,int y2,int t2,in
 
 /* create corpse on given position and with color num */
 /* num is number of dead player */
-void create_corpse(int x,int y,int num, int status)
+static void create_corpse(int x,int y,int num, int status)
 {
 	struct it *o;
 	static char txt[32];
@@ -1420,7 +1421,7 @@ void create_corpse(int x,int y,int num, int status)
 /* create mess on given position */
 /* y1=y coordinate of the mess */
 /* y2=y coordinate of the player (place where blood gushes and guts fly from */
-void create_mess(int x,int y1,int y2)
+static void create_mess(int x,int y1,int y2)
 {
 	struct it *o;
 
@@ -1475,7 +1476,7 @@ void create_mess(int x,int y1,int y2)
 /* return value: 1=delete this object */
 /*               0=don't delete */
 /* 		 2= delete this object but don't send delete packet */
-int dynamic_collision(struct it *obj)
+static int dynamic_collision(struct it *obj)
 {
 	struct it *p;
 	struct player_list *pl;
@@ -2040,7 +2041,7 @@ int dynamic_collision(struct it *obj)
 
 
 /* recompute objects positions */
-void update_game(void)
+static void update_game(void)
 {
 	static char packet[64];
 	char txt[256];
@@ -2346,7 +2347,7 @@ cont_cycle:;
         }
 }
 
-void free_all_memory(void)
+static void free_all_memory(void)
 {
 	struct queue_list *t;
 	struct player_list *p;
@@ -2378,7 +2379,7 @@ void free_all_memory(void)
 }
 
 /* fatal signal handler (sigsegv, sigabrt, ... ) */
-void signal_handler(int sig_num)
+static void signal_handler(int sig_num)
 {
 	char packet[16];
 	char txt[256];
@@ -2411,7 +2412,7 @@ void signal_handler(int sig_num)
 
 
 /* walk with given player */
-void walk_player(struct player *q,int direction, int speed, int creep)
+static void walk_player(struct player *q,int direction, int speed, int creep)
 {
 	int a;
 
@@ -2466,7 +2467,7 @@ void walk_player(struct player *q,int direction, int speed, int creep)
 
 
 /* jump with given player */
-void jump_player(struct player *p)
+static void jump_player(struct player *p)
 {
 	if (p->obj->status & (S_FALLING | S_CREEP))
 		return;
@@ -2477,7 +2478,7 @@ void jump_player(struct player *p)
 
 
 /* change weapon of given player (w=new weapon) */
-void change_weapon_player(struct player *q,int w)
+static void change_weapon_player(struct player *q,int w)
 {
 	char txt[256];
 
@@ -2497,7 +2498,7 @@ void change_weapon_player(struct player *q,int w)
 
 /* shoot with given player */
 /* direction: 0=right, 1=left */
-void fire_player(struct player *q,int direction)
+static void fire_player(struct player *q,int direction)
 {
 	int a;
 	struct it *s;
@@ -2713,7 +2714,7 @@ void fire_player(struct player *q,int direction)
 
 
 /* update given player (jump, shoot, creep, change weapon) */
-void move_player(struct player *p)
+static void move_player(struct player *p)
 {
 	int a;
 
@@ -2769,7 +2770,7 @@ void move_player(struct player *p)
 
 
 /* update players, kick out not responding players */
-void update_players(void)
+static void update_players(void)
 {
 	struct player_list *p;
 	char txt[256];
@@ -2797,7 +2798,7 @@ void update_players(void)
 
 
 /* write help message to stdout */
-void print_help(void)
+static void print_help(void)
 {
 	char *p = "";
 #ifdef __EMX__
@@ -2824,7 +2825,7 @@ void print_help(void)
 }
 
 
-void parse_command_line(int argc,char **argv)
+static void parse_command_line(int argc,char **argv)
 {
 	int a;
 	char *c;
@@ -2919,7 +2920,7 @@ void parse_command_line(int argc,char **argv)
 
 
 /*-----------------------------------------------------------------------------------*/
-int server(void)
+static int server(void)
 {
 	int a;
 	char txt[256];
