@@ -65,7 +65,7 @@ unsigned long_long game_start; /* time of game start */
 int grenade_sprite,bullet_sprite,slug_sprite,shell_sprite,shotgun_shell_sprite,
     mess1_sprite,mess2_sprite,mess3_sprite,mess4_sprite,noise_sprite,
     bfgcell_sprite,chain_sprite;
-int shrapnel_sprite[N_SHRAPNELS],bfgbit_sprite[N_SHRAPNELS];
+int shrapnel_sprite[N_SHRAPNELS],bfgbit_sprite[N_SHRAPNELS],bloodrain_sprite[N_SHRAPNELS];
 int nonquitable=0;  /* 1=clients can't abort game pressing F12 (request is ignored) */
 unsigned long_long last_tick;
 unsigned long_long last_player_left=0,last_packet_came=0;
@@ -517,12 +517,13 @@ void init_player(struct player* p,int x,int y)
 	p->current_weapon=0;
 	p->weapons= WEAPON_MASK_GUN |
 		    WEAPON_MASK_GRENADE |
-		    WEAPON_MASK_CHAINSAW; /* he has only gun, grenades and chainsaw */
+		    WEAPON_MASK_CHAINSAW |
+		    WEAPON_MASK_BLOODRAIN; /* he has only gun, grenades, chainsaw and bloodrain */
 	p->invisibility_counter=0;
 	for (a=0;a<ARMS;a++)
 		p->ammo[a]=0;
-	p->ammo[0]=weapon[0].basic_ammo;
-	p->ammo[6]=weapon[6].basic_ammo;
+	p->ammo[WEAPON_GUN]=weapon[WEAPON_GUN].basic_ammo;
+	p->ammo[WEAPON_CHAINSAW]=weapon[WEAPON_CHAINSAW].basic_ammo;
 	p->obj->xspeed=0;
 	p->obj->yspeed=0;
 	p->obj->status=0;
@@ -1485,6 +1486,7 @@ int dynamic_collision(struct it *obj)
 {
 	struct it *p;
 	struct player_list *pl;
+	struct object_list *ol;
 	char txt[256];
 	struct it *o;
 	int b;
@@ -1724,6 +1726,28 @@ int dynamic_collision(struct it *obj)
 				}
 				return 2;
 
+				case T_BLOODRAIN:
+				{
+					char txt[256];
+					if (p->type!=T_PLAYER)break;
+					if ((((struct player*)(p->data))->ammo[WEAPON_BLOODRAIN]==MAX_AMMO(WEAPON_BLOODRAIN))&&((((struct player *)(p->data))->weapons)&WEAPON_MASK_BLOODRAIN))break;
+
+ 					if(is_weapon_better((struct player*)(p->data), WEAPON_BLOODRAIN) 
+ 						&& !is_weapon_usable((struct player*)(p->data), WEAPON_BLOODRAIN))
+ 						P->current_weapon = WEAPON_BLOODRAIN;
+
+					((struct player*)(p->data))->weapons|=WEAPON_MASK_BLOODRAIN;
+					((struct player*)(p->data))->ammo[WEAPON_BLOODRAIN]+=weapon[WEAPON_BLOODRAIN].basic_ammo;
+					if (((struct player*)(p->data))->ammo[WEAPON_BLOODRAIN]>MAX_AMMO(WEAPON_BLOODRAIN))
+						((struct player*)(p->data))->ammo[WEAPON_BLOODRAIN]=MAX_AMMO(WEAPON_BLOODRAIN);
+//					P->current_weapon=select_best_weapon(P);
+					send_update_player((struct player*)(p->data));
+					send_message((struct player*)(p->data),0,"You charged your Bloodrain", M_WEAPON);
+					snprintf(txt,256,"%s charged his Bloodrain.\n",((struct player*)(p->data))->name);
+					message(txt,1);
+				}
+				return 2;
+
 				case T_INVISIBILITY:
 				{
 					char txt[256];
@@ -1938,9 +1962,17 @@ int dynamic_collision(struct it *obj)
 				c=weapon[obj->status].armor_damage*(2-double2int(obj->y-p->y)/(double)PLAYER_HEIGHT)*obj->ttl/weapon[obj->status].ttl;
 				if (a>=H)  /* player was slain */
 				{
-					o=&((find_in_table((long)(obj->data)))->member);  /* owner of the bullet */
+					o=&(((ol = find_in_table((long)(obj->data))))->member);  /* owner of the bullet */
 					((struct player*)(p->data))->deaths++;
-					if (o->data==p->data) /* suicide */
+					if (!ol) { /* for now only bloodrain */
+						snprintf(txt,256,"Bloody shrapnel killed %s.",((struct player*)(p->data))->name);
+						sendall_message(0,txt,NULL,(struct player*)(p->data), M_DEATH);
+						snprintf(txt,256,"Bloody shrapnel killed you");
+						send_message((struct player*)(p->data),0,txt, M_DEATH);  /* the dead */
+						snprintf(txt,256,"Bloody shrapnel killed %s.\n",((struct player*)(p->data))->name);
+						message(txt,2);
+					}
+					else if (o->data==p->data) /* suicide */
 					{
 						((struct player*)(o->data))->frags-=!!(((struct player*)(o->data))->frags);
 						send_message((struct player*)(o->data),0,"You killed yourself", M_DEATH);
@@ -1971,7 +2003,8 @@ int dynamic_collision(struct it *obj)
 					p->status |= S_DEAD;  /* dead flag */
 					sendall_update_object(p,0,0); /* update everything */
 					send_update_player((struct player*)(p->data));   /* dead player */
-					send_update_player((struct player*)(o->data));  /* owner of bullet/shrapnel */
+					if (ol)
+						send_update_player((struct player*)(o->data));  /* owner of bullet/shrapnel */
 					send_info(0,0);
 					if (a-h>=OVERKILL)
 						create_mess(px,py+((s & S_CREEP)?CREEP_HEIGHT:PLAYER_HEIGHT)-MESS_HEIGHT,py);
@@ -2100,6 +2133,8 @@ void update_game(void)
 		}
 
 		/* decrement time to live */
+		if (p->next->member.type == T_PLAYER && (p->next->member.status & S_BLOODRAIN))
+			goto br;
 		if (p->next->member.ttl>0)
 		{
 			p->next->member.ttl--;
@@ -2149,7 +2184,8 @@ void update_game(void)
 
 					case T_GRENADE:
 					case T_BFGCELL:
-					packet[0]=(p->next->member.type==T_GRENADE)?P_EXPLODE_GRENADE:P_EXPLODE_BFG;
+br:					packet[0]=(p->next->member.type==T_GRENADE)?P_EXPLODE_GRENADE:
+						(p->next->member.type==T_BFGCELL)?P_EXPLODE_BFG:P_EXPLODE_BLOODRAIN;
 					put_int(packet+1,id);
 					put_int(packet+5,p->next->member.id);
 					sendall_chunked(packet,9,0);
@@ -2165,7 +2201,9 @@ void update_game(void)
 							SHRAPNEL_TTL,
 							(p->next->member.type==T_GRENADE)?
 							shrapnel_sprite[random()%N_SHRAPNELS]:
-							bfgbit_sprite[random()%N_SHRAPNELS],
+							(p->next->member.type==T_BFGCELL)?
+							bfgbit_sprite[random()%N_SHRAPNELS]:
+							bloodrain_sprite[random()%N_SHRAPNELS],
 							0,
 							WEAPON_GRENADE,
 							p->next->member.x,
@@ -2175,7 +2213,19 @@ void update_game(void)
 							p->next->member.data); 
 						id++;
 					}
-					delete_obj(p->next->member.id);
+					if (p->next->member.status & S_BLOODRAIN) {
+						p->next->member.status |= S_DEAD;
+						((struct player *)p->next->member.data)->frags-=!!(((struct player *)p->next->member.data)->frags);
+						((struct player *)p->next->member.data)->deaths++;
+						sendall_update_object(&(p->next->member),0,0); /* update everything */
+						send_update_player((struct player*)(p->next->member.data));   /* dead player */
+						send_info(0,0);
+						create_mess(double2int(p->next->member.x),double2int(p->next->member.y)+((p->next->member.status & S_CREEP)?
+							CREEP_HEIGHT:PLAYER_HEIGHT)-CORPSE_HEIGHT,
+							double2int(p->next->member.y)+((p->next->member.status & S_CREEP)?
+							CREEP_HEIGHT:PLAYER_HEIGHT)-CORPSE_HEIGHT);
+					} else
+						delete_obj(p->next->member.id);
 					if (!(p->next))return;
 					goto cont_cycle;
 
@@ -2460,6 +2510,10 @@ void fire_player(struct player *q,int direction)
 	struct it *s;
 	q->obj->status &= ~S_CHAINSAW; /* chainsaw */
 
+	if (q->current_weapon==WEAPON_BLOODRAIN) {
+		q->obj->status |= S_BLOODRAIN;
+		return;
+	}
 	if (!(q->obj->status & (S_LOOKLEFT | S_LOOKRIGHT))||(q->obj->status & S_CREEP)||
 		((q->obj->status & S_SHOOTING)&&(q->obj->ttl>HOLD_GUN_AFTER_SHOOT)))
 		return;
@@ -2620,44 +2674,41 @@ void fire_player(struct player *q,int direction)
 		id++;
 		sendall_new_object(s,0);
 		q->obj->status |= S_CHAINSAW;
-	} else
+	} else if (q->current_weapon==WEAPON_GRENADE)  /* grenades */
 	{
-		if (q->current_weapon!=WEAPON_GRENADE)  /* not grenades */
-		{
-			s=new_obj(  /* SHELL */
-				id,
-				T_SHELL,
-				SHELL_TTL,
-				shell_sprite,
-				0,
-				0,
-				add_int(q->obj->x,direction==1?0:PLAYER_WIDTH),
-				q->obj->y+FIRE_YOFFSET,
-				q->obj->xspeed+(direction==1?-weapon[q->current_weapon].shell_xspeed:weapon[q->current_weapon].shell_xspeed),
-				weapon[q->current_weapon].shell_yspeed,
-				(void *)(long)(q->obj->id)); 
-			id++;
-			sendall_new_object(s,0);
-			s=new_obj(
-				id,
-				T_BULLET,
-				weapon[q->current_weapon].ttl,
-				bullet_sprite,
-				0,
-				q->current_weapon,
-				add_int(q->obj->x,direction==1?0:PLAYER_WIDTH),
-				q->obj->y+FIRE_YOFFSET,
-				q->obj->xspeed+(direction==1?-weapon[q->current_weapon].speed:weapon[q->current_weapon].speed),
-				0,
-				(void *)(long)(q->obj->id)); 
-			id++;
-			sendall_new_object(s,0);
-		}
-		else  /* grenades */
-		{
-			q->obj->status |= S_GRENADE;
-			q->obj->status &= ~S_WALKING;
-		}
+		q->obj->status |= S_GRENADE;
+		q->obj->status &= ~S_WALKING;
+	}
+	else if (!(q->obj->status & S_BLOODRAIN))
+	{
+		s=new_obj(  /* SHELL */
+			id,
+			T_SHELL,
+			SHELL_TTL,
+			shell_sprite,
+			0,
+			0,
+			add_int(q->obj->x,direction==1?0:PLAYER_WIDTH),
+			q->obj->y+FIRE_YOFFSET,
+			q->obj->xspeed+(direction==1?-weapon[q->current_weapon].shell_xspeed:weapon[q->current_weapon].shell_xspeed),
+			weapon[q->current_weapon].shell_yspeed,
+			(void *)(long)(q->obj->id)); 
+		id++;
+		sendall_new_object(s,0);
+		s=new_obj(
+			id,
+			T_BULLET,
+			weapon[q->current_weapon].ttl,
+			bullet_sprite,
+			0,
+			q->current_weapon,
+			add_int(q->obj->x,direction==1?0:PLAYER_WIDTH),
+			q->obj->y+FIRE_YOFFSET,
+			q->obj->xspeed+(direction==1?-weapon[q->current_weapon].speed:weapon[q->current_weapon].speed),
+			0,
+			(void *)(long)(q->obj->id)); 
+		id++;
+		sendall_new_object(s,0);
 	}
 	q->obj->xspeed+=(direction==1)?weapon[q->current_weapon].impact:-weapon[q->current_weapon].impact;
 	q->obj->status |= S_SHOOTING;
@@ -2929,6 +2980,8 @@ int server(void)
 		if (find_sprite(txt,&shrapnel_sprite[a])){char msg[256];snprintf(msg,256,"Can't find sprite \"%s\".\n",txt);ERROR(msg);EXIT(1);}
 		snprintf(txt, sizeof(txt), "bfgbit%d",a+1);
 		if (find_sprite(txt,&bfgbit_sprite[a])){char msg[256];snprintf(msg,256,"Can't find sprite \"%s\".\n",txt);ERROR(msg);EXIT(1);}
+		snprintf(txt, sizeof(txt), "bloodrain%d",a+1);
+		if (find_sprite(txt,&bloodrain_sprite[a])){char msg[256];snprintf(msg,256,"Can't find sprite \"%s\".\n",txt);ERROR(msg);EXIT(1);}
 	}
 	
 	LEVEL=load_level(level_number);

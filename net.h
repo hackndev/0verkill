@@ -41,6 +41,7 @@
 #define P_CHANGE_LEVEL 31
 #define P_LEVEL_ACCEPTED 32
 #define P_EXPLODE_BFG 33
+#define P_EXPLODE_BLOODRAIN 34
 
 
 /* socket filedescriptor */

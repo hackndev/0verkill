@@ -128,7 +128,7 @@ struct it* hero;
 int hit_sprite;
 int title_sprite;
 int bulge_sprite;
-int shrapnel_sprite[N_SHRAPNELS],bfgbit_sprite[N_SHRAPNELS];
+int shrapnel_sprite[N_SHRAPNELS],bfgbit_sprite[N_SHRAPNELS],bloodrain_sprite[N_SHRAPNELS];
 
 int level_sprites_start;  /* number of first sprite in the level (all other level sprites follow) */
 
@@ -570,12 +570,13 @@ int contact_server(struct config *cfg)
 		armor=0;
 		for(a=0;a<ARMS;a++)
 			ammo[a]=0;
-		ammo[0]=weapon[0].basic_ammo;
-		ammo[6]=1;
+		ammo[WEAPON_GUN]=weapon[WEAPON_GUN].basic_ammo;
+		ammo[WEAPON_CHAINSAW]=weapon[WEAPON_CHAINSAW].basic_ammo;
 		current_weapon=0;
 		weapons=WEAPON_MASK_GUN |
 			WEAPON_MASK_GRENADE |
-			WEAPON_MASK_CHAINSAW;  /* gun and grenades */
+			WEAPON_MASK_CHAINSAW |
+			WEAPON_MASK_BLOODRAIN;  /* gun, grenades, chainsaw and blodrain */
 		hero=new_obj(
 			get_int(packet+1),   /* ID */
 			T_PLAYER,   /* type */
@@ -1382,6 +1383,7 @@ level_changed:
 
 		case P_EXPLODE_GRENADE:
 		case P_EXPLODE_BFG:
+		case P_EXPLODE_BLOODRAIN:
 		{
 			unsigned int i,j;
 			struct object_list *p;
@@ -1405,7 +1407,9 @@ level_changed:
 					SHRAPNEL_TTL,
 					(*packet==P_EXPLODE_GRENADE)?
 					shrapnel_sprite[random()%N_SHRAPNELS]:
-					bfgbit_sprite[random()%N_SHRAPNELS],
+					(*packet==P_EXPLODE_BFG)?
+					bfgbit_sprite[random()%N_SHRAPNELS]:
+					bloodrain_sprite[random()%N_SHRAPNELS],
 					0,
 					WEAPON_GRENADE,
 					p->member.x,
@@ -1415,7 +1419,8 @@ level_changed:
 					0); 
 				i++;
 			}
-			delete_obj(j);
+			if (*packet != P_EXPLODE_BLOODRAIN)
+				delete_obj(j);
 
 		}
 		break;
@@ -2197,6 +2202,8 @@ void play(void)
 			keyboard_status.weapon=6;
 		if (!chat && c_was_pressed('7'))
 			keyboard_status.weapon=7;
+		if (!chat && c_was_pressed('8'))
+			keyboard_status.weapon=8;
 		if (c_pressed(K_LEFT_SHIFT)||c_pressed(K_RIGHT_SHIFT)||autorun)
 		keyboard_status.speed=1;
 		if (c_pressed(K_LEFT))
@@ -2261,6 +2268,11 @@ int main(int argc,char **argv)
 		}
 		snprintf(txt, sizeof(txt), "bfgbit%d",a+1);
 		if (find_sprite(txt,&bfgbit_sprite[a])) {
+			fprintf(stderr,"Can't find sprite \"%s\".\n",txt);
+			EXIT(1);
+		}
+		snprintf(txt, sizeof(txt), "bloodrain%d",a+1);
+		if (find_sprite(txt,&bloodrain_sprite[a])) {
 			fprintf(stderr,"Can't find sprite \"%s\".\n",txt);
 			EXIT(1);
 		}

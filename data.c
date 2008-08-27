@@ -85,6 +85,7 @@ struct weapon_type weapon[ARMS]=
 	{"Grenades",15,60,float2double((double)3.73*36),0,75,40,0,6,24,float2double(3*36),-float2double((double)1.5*36)},  /* shell speed=grenade throwing speed, bullet speed=shrapnel speed */
 	{"BFG",200,80,float2double(2*36),float2double(1*36),100,100,10,10,10,float2double((double).1*36),-float2double((double)1.5*36)},
 	{"Chainsaw",1,5,float2double(1.8*36),0,10,10,1,1,1,0,0},
+	{"Bloodrain",15,0,float2double((double)3.73*36),0,75,40,1,1,1,0,0},
 };
 
 
@@ -137,64 +138,40 @@ int find_sprite(char *name,int *num)
 /* convert type character (from data files) into type */
 int _convert_type(unsigned char c)
 {
- switch(c)
- {
-
+switch(c) {
 /* static objects */
-  case 'b': return TYPE_BACKGROUND;
-  
-  case 'w': return TYPE_WALL;
-  
-  case 'j': return TYPE_JUMP;
-
-  case 'f': return TYPE_FOREGROUND;
-
-  case 'i': return TYPE_JUMP_FOREGROUND;
+	case 'b': return TYPE_BACKGROUND;
+	case 'w': return TYPE_WALL;
+	case 'j': return TYPE_JUMP;
+	case 'f': return TYPE_FOREGROUND;
+	case 'i': return TYPE_JUMP_FOREGROUND;
 
 /* dynamic objects, they use great letter */
-  
-  case 'M': return T_MEDIKIT;
+	case 'M': return T_MEDIKIT;
+	case 'A': return T_ARMOR;
+	case 'N': return T_NOTHING;
+	case 'F': return T_NOTHING_FORE;
+	case 'K': return T_KILL;
+	case 'S': return T_SHOTGUN;
+	case 'Z': return T_BFG;
+	case 'U': return T_UZI;
+	case 'R': return T_RIFLE;
+	case '1': return T_AMMO_GUN;
+	case '2': return T_AMMO_SHOTGUN;
+	case '3': return T_AMMO_UZI;
+	case '4': return T_AMMO_RIFLE;
+	case '5': return T_AMMO_GRENADE;
+	case 'I': return T_INVISIBILITY;
+	case 'T': return T_TELEPORT;
+	case 'X': return T_BIOSKULL;
+	case 'x': return T_BIOMED;
+	case 'r': return T_BLOODRAIN;
 
-  case 'A': return T_ARMOR;
+/* birthplace */
+	case 'B': return TYPE_BIRTHPLACE;
 
-  case 'N': return T_NOTHING;
-  
-  case 'F': return T_NOTHING_FORE;
-
-  case 'K': return T_KILL;
-
-  case 'S': return T_SHOTGUN;
-
-  case 'Z': return T_BFG;
-
-  case 'U': return T_UZI;
-  
-  case 'R': return T_RIFLE;
-  
-  case '1': return T_AMMO_GUN;
-  
-  case '2': return T_AMMO_SHOTGUN;
-  
-  case '3': return T_AMMO_UZI;
-  
-  case '4': return T_AMMO_RIFLE;
-  
-  case '5': return T_AMMO_GRENADE;
-
-  case 'I': return T_INVISIBILITY;
-  
-  case 'T': return T_TELEPORT;
-  
-  case 'X': return T_BIOSKULL;
-  
-  case 'x': return T_BIOMED;
-  
-  /* birthplace */
-  case 'B': return TYPE_BIRTHPLACE;
-
-  default:
-  return -1;
- }
+	default: return -1;
+}
 }
 
 
