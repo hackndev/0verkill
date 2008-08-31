@@ -691,9 +691,9 @@ static void sendall_update_object(struct it* obj, struct player * not_this_playe
 		put_int(packet+10,obj->y);
 		put_int(packet+14,obj->xspeed);
 		put_int(packet+18,obj->yspeed);
-		put_int16(packet+22,obj->status);
-		put_int16(packet+24,obj->ttl);
-		l=26;
+		put_int(packet+22,obj->status);
+		put_int16(packet+26,obj->ttl);
+		l=28;
 		break;
 
 		case 1: /* coordinates and speed */
@@ -731,8 +731,8 @@ static void sendall_update_object(struct it* obj, struct player * not_this_playe
 		packet[5]=obj->update_counter;
 		put_int(packet+6,obj->xspeed);
 		put_int(packet+10,obj->yspeed);
-		put_int16(packet+14,obj->status);
-		l=16;
+		put_int(packet+14,obj->status);
+		l=18;
 		break;
 		
 		case 5: /* coordinates and status */
@@ -741,8 +741,8 @@ static void sendall_update_object(struct it* obj, struct player * not_this_playe
 		packet[5]=obj->update_counter;
 		put_int(packet+6,obj->x);
 		put_int(packet+10,obj->y);
-		put_int16(packet+14,obj->status);
-		l=16;
+		put_int(packet+14,obj->status);
+		l=20;
 		break;
 		
 		case 6: /* speed and status and ttl */
@@ -751,9 +751,9 @@ static void sendall_update_object(struct it* obj, struct player * not_this_playe
 		packet[5]=obj->update_counter;
 		put_int(packet+6,obj->xspeed);
 		put_int(packet+10,obj->yspeed);
-		put_int16(packet+14,obj->status);
-		put_int16(packet+16,obj->ttl);
-		l=18;
+		put_int(packet+14,obj->status);
+		put_int16(packet+18,obj->ttl);
+		l=20;
 		break;
 		
 		case 7: /* coordinates and status and ttl */
@@ -763,8 +763,8 @@ static void sendall_update_object(struct it* obj, struct player * not_this_playe
 		put_int(packet+6,obj->x);
 		put_int(packet+10,obj->y);
 		put_int16(packet+14,obj->status);
-		put_int16(packet+16,obj->ttl);
-		l=18;
+		put_int16(packet+18,obj->ttl);
+		l=20;
 		break;
 
 		default: /* don't update */
@@ -788,19 +788,19 @@ static void sendall_update_object(struct it* obj, struct player * not_this_playe
 static void sendall_update_status(struct it* obj, struct player * not_this_player)
 {
 	struct player_list* p;
-	static char packet[8];
+	static char packet[32];
 
 	packet[0]=P_UPDATE_STATUS;
 	put_int(packet+1,obj->id);
-	put_int16(packet+5,obj->status);
+	put_int(packet+5,obj->status);
 	
 	if (!not_this_player)
 		for (p=&players;p->next;p=p->next)
- 			send_chunk_packet_to_player(packet,7,&(p->next->member));
+ 			send_chunk_packet_to_player(packet,9,&(p->next->member));
 	else
 		for (p=&players;p->next;p=p->next)
 			if ((&(p->next->member))!=not_this_player)
- 				send_chunk_packet_to_player(packet,7,&(p->next->member));
+ 				send_chunk_packet_to_player(packet,9,&(p->next->member));
 }
 
 
@@ -964,10 +964,10 @@ static void send_new_obj(struct sockaddr* address, struct it* obj,int id)
 	put_int(packet+11,obj->y);
 	put_int(packet+15,obj->xspeed);
 	put_int(packet+19,obj->yspeed);
-	put_int16(packet+23,obj->status);
-	packet[25]=obj->type;
-	put_int16(packet+26,obj->ttl);
-	send_packet(packet,28,address,0,id);
+	put_int(packet+23,obj->status);
+	packet[27]=obj->type;
+	put_int16(packet+28,obj->ttl);
+	send_packet(packet,30,address,0,id);
 }
 #endif
 
@@ -983,10 +983,10 @@ static void send_new_obj_chunked(struct player* player, struct it* obj)
 	put_int(packet+11,obj->y);
 	put_int(packet+15,obj->xspeed);
 	put_int(packet+19,obj->yspeed);
-	put_int16(packet+23,obj->status);
-	packet[25]=obj->type;
-	put_int16(packet+26,obj->ttl);
-	send_chunk_packet_to_player(packet,28,player);
+	put_int(packet+23,obj->status);
+	packet[27]=obj->type;
+	put_int16(packet+28,obj->ttl);
+	send_chunk_packet_to_player(packet,30,player);
 }
 
 
@@ -1263,13 +1263,13 @@ static void read_data(void)
 				put_int(packet+11,last_player->member.obj->y);
 				put_int(packet+15,last_player->member.obj->xspeed);
 				put_int(packet+19,last_player->member.obj->yspeed);
-				put_int16(packet+23,last_player->member.obj->status);
+				put_int(packet+23,last_player->member.obj->status);
 				t=get_time();
-				put_long_long(packet+25,t-game_start);
-				put_int(packet+33,last_player->member.id);
-				packet[37]=VERSION_MAJOR;
-				packet[38]=VERSION_MINOR;
-				send_packet(packet,39,(struct sockaddr*)(&client),0,0);
+				put_long_long(packet+27,t-game_start);
+				put_int(packet+35,last_player->member.id);
+				packet[39]=VERSION_MAJOR;
+				packet[40]=VERSION_MINOR;
+				send_packet(packet,41,(struct sockaddr*)(&client),0,0);
 				send_change_level(&(last_player->member));
 				sendall_bell();
 				sendall_message(0,txt,0,0, M_ENTER);
@@ -2053,7 +2053,7 @@ static void update_game(void)
 	int x1,y1;
 	unsigned char sy;
 	struct it *s;   /* for grenades throwing */
-	int status;
+	unsigned int status;
 	int DELTA_TIME;
 	unsigned long_long t;
 	unsigned int old_status;

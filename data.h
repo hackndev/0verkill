@@ -178,7 +178,8 @@ struct it
 	int ttl:16;   /* time to live */
 	unsigned int sprite:16;  /* sprite number */
 	unsigned int anim_pos:16;  /* animating position */
-	unsigned int status:16;  /* status - especially for hero objects */
+	/* 16b hole in the structure */
+	unsigned int status;  /* status - especially for hero objects */
 	void * data;  /* object's own data, this is individual filled */
 	unsigned char update_counter;  /* increased with each update of the object */
 	unsigned long_long last_updated;   /* last time object was updated */

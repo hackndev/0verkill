@@ -291,28 +291,32 @@ char * contact_server(int color, char *name)
 		}
 		
 		case P_PLAYER_ACCEPTED:
-		my_id=get_int(packet+33);
-		if (r<39){send_quit();return "Incompatible server version. Givin' up.\n";}
-		maj=packet[37];
-		min=packet[38];
+		my_id=get_int(packet+35);
+		if (r<41){send_quit();return "Incompatible server version. Givin' up.\n";}
+		maj=packet[39];
+		min=packet[40];
 		if (maj!=VERSION_MAJOR||min<MIN_SERVER_VERSION_MINOR)
 		{send_quit();return "Incompatible server version. Givin' up.\n";}
 		game_start_offset=get_time();
-		game_start_offset-=get_long_long(packet+25);
+		game_start_offset-=get_long_long(packet+27);
 		health=100;
 		armor=0;
 		for(a=0;a<ARMS;a++)
 			ammo[a]=0;
 		ammo[0]=weapon[0].basic_ammo;
 		current_weapon=0;
-		weapons=17;  /* gun and grenades */
+		weapons =	WEAPON_MASK_GUN | 
+				WEAPON_MASK_GRENADE | 
+				WEAPON_MASK_CHAINSAW | 
+				WEAPON_MASK_BLOODRAIN;  /* gun, grenades, chainsaw
+							   and bloodrain */
 		hero=new_obj(
 			get_int(packet+1),   /* ID */
 			T_PLAYER,   /* type */
 			0,  /* time to live */
 			get_int16(packet+5),   /* sprite */
 			0,        /* position */
-			get_int16(packet+23),        /* status */
+			get_int(packet+23),        /* status */
 			get_int(packet+7),     /* X */
 			get_int(packet+11),    /* Y */
 			get_int(packet+15),    /* XSPEED */
@@ -645,15 +649,14 @@ int process_packet(char *packet,int l)
 		break;
 
 		case P_NEW_OBJ:
-		if (l<28)break;  /* invalid packet */
-		n=28;
+		if (l < (n=30))break;  /* invalid packet */
 		new_obj(
 			get_int(packet+1), /* ID */
-			packet[25],  /* type */
-			get_int16(packet+26), /* time to live */
+			packet[27],  /* type */
+			get_int16(packet+28), /* time to live */
 			get_int16(packet+5),  /* sprite */
 			0, /* anim position */
-			get_int16(packet+23),  /* status */
+			get_int(packet+23),  /* status */
 			get_int(packet+7),  /* x */
 			get_int(packet+11),  /* y */
 			get_int(packet+15),  /* xspeed */
@@ -674,11 +677,10 @@ int process_packet(char *packet,int l)
 		break;
 
 		case P_UPDATE_OBJECT:
-		if (l<26)break;   /* invalid packet */
+		if (l < (n=28))break;   /* invalid packet */
 		{
 			struct object_list *p;
 			
-			n=26;
 			p=find_in_table(get_int(packet+1));
 			if (!p)break;
 			if(packet[5]-(p->member.update_counter)>127)break; /* throw out old updates */
@@ -687,9 +689,9 @@ int process_packet(char *packet,int l)
 			p->member.y=get_int(packet+10);
 			p->member.xspeed=get_int(packet+14);
 			p->member.yspeed=get_int(packet+18);
-			p->member.status=get_int16(packet+22);
+			p->member.status=get_int(packet+22);
 			p->member.data=0;
-			p->member.ttl=get_int16(packet+24);
+			p->member.ttl=get_int16(packet+26);
 			/* kdyz tasi, tak se nahodi ttl */
 			if (p->member.type==T_PLAYER&&(p->member.status & S_HOLDING)&&(p->member.status & S_SHOOTING))
 				p->member.ttl=weapon[current_weapon].cadence+HOLD_GUN_AFTER_SHOOT;
@@ -744,18 +746,17 @@ int process_packet(char *packet,int l)
 		break;
 
 		case P_UPDATE_OBJECT_SPEED_STATUS:
-		if (l<16)break;   /* invalid packet */
+		if (l < (n=18))break;   /* invalid packet */
 		{
 			struct object_list *p;
 			
-			n=16;
 			p=find_in_table(get_int(packet+1));
 			if (!p)break;
 			if(packet[5]-(p->member.update_counter)>127)break; /* throw out old updates */
 			p->member.update_counter=packet[5];
 			p->member.xspeed=get_int(packet+6);
 			p->member.yspeed=get_int(packet+10);
-			p->member.status=get_int16(packet+14);
+			p->member.status=get_int(packet+14);
 			/* kdyz tasi, tak se nahodi ttl */
 			if (p->member.type==T_PLAYER&&(p->member.status & S_HOLDING)&&(p->member.status & S_SHOOTING))
 				p->member.ttl=weapon[current_weapon].cadence+HOLD_GUN_AFTER_SHOOT;
@@ -763,18 +764,17 @@ int process_packet(char *packet,int l)
 		break;
 
 		case P_UPDATE_OBJECT_COORDS_STATUS:
-		if (l<16)break;   /* invalid packet */
+		if (l < (n=18))break;   /* invalid packet */
 		{
 			struct object_list *p;
 			
-			n=16;
 			p=find_in_table(get_int(packet+1));
 			if (!p)break;
 			if(packet[5]-(p->member.update_counter)>127)break; /* throw out old updates */
 			p->member.update_counter=packet[5];
 			p->member.x=get_int(packet+6);
 			p->member.y=get_int(packet+10);
-			p->member.status=get_int16(packet+14);
+			p->member.status=get_int(packet+14);
 			/* kdyz tasi, tak se nahodi ttl */
 			if (p->member.type==T_PLAYER&&(p->member.status & S_HOLDING)&&(p->member.status & S_SHOOTING))
 				p->member.ttl=weapon[current_weapon].cadence+HOLD_GUN_AFTER_SHOOT;
@@ -782,19 +782,18 @@ int process_packet(char *packet,int l)
 		break;
 
 		case P_UPDATE_OBJECT_SPEED_STATUS_TTL:
-		if (l<18)break;   /* invalid packet */
+		if (l < (n=20))break;   /* invalid packet */
 		{
 			struct object_list *p;
 			
-			n=18;
 			p=find_in_table(get_int(packet+1));
 			if (!p)break;
 			if(packet[5]-(p->member.update_counter)>127)break; /* throw out old updates */
 			p->member.update_counter=packet[5];
 			p->member.xspeed=get_int(packet+6);
 			p->member.yspeed=get_int(packet+10);
-			p->member.status=get_int16(packet+14);
-			p->member.ttl=get_int16(packet+16);
+			p->member.status=get_int(packet+14);
+			p->member.ttl=get_int16(packet+18);
 			/* kdyz tasi, tak se nahodi ttl */
 			if (p->member.type==T_PLAYER&&(p->member.status & S_HOLDING)&&(p->member.status & S_SHOOTING))
 				p->member.ttl=weapon[current_weapon].cadence+HOLD_GUN_AFTER_SHOOT;
@@ -802,19 +801,18 @@ int process_packet(char *packet,int l)
 		break;
 
 		case P_UPDATE_OBJECT_COORDS_STATUS_TTL:
-		if (l<18)break;   /* invalid packet */
+		if (l < (n=20))break;   /* invalid packet */
 		{
 			struct object_list *p;
 			
-			n=18;
 			p=find_in_table(get_int(packet+1));
 			if (!p)break;
 			if(packet[5]-(p->member.update_counter)>127)break; /* throw out old updates */
 			p->member.update_counter=packet[5];
 			p->member.x=get_int(packet+6);
 			p->member.y=get_int(packet+10);
-			p->member.status=get_int16(packet+14);
-			p->member.ttl=get_int16(packet+16);
+			p->member.status=get_int(packet+14);
+			p->member.ttl=get_int16(packet+18);
 			/* kdyz tasi, tak se nahodi ttl */
 			if (p->member.type==T_PLAYER&&(p->member.status & S_HOLDING)&&(p->member.status & S_SHOOTING))
 				p->member.ttl=weapon[current_weapon].cadence+HOLD_GUN_AFTER_SHOOT;
@@ -822,14 +820,13 @@ int process_packet(char *packet,int l)
 		break;
 
 		case P_UPDATE_STATUS:
-		if (l<7)break;   /* invalid packet */
+		if (l < (n=9))break;   /* invalid packet */
 		{
 			struct object_list *p;
 
-			n=7;
 			p=find_in_table(get_int(packet+1));
 			if (!p)break;  /* ignore objects we don't have */
-			p->member.status=get_int16(packet+5);
+			p->member.status=get_int(packet+5);
 			/* kdyz tasi, tak se nahodi ttl */
 			if (p->member.type==T_PLAYER&&(p->member.status & S_HOLDING)&&(p->member.status & S_SHOOTING))
 				p->member.ttl=weapon[current_weapon].cadence+HOLD_GUN_AFTER_SHOOT;
