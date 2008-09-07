@@ -2223,7 +2223,7 @@ int main(int argc,char **argv)
 	printf("Started WinSock version %X.%02X\n", wd.wVersion/0x100, wd.wVersion&0xFF);
 #endif
 
-
+	chdir_to_data_files();
 #ifdef XWINDOW
 	x_display_name=0;
 	x_font_name=0;

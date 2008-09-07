@@ -3081,6 +3081,7 @@ int main(int argc, char **argv)
 	}
 	consoleApp=1;
 #endif
+	chdir_to_data_files();
 	parse_command_line(argc,argv);
 	
 	a=server();

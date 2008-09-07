@@ -361,6 +361,7 @@ int main(int argc, char**argv)
 	unsigned long_long last_time;
 	char *LEVEL;
 
+	chdir_to_data_files();
 	set_sigint();
 
 	while(1)

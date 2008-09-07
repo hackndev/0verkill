@@ -6,6 +6,12 @@
 #include "config.h"
 #endif
 
+#ifdef HAVE_ACCESS
+# ifdef HAVE_UNISTD_H
+#  include <unistd.h>
+# endif
+#endif
+
 #include "data.h"
 #include "cfg.h"
 #include "hash.h"
@@ -622,4 +628,26 @@ char* md5_level(int level_num)
 	q=MD5Data(result,len,NULL);
 	mem_free(result);
 	return q;
+}
+
+/* returns 1 if the file is readable */
+static int r_access(const char *filename)
+{
+#ifdef HAVE_ACCESS
+	return !access(filename, R_OK);
+#else
+	FILE *f = fopen(filename, "r");
+	if (f) {
+		fclose(f);
+		return 1;
+	}
+	return 0;
+#endif
+}
+
+/* changes the current dir to where the data files can be found */
+void chdir_to_data_files(void)
+{
+	if (!r_access(DATA_PATH BANNER_FILE))
+		chdir(BASE_DIR);
 }

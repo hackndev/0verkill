@@ -252,4 +252,5 @@ void update_position(
 extern void _skip_ws(char**txt);
 extern int _convert_type(unsigned char c);
 extern char * load_level(int);
+extern void chdir_to_data_files(void);
 #endif

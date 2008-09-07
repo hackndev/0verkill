@@ -1095,7 +1095,7 @@ int main(int argc,char **argv)
 	printf("Started WinSock version %X.%02X\n", wd.wVersion/0x100, wd.wVersion&0xFF);
 #endif
 
-
+	chdir_to_data_files();
 	ERROR("Initialization...\n");
 
 	last_obj=&objects;

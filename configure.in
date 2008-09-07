@@ -34,9 +34,7 @@ AC_STRUCT_TM
 dnl Checks for library functions.
 AC_PROG_GCC_TRADITIONAL
 AC_TYPE_SIGNAL
-AC_CHECK_FUNCS(gettimeofday select strtol strtoul getopt)
-
-AC_CHECK_FUNCS(psignal)
+AC_CHECK_FUNCS(gettimeofday select strtol strtoul getopt psignal access)
 
 AC_CHECK_FUNC(random, cf_result=yes, cf_result=no)
 if test "$cf_result" = no; then
