@@ -370,25 +370,25 @@ void delete_obj(unsigned long id)
 	mem_free(q);
 }
 
-void put_long_long(char *p,unsigned long_long num)
+void put_long_long(char *p,unsigned long_long num, int *offset)
 {
-        p[0]=num&255;num>>=8;
-        p[1]=num&255;num>>=8;
-        p[2]=num&255;num>>=8;
-        p[3]=num&255;num>>=8;
-        p[4]=num&255;num>>=8;
-        p[5]=num&255;num>>=8;
-        p[6]=num&255;num>>=8;
-        p[7]=num&255;
+	p[(*offset)++]=(char)(num & 0xff);num>>=8;
+	p[(*offset)++]=(char)(num & 0xff);num>>=8;
+	p[(*offset)++]=(char)(num & 0xff);num>>=8;
+	p[(*offset)++]=(char)(num & 0xff);num>>=8;
+	p[(*offset)++]=(char)(num & 0xff);num>>=8;
+	p[(*offset)++]=(char)(num & 0xff);num>>=8;
+	p[(*offset)++]=(char)(num & 0xff);num>>=8;
+	p[(*offset)++]=(char)(num & 0xff);
 }
 
 
-void put_int(char *p,int num)
+void put_int(char *p,int num, int *offset)
 {
-        p[0]=num & 0xff;
-        p[1]=(num>>8) & 0xff;
-        p[2]=(num>>16) & 0xff;
-        p[3]=(num>>24) & 0xff;
+	p[(*offset)++]=(char)(num & 0xff);num>>=8;
+	p[(*offset)++]=(char)(num & 0xff);num>>=8;
+	p[(*offset)++]=(char)(num & 0xff);num>>=8;
+	p[(*offset)++]=(char)(num & 0xff);
 }
 
 
@@ -396,14 +396,13 @@ int get_int(char *p)
 {
 	return	((p[0]&0xff) | ((p[1]&0xff)<<8) |
 		((p[2]&0xff)<<16) | ((p[3]&0xff)<<24));
-		
 }
 
 
-void put_int16(char *p, short num)
+void put_int16(char *p, short num, int *offset)
 {
-        p[0]=num & 0xff;
-        p[1]=(num>>8) & 0xff;
+	p[(*offset)++]=(char)(num & 0xff);num>>=8;
+	p[(*offset)++]=(char)(num & 0xff);
 }
 
 

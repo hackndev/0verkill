@@ -678,109 +678,100 @@ static int which_update(struct it *obj,int old_x,int old_y,int old_x_speed,int o
 static void sendall_update_object(struct it* obj, struct player * not_this_player,int type)
 {
 	struct player_list* p;
-	int l;
 	static char packet[32];
+	int offset = 0;
 
 	switch (type)
 	{
 		case 0: /* all */
-		packet[0]=P_UPDATE_OBJECT;
-		put_int(packet+1,obj->id);
-		packet[5]=obj->update_counter;
-		put_int(packet+6,obj->x);
-		put_int(packet+10,obj->y);
-		put_int(packet+14,obj->xspeed);
-		put_int(packet+18,obj->yspeed);
-		put_int(packet+22,obj->status);
-		put_int16(packet+26,obj->ttl);
-		l=28;
+		packet[offset++]=P_UPDATE_OBJECT;
+		put_int(packet,obj->id,&offset);
+		packet[offset++]=obj->update_counter;
+		put_int(packet,obj->x,&offset);
+		put_int(packet,obj->y,&offset);
+		put_int(packet,obj->xspeed,&offset);
+		put_int(packet,obj->yspeed,&offset);
+		put_int(packet,obj->status,&offset);
+		put_int16(packet,obj->ttl,&offset);
 		break;
 
 		case 1: /* coordinates and speed */
-		packet[0]=P_UPDATE_OBJECT_POS;
-		put_int(packet+1,obj->id);
-		packet[5]=obj->update_counter;
-		put_int(packet+6,obj->x);
-		put_int(packet+10,obj->y);
-		put_int(packet+14,obj->xspeed);
-		put_int(packet+18,obj->yspeed);
-		l=22;
+		packet[offset++]=P_UPDATE_OBJECT_POS;
+		put_int(packet,obj->id,&offset);
+		packet[offset++]=obj->update_counter;
+		put_int(packet,obj->x,&offset);
+		put_int(packet,obj->y,&offset);
+		put_int(packet,obj->xspeed,&offset);
+		put_int(packet,obj->yspeed,&offset);
 		break;
 		
 		case 2: /* speed */
-		packet[0]=P_UPDATE_OBJECT_SPEED;
-		put_int(packet+1,obj->id);
-		packet[5]=obj->update_counter;
-		put_int(packet+6,obj->xspeed);
-		put_int(packet+10,obj->yspeed);
-		l=14;
+		packet[offset++]=P_UPDATE_OBJECT_SPEED;
+		put_int(packet,obj->id,&offset);
+		packet[offset++]=obj->update_counter;
+		put_int(packet,obj->xspeed,&offset);
+		put_int(packet,obj->yspeed,&offset);
 		break;
 		
 		case 3: /* coordinates */
-		packet[0]=P_UPDATE_OBJECT_COORDS;
-		put_int(packet+1,obj->id);
-		packet[5]=obj->update_counter;
-		put_int(packet+6,obj->x);
-		put_int(packet+10,obj->y);
-		l=14;
+		packet[offset++]=P_UPDATE_OBJECT_COORDS;
+		put_int(packet,obj->id,&offset);
+		packet[offset++]=obj->update_counter;
+		put_int(packet,obj->x,&offset);
+		put_int(packet,obj->y,&offset);
 		break;
 		
 		case 4: /* speed and status */
-		packet[0]=P_UPDATE_OBJECT_SPEED_STATUS;
-		put_int(packet+1,obj->id);
-		packet[5]=obj->update_counter;
-		put_int(packet+6,obj->xspeed);
-		put_int(packet+10,obj->yspeed);
-		put_int(packet+14,obj->status);
-		l=18;
+		packet[offset++]=P_UPDATE_OBJECT_SPEED_STATUS;
+		put_int(packet,obj->id,&offset);
+		packet[offset++]=obj->update_counter;
+		put_int(packet,obj->xspeed,&offset);
+		put_int(packet,obj->yspeed,&offset);
+		put_int(packet,obj->status,&offset);
 		break;
 		
 		case 5: /* coordinates and status */
-		packet[0]=P_UPDATE_OBJECT_COORDS_STATUS;
-		put_int(packet+1,obj->id);
-		packet[5]=obj->update_counter;
-		put_int(packet+6,obj->x);
-		put_int(packet+10,obj->y);
-		put_int(packet+14,obj->status);
-		l=20;
+		packet[offset++]=P_UPDATE_OBJECT_COORDS_STATUS;
+		put_int(packet,obj->id,&offset);
+		packet[offset++]=obj->update_counter;
+		put_int(packet,obj->x,&offset);
+		put_int(packet,obj->y,&offset);
+		put_int(packet,obj->status,&offset);
 		break;
 		
 		case 6: /* speed and status and ttl */
-		packet[0]=P_UPDATE_OBJECT_SPEED_STATUS_TTL;
-		put_int(packet+1,obj->id);
-		packet[5]=obj->update_counter;
-		put_int(packet+6,obj->xspeed);
-		put_int(packet+10,obj->yspeed);
-		put_int(packet+14,obj->status);
-		put_int16(packet+18,obj->ttl);
-		l=20;
+		packet[offset++]=P_UPDATE_OBJECT_SPEED_STATUS_TTL;
+		put_int(packet,obj->id,&offset);
+		packet[offset++]=obj->update_counter;
+		put_int(packet,obj->xspeed,&offset);
+		put_int(packet,obj->yspeed,&offset);
+		put_int(packet,obj->status,&offset);
+		put_int16(packet,obj->ttl,&offset);
 		break;
 		
 		case 7: /* coordinates and status and ttl */
-		packet[0]=P_UPDATE_OBJECT_COORDS_STATUS_TTL;
-		put_int(packet+1,obj->id);
-		packet[5]=obj->update_counter;
-		put_int(packet+6,obj->x);
-		put_int(packet+10,obj->y);
-		put_int16(packet+14,obj->status);
-		put_int16(packet+18,obj->ttl);
-		l=20;
+		packet[offset++]=P_UPDATE_OBJECT_COORDS_STATUS_TTL;
+		put_int(packet,obj->id,&offset);
+		packet[offset++]=obj->update_counter;
+		put_int(packet,obj->x,&offset);
+		put_int(packet,obj->y,&offset);
+		put_int16(packet,obj->status,&offset);
+		put_int16(packet,obj->ttl,&offset);
 		break;
 
 		default: /* don't update */
 		return;
-		
 	}
 
 	obj->update_counter++;
 	
 	if (!not_this_player)
 		for (p=&players;p->next;p=p->next)
-			send_chunk_packet_to_player(packet,l,&(p->next->member));
+			send_chunk_packet_to_player(packet,offset,&(p->next->member));
 	else
 		for (p=&players;p->next;p=p->next)
 			if ((&(p->next->member))!=not_this_player)
- 				send_chunk_packet_to_player(packet,l,&(p->next->member));
+ 				send_chunk_packet_to_player(packet,offset,&(p->next->member));
 }
 
 
@@ -789,18 +780,19 @@ static void sendall_update_status(struct it* obj, struct player * not_this_playe
 {
 	struct player_list* p;
 	static char packet[32];
+	int offset = 0;
 
-	packet[0]=P_UPDATE_STATUS;
-	put_int(packet+1,obj->id);
-	put_int(packet+5,obj->status);
+	packet[offset++]=P_UPDATE_STATUS;
+	put_int(packet,obj->id,&offset);
+	put_int(packet,obj->status,&offset);
 	
 	if (!not_this_player)
 		for (p=&players;p->next;p=p->next)
- 			send_chunk_packet_to_player(packet,9,&(p->next->member));
+ 			send_chunk_packet_to_player(packet,offset,&(p->next->member));
 	else
 		for (p=&players;p->next;p=p->next)
 			if ((&(p->next->member))!=not_this_player)
- 				send_chunk_packet_to_player(packet,9,&(p->next->member));
+ 				send_chunk_packet_to_player(packet,offset,&(p->next->member));
 }
 
 
@@ -809,20 +801,21 @@ static void sendall_hit(unsigned long id,unsigned char direction,unsigned char x
 {
 	struct player_list* p;
 	static char packet[8];
+	int offset = 0;
 
-	packet[0]=P_HIT;
-	put_int(packet+1,id);
-	packet[5]=direction;
-	packet[6]=xoffs;
-	packet[7]=yoffs;
+	packet[offset++]=P_HIT;
+	put_int(packet,id,&offset);
+	packet[offset++]=direction;
+	packet[offset++]=xoffs;
+	packet[offset++]=yoffs;
 	
 	if (!not_this_player)
 		for (p=&players;p->next;p=p->next)
- 			send_chunk_packet_to_player(packet,8,&(p->next->member));
+ 			send_chunk_packet_to_player(packet,offset,&(p->next->member));
 	else
 		for (p=&players;p->next;p=p->next)
 			if ((&(p->next->member))!=not_this_player)
- 				send_chunk_packet_to_player(packet,8,&(p->next->member));
+ 				send_chunk_packet_to_player(packet,offset,&(p->next->member));
 }
 
 
@@ -853,7 +846,7 @@ static void send_info(struct sockaddr *addr,int id)
 {
 	char *packet;
 	int p=active_players>TOP_PLAYERS_N?TOP_PLAYERS_N:active_players;
-	int a,n,l;
+	int a,offset = 0,l;
 	struct player **t;  /* table for qsort */
 	struct player_list *q;
 
@@ -871,23 +864,22 @@ static void send_info(struct sockaddr *addr,int id)
 	qsort(t,active_players,sizeof(struct player*),_qsort_cmp);
 	
 	/* create packet header */
-	packet[0]=P_INFO;
-	put_int(packet+1,active_players);
-	packet[5]=p;
-	n=6;
+	packet[offset++]=P_INFO;
+	put_int(packet,active_players,&offset);
+	packet[offset++]=p;
 
 	/* put players into packet */
 	for (a=0;a<p;a++)
 	{
-		put_int(packet+n,(t[a])->frags);
-		put_int(packet+n+4,(t[a])->deaths);
-		packet[n+8]=t[a]->color;
-		l=strlen((t[a])->name)+1;
-		memcpy(packet+n+9,(t[a])->name,l);
-		n+=l+9;
+		put_int(packet,(t[a])->frags,&offset);
+		put_int(packet,(t[a])->deaths,&offset);
+		packet[offset++]=t[a]->color;
+		memcpy(packet+offset,(t[a])->name,l=strlen((t[a])->name)+1);
+		offset+=l;
 	}
-	if (!addr)sendall(packet,n,0);
-	else send_packet(packet,n,addr,0,id);
+	if (!addr)
+		sendall(packet,offset,0);
+	else send_packet(packet,offset,addr,0,id);
 
 	mem_free(packet);
 	mem_free(t);
@@ -956,18 +948,19 @@ static void sendall_bell(void)
 static void send_new_obj(struct sockaddr* address, struct it* obj,int id)
 {
 	static char packet[32];
+	int offset = 0;
 
-	packet[0]=P_NEW_OBJ;
-	put_int(packet+1,obj->id);
-	put_int16(packet+5,obj->sprite);
-	put_int(packet+7,obj->x);
-	put_int(packet+11,obj->y);
-	put_int(packet+15,obj->xspeed);
-	put_int(packet+19,obj->yspeed);
-	put_int(packet+23,obj->status);
-	packet[27]=obj->type;
-	put_int16(packet+28,obj->ttl);
-	send_packet(packet,30,address,0,id);
+	packet[offset++]=P_NEW_OBJ;
+	put_int(packet,obj->id,&offset);
+	put_int16(packet,obj->sprite,&offset);
+	put_int(packet,obj->x,&offset);
+	put_int(packet,obj->y,&offset);
+	put_int(packet,obj->xspeed,&offset);
+	put_int(packet,obj->yspeed,&offset);
+	put_int(packet,obj->status,&offset);
+	packet[offset++]=obj->type;
+	put_int16(packet,obj->ttl,&offset);
+	send_packet(packet,offset,address,0,id);
 }
 #endif
 
@@ -975,18 +968,19 @@ static void send_new_obj(struct sockaddr* address, struct it* obj,int id)
 static void send_new_obj_chunked(struct player* player, struct it* obj)
 {
 	static char packet[32];
+	int offset = 0;
 
-	packet[0]=P_NEW_OBJ;
-	put_int(packet+1,obj->id);
-	put_int16(packet+5,obj->sprite);
-	put_int(packet+7,obj->x);
-	put_int(packet+11,obj->y);
-	put_int(packet+15,obj->xspeed);
-	put_int(packet+19,obj->yspeed);
-	put_int(packet+23,obj->status);
-	packet[27]=obj->type;
-	put_int16(packet+28,obj->ttl);
-	send_chunk_packet_to_player(packet,30,player);
+	packet[offset++]=P_NEW_OBJ;
+	put_int(packet,obj->id,&offset);
+	put_int16(packet,obj->sprite,&offset);
+	put_int(packet,obj->x,&offset);
+	put_int(packet,obj->y,&offset);
+	put_int(packet,obj->xspeed,&offset);
+	put_int(packet,obj->yspeed,&offset);
+	put_int(packet,obj->status,&offset);
+	packet[offset++]=obj->type;
+	put_int16(packet,obj->ttl,&offset);
+	send_chunk_packet_to_player(packet,offset,player);
 }
 
 
@@ -994,18 +988,18 @@ static void send_new_obj_chunked(struct player* player, struct it* obj)
 static void send_update_player(struct player* p)
 {
 	static char packet[32];
-	int a;
+	int a,offset = 0;
 
-	packet[0]=P_UPDATE_PLAYER;
-	packet[1]=p->health;
-	packet[2]=p->armor;
+	packet[offset++]=P_UPDATE_PLAYER;
+	packet[offset++]=p->health;
+	packet[offset++]=p->armor;
 	for (a=0;a<ARMS;a++)
-		put_int16(packet+3+(a<<1),p->ammo[a]);
-	put_int(packet+3+2*ARMS,p->frags);
-	put_int(packet+7+2*ARMS,p->deaths);
-	put_int16(packet+11+2*ARMS,p->current_weapon);
-	put_int16(packet+13+2*ARMS,p->weapons);
-	send_chunk_packet_to_player(packet,15+2*ARMS,p);
+		put_int16(packet,p->ammo[a],&offset);
+	put_int(packet,p->frags,&offset);
+	put_int(packet,p->deaths,&offset);
+	put_int16(packet,p->current_weapon,&offset);
+	put_int16(packet,p->weapons,&offset);
+	send_chunk_packet_to_player(packet,offset,p);
 }
 
 /* send a packet to all players except one */
@@ -1043,14 +1037,17 @@ static void send_objects(struct player* player,struct it* not_this_object)
 
 /* send all objects except one to specified player */
 /* if not_this_object is null, sends all objects */
+#define CHKSUM_SZ	32
 static void send_change_level(struct player* player)
 {
 	char packet[64];
+	int offset = 0;
 
-	packet[0]=P_CHANGE_LEVEL;
-	put_int(packet+1,level_number);
-	memcpy(packet+5,level_checksum,33);
-	send_packet(packet,38,(struct sockaddr*)(&(player->address)),0,player->id);
+	packet[offset++]=P_CHANGE_LEVEL;
+	put_int(packet,level_number,&offset);
+	memcpy(packet+offset,level_checksum,CHKSUM_SZ+1);
+	offset+=CHKSUM_SZ+1;
+	send_packet(packet,offset,(struct sockaddr*)(&(player->address)),0,player->id);
 }
 
 
@@ -1069,10 +1066,11 @@ static void send_timeq_objects(struct player *player)
 static void delete_player(struct player_list *q)
 {
 	char packet[5];
-	
+	int offset = 0;
+
 	/* delete object player's hero */
-	packet[0]=P_DELETE_OBJECT;
-	put_int(packet+1,q->member.obj->id);
+	packet[offset++]=P_DELETE_OBJECT;
+	put_int(packet,q->member.obj->id,&offset);
 	sendall_chunked(packet,5,&(q->member));
 	delete_obj(q->member.obj->id);
 
@@ -1199,7 +1197,7 @@ static void read_data(void)
 	struct player *p;
 	struct player_list *q;
 	unsigned char min,maj;
-	int s,x,y,l;
+	int s,x,y,l,offset = 0;
 
 	packet[279]=0;
 
@@ -1255,21 +1253,21 @@ static void read_data(void)
 				snprintf(txt,256,"%s entered the game.",packet+5);
 				active_players++;
 				n_players++;
-				packet[0]=P_PLAYER_ACCEPTED;
+				packet[offset++]=P_PLAYER_ACCEPTED;
 				last_player->member.obj->status |= S_DEAD;
-				put_int(packet+1,last_player->member.obj->id);
-				put_int16(packet+5,last_player->member.obj->sprite);
-				put_int(packet+7,last_player->member.obj->x);
-				put_int(packet+11,last_player->member.obj->y);
-				put_int(packet+15,last_player->member.obj->xspeed);
-				put_int(packet+19,last_player->member.obj->yspeed);
-				put_int(packet+23,last_player->member.obj->status);
+				put_int(packet,last_player->member.obj->id,&offset);
+				put_int16(packet,last_player->member.obj->sprite,&offset);
+				put_int(packet,last_player->member.obj->x,&offset);
+				put_int(packet,last_player->member.obj->y,&offset);
+				put_int(packet,last_player->member.obj->xspeed,&offset);
+				put_int(packet,last_player->member.obj->yspeed,&offset);
+				put_int(packet,last_player->member.obj->status,&offset);
 				t=get_time();
-				put_long_long(packet+27,t-game_start);
-				put_int(packet+35,last_player->member.id);
-				packet[39]=VERSION_MAJOR;
-				packet[40]=VERSION_MINOR;
-				send_packet(packet,41,(struct sockaddr*)(&client),0,0);
+				put_long_long(packet,t-game_start,&offset);
+				put_int(packet,last_player->member.id,&offset);
+				packet[offset++]=VERSION_MAJOR;
+				packet[offset++]=VERSION_MINOR;
+				send_packet(packet,offset,(struct sockaddr*)(&client),0,0);
 				send_change_level(&(last_player->member));
 				sendall_bell();
 				sendall_message(0,txt,0,0, M_ENTER);
@@ -1933,11 +1931,12 @@ static int dynamic_collision(struct it *obj)
 				if (p->type==T_CORPSE)
 				{
 					char packet[5];
+					int offset = 0;
 					px=PX;
 					py=PY;
-					packet[0]=P_DELETE_OBJECT;
-					put_int(packet+1,p->id);
-					sendall_chunked(packet,5,0);
+					packet[offset++]=P_DELETE_OBJECT;
+					put_int(packet,p->id,&offset);
+					sendall_chunked(packet,offset,0);
 					delete_obj(p->id);
 					create_mess(px,py,py);
 					return 1;
@@ -2059,6 +2058,7 @@ static void update_game(void)
 	unsigned int old_status;
 	int old_ttl;
 	int old_x,old_y,old_x_speed,old_y_speed;
+	int offset = 0;
 
         for(p=&objects;p->next;p=p->next)
         {
@@ -2178,11 +2178,12 @@ static void update_game(void)
 
 					case T_GRENADE:
 					case T_BFGCELL:
-br:					packet[0]=(p->next->member.type==T_GRENADE)?P_EXPLODE_GRENADE:
+br:					offset = 0;
+					packet[offset++]=(p->next->member.type==T_GRENADE)?P_EXPLODE_GRENADE:
 						(p->next->member.type==T_BFGCELL)?P_EXPLODE_BFG:P_EXPLODE_BLOODRAIN;
-					put_int(packet+1,id);
-					put_int(packet+5,p->next->member.id);
-					sendall_chunked(packet,9,0);
+					put_int(packet,id,&offset);
+					put_int(packet,p->next->member.id,&offset);
+					sendall_chunked(packet,offset,0);
 					
 					for (b=0;b<N_SHRAPNELS_EXPLODE;b++)
 					{
@@ -2224,9 +2225,10 @@ br:					packet[0]=(p->next->member.type==T_GRENADE)?P_EXPLODE_GRENADE:
 					goto cont_cycle;
 
 					default:
-					packet[0]=P_DELETE_OBJECT;
-					put_int(packet+1,p->next->member.id);
-					sendall_chunked(packet,5,0);
+					offset = 0;
+					packet[offset++]=P_DELETE_OBJECT;
+					put_int(packet,p->next->member.id,&offset);
+					sendall_chunked(packet,offset,0);
 					delete_obj(p->next->member.id);
 					if (!(p->next))return;
 					goto cont_cycle;
@@ -2307,9 +2309,10 @@ br:					packet[0]=(p->next->member.type==T_GRENADE)?P_EXPLODE_GRENADE:
 		if ((p->next->member.type==T_SHRAPNEL||p->next->member.type==T_BULLET||
 		p->next->member.type==T_BFGCELL||p->next->member.type==T_CHAIN)&&(stop_x||stop_y))  /* bullet and shrapnel die crashing into wall */
 		{
-			packet[0]=P_DELETE_OBJECT;
-			put_int(packet+1,p->next->member.id);
-			sendall_chunked(packet,5,0);
+			offset = 0;
+			packet[offset++]=P_DELETE_OBJECT;
+			put_int(packet,p->next->member.id,&offset);
+			sendall_chunked(packet,offset,0);
 			delete_obj(p->next->member.id);
 			if (!(p->next))break;
 			continue;
@@ -2320,9 +2323,10 @@ dc:
 		switch (a)
 		{ 
 			case 1:  /* object dies */
-			packet[0]=P_DELETE_OBJECT;
-			put_int(packet+1,p->next->member.id);
-			sendall_chunked(packet,5,0);
+			offset = 0;
+			packet[offset++]=P_DELETE_OBJECT;
+			put_int(packet,p->next->member.id,&offset);
+			sendall_chunked(packet,offset,0);
 
 			case 2:
 			delete_obj(p->next->member.id);

@@ -40,20 +40,20 @@ void send_packet(char *packet,int len,const struct sockaddr* addr,int sender,int
 	}
 	if (!p)return;  /* not enough memory */
 	memcpy(p+12,packet,len);
-	p[0]=crc&255;crc>>=8;  /* CRC 32 */
-	p[1]=crc&255;crc>>=8;
-	p[2]=crc&255;crc>>=8;
-	p[3]=crc&255;
+	p[0]=(char)(crc & 0xff);crc>>=8;  /* CRC 32 */
+	p[1]=(char)(crc & 0xff);crc>>=8;
+	p[2]=(char)(crc & 0xff);crc>>=8;
+	p[3]=(char)(crc & 0xff);
 	
-	p[4]=sender&255;sender>>=8;  /* sender */
-	p[5]=sender&255;sender>>=8;
-	p[6]=sender&255;sender>>=8;
-	p[7]=sender&255;
+	p[4]=(char)(sender & 0xff);sender>>=8;  /* sender */
+	p[5]=(char)(sender & 0xff);sender>>=8;
+	p[6]=(char)(sender & 0xff);sender>>=8;
+	p[7]=(char)(sender & 0xff);
 	
-	p[8]=recipient&255;recipient>>=8;  /* recipient */
-	p[9]=recipient&255;recipient>>=8;
-	p[10]=recipient&255;recipient>>=8;
-	p[11]=recipient&255;
+	p[8]=(char)(recipient & 0xff);recipient>>=8;  /* recipient */
+	p[9]=(char)(recipient & 0xff);recipient>>=8;
+	p[10]=(char)(recipient & 0xff);recipient>>=8;
+	p[11]=(char)(recipient & 0xff);
 	
 	sendto(fd,p,len+12,0,addr,sizeof(*addr));
 }

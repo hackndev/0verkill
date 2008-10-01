@@ -224,11 +224,11 @@ extern struct it* new_obj(
 	int yspeed, 
 	void * data);
 void delete_obj(unsigned long id);
-extern void put_int(char *p,int num);
+extern void put_int(char *p,int num, int *offset);
 extern int get_int(char *p);
-extern void put_int16(char *p,short num);
+extern void put_int16(char *p,short num, int *offset);
 extern int get_int16(char *p);
-extern void put_long_long(char *p,unsigned long_long num);
+extern void put_long_long(char *p,unsigned long_long num, int *offset);
 extern unsigned long_long get_long_long(char *p);
 extern void free_sprites(int);
 
