@@ -21,8 +21,6 @@
 
 #define DEFAULT_FONT_NAME "-misc-fixed-bold-r-normal-*-13-*-*-*-c-*-iso8859-*"
 
-
-#define DATA_PATH "data/"
 #define LEVEL_FILE "level.dat"
 #define GAME_SPRITES_FILE "sprites.dat"
 #define BANNER_FILE "banner.dat"
@@ -152,7 +150,11 @@ extern int tri_d;
 		#define EXIT(a)		{exit(a);}
 	#endif
 	#define random		rand
+	#define BASE_DIR	"."
+	#define DATA_PATH "data\\"
 #else
+	#define DATA_PATH "data/"
+
 	#define long_long	long long
 	#ifdef CLIENT
 		#define ERROR(a)	{if (!console_ok)c_shutdown();fprintf(stderr,a);}

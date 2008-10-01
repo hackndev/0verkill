@@ -39,8 +39,8 @@ void sleep_until(unsigned long_long t)
 
 	if (u>=t) return;
 	t-=u;
-#if defined(WIN32)
-	Sleep(t/1000);
+#ifdef WIN32
+	Sleep((DWORD)(t/1000));
 #elif defined(__EMX__)
 	_sleep2(t/1000);
 #else
@@ -58,8 +58,8 @@ void sleep_until(unsigned long_long t)
 /* waits time t microseconds */
 void my_sleep(unsigned long_long t)
 {
-#if defined(WIN32)
-	Sleep(t/1000);
+#ifdef WIN32
+	Sleep((DWORD)(t/1000));
 #elif defined(__EMX__)
 	_sleep2(t/1000);
 #else

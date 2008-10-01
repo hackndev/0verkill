@@ -190,7 +190,11 @@ void load_data(char * filename)
  int n,x,y;
  int t;
 
+#ifndef WIN32
  if (!(stream=fopen(filename,"rb")))
+#else
+ if (!fopen_s(&stream,filename,"rb"))
+#endif
  {
 	char msg[256];
  	snprintf(msg,256,"Can't open file \"%s\"!\n",filename);
@@ -234,12 +238,17 @@ void load_data(char * filename)
 void load_sprites(char * filename)
 {
  FILE *stream;
- static char line[1024];
+ char line[1024];
  char *p,*q;
  int l;
 
- stream=fopen(filename,"rb");
- if (!stream)
+#ifndef WIN32
+ if(!(stream=fopen(filename,"rb")))
+#else
+ int err;
+ char r[1024];
+ if((err = fopen_s(&stream,filename,"rb")) != 0)
+#endif
  {
  	char msg[256];
 	snprintf(msg,256,"Can't open file \"%s\"!\n",filename);
@@ -263,7 +272,13 @@ void load_sprites(char * filename)
   if (!sprite_names[n_sprites-1]){ERROR("Memory allocation error!\n");EXIT(1);}
   memcpy(sprite_names[n_sprites-1],q,l+1);
   _skip_ws(&p);
-  for (q=p;(*p)!=' '&&(*p)!=9&&(*p)!=10&&(*p);p++);
+  for (q=p;(*p)!=' '&&(*p)!=9&&(*p)!=10&&(*p);p++)
+#ifdef WIN32
+	  if (*p == '/')
+		  *p = '\\';
+  snprintf(r, sizeof(r), "%s\\%s", _getcwd(NULL, 0), q)
+#endif
+;
   *p=0;p++;
   load_sprite(q,sprites+(n_sprites-1));
  }
@@ -297,8 +312,14 @@ char *load_level(int level_num)
 	int a;
 	FILE *f;
 
-	f=fopen(DATA_PATH LEVEL_FILE,"r");
-	if (!f)return NULL;
+#ifndef WIN32
+	if(!(f=fopen(DATA_PATH LEVEL_FILE,"r")))
+#else
+	int err;
+	snprintf(txt,sizeof(txt),"%s\\data\\level.dat",_getcwd(NULL, 0));
+	if((err = fopen_s(&f, txt, "r")) != 0)
+#endif
+	return NULL;
 
 	for (a=0;a<=level_num;)
 	{
@@ -607,8 +628,15 @@ char* md5_level(int level_num)
 	{
 		FILE *f;
 
-		f=fopen(p,"r");
-		if (!f){mem_free(result);return NULL;}
+#ifndef WIN32
+		if(!(f=fopen(p,"r")))
+#else
+		if(!fopen_s(&f, p, "r"))
+#endif
+		{
+			mem_free(result);
+			return NULL;
+		}
 		while (fgets(p,2048,f))
 		{
 			if (p[strlen(p)-1]==13)p[strlen(p)-1]=0;
@@ -635,8 +663,13 @@ static int r_access(const char *filename)
 #ifdef HAVE_ACCESS
 	return !access(filename, R_OK);
 #else
-	FILE *f = fopen(filename, "r");
-	if (f) {
+	FILE *f;
+#ifndef WIN32
+	if(f = fopen(filename, "r"))
+#else
+	if(fopen_s(&f, filename, "r"))
+#endif
+	{
 		fclose(f);
 		return 1;
 	}

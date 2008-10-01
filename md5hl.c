@@ -12,7 +12,9 @@
 
 #include <sys/types.h>
 #include <fcntl.h>
+#ifndef WIN32
 #include <unistd.h>
+#endif
 
 #include <errno.h>
 #include <stdio.h>
@@ -46,16 +48,23 @@ MD5File (const char *filename, char *buf)
 {
     unsigned char buffer[BUFSIZ];
     MD5_CTX ctx;
-    int f,i,j;
+    int i,j;
+	FILE *f;
 
     MD5Init(&ctx);
-    f = open(filename,O_RDONLY);
-    if (f < 0) return 0;
-    while ((i = read(f,buffer,sizeof buffer)) > 0) {
+
+#ifndef WIN32
+    if (!(f = fopen(filename, "r")))
+#else
+	printf("%s\n", filename);for(;;);
+	if (fopen_s(&f, filename, "r") != 0) /* tady to hnije .. */
+#endif
+	return 0;
+    while ((i = fread(buffer,sizeof buffer,1,f)) > 0) {
 	MD5Update(&ctx,buffer,i);
     }
     j = errno;
-    close(f);
+    fclose(f);
     errno = j;
     if (i < 0) return 0;
     return MD5End(&ctx, buf);

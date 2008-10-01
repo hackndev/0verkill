@@ -122,14 +122,15 @@ void c_shutdown(void) {
 			mem_free(dirtyChars);
 			dirtyChars=NULL;
 		}
-		if ( dirtyLines ) {
+		/* dalsi chyba woken ... */
+		/*if ( dirtyLines ) {
 			mem_free(dirtyLines);
 			dirtyLines=NULL;
 		}
 		if ( dirtyBlockStart ) {
 			mem_free(dirtyBlockStart);
 			dirtyBlockStart=NULL;
-		}
+		}*/
 	#endif
 #endif
 	c_cursor(1);
@@ -196,6 +197,16 @@ void c_print(char *text) {
 	FillConsoleOutputAttribute(hMyConsole, curattr, len, curpos, &wr);
 	curpos.X+=(SHORT)len;
 #endif
+}
+
+void c_print_l(char * text, int len)
+{
+	int l = 0;
+	char b[2] = {0,0};
+	while(l++ < len) {
+		b[0] = *text++;
+		c_print(b);
+	}
 }
 
 void c_putc(char c) {

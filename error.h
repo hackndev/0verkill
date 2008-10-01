@@ -5,14 +5,22 @@
 
 
 #include "cfg.h"
+#ifndef WIN32
 #include "config.h"
+#else
+#define inline __inline
+#endif
 #include <string.h>
 
 #define DUMMY ((void *)-1L)
 
 void do_not_optimize_here(void *p);
 void check_memory_leaks(void);
+#ifndef WIN32
 void error(char *, ...);
+#else
+#define error(...) while(0);
+#endif
 void debug_msg(char *, ...);
 void int_error(char *, ...);
 extern int errline;

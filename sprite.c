@@ -186,7 +186,11 @@ void load_sprite(char * filename,struct sprite *s)
 	s->positions=DUMMY;
 	s->n_positions=0;
  
+#ifndef WIN32
 	if (!(f=fopen(filename,"rb")))
+#else
+	if (fopen_s(&f,filename,"rb") != 0)
+#endif
 	{
 		char msg[256];
 		snprintf(msg,256,"Error opening file \"%s\"!\n",filename);

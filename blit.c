@@ -268,10 +268,10 @@ blit_screen(unsigned char ignore_bg)
 				break;
 			}
 			/* draw bigger pieces to screen */
-			line_buf[x] = sc[off = x + yof] ? : 32;
+			line_buf[x] = sc[off = x + yof] ? sc[off = x + yof] : 32;
 			for (s = x++; x < SCREEN_X && at[off = x + yof] == attribute &&
 					at_old[off] == attribute_old; x++)
-					line_buf[x] = sc[off] ? : 32;
+					line_buf[x] = sc[off] ? sc[off] : 32;
 			last_color = attribute;
 			c_print_l(line_buf + s, x---s);
 		}

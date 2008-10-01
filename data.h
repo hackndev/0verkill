@@ -3,6 +3,16 @@
 
 #ifndef WIN32
 #include "config.h"
+#else
+/* rezim kompatibility s woknama ... */
+#include <direct.h>
+#define snprintf(t, s, ...) _snprintf_s(t, s, s, __VA_ARGS__)
+#define close(...) while(0);
+#define chdir(...) _chdir(__VA_ARGS__)
+#define random rand
+#define srandom(x) srand((unsigned int)x)
+#define sleep(x) Sleep(x)
+#define strcat(d, s) strcat_s(d, sizeof(s), s)
 #endif
 #include "cfg.h"
 #include "sprite.h"

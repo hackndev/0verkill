@@ -108,11 +108,8 @@ struct object_list *last_obj;
 
 
 #ifdef WIN32
-	#define random rand
-	#define srandom srand
-
-	#define	SERVICE_NAME			"0verkill_015"
-	#define	SERVICE_DISP_NAME		"0verkill Server 0.15"
+	#define	SERVICE_NAME			"0verkill_017"
+	#define	SERVICE_DISP_NAME		"0verkill Server 0.17"
 	int		consoleApp=0;	/* 0 kdyz to bezi jako server na pozadi */
 
 /***************************************************/
@@ -340,7 +337,17 @@ static void load_dynamic(char * filename)
 	char *p,*q,*name;
 	int n,x,y,t;
 
-	if (!(stream=fopen(filename,"rb"))){char msg[256];snprintf(msg,256,"Can't open file \"%s\"!\n",filename);ERROR(msg);EXIT(1);}
+#ifndef WIN32
+	if (!(stream=fopen(filename,"rb")))
+#else
+	if (!fopen_s(&stream, filename, "rb"))
+#endif
+	{
+		char msg[256];
+		snprintf(msg,256,"Can't open file \"%s\"!\n",filename);
+		ERROR(msg);
+		EXIT(1);
+	}
 	while(fgets(line,1024,stream))
 	{
 		p=line;
@@ -385,7 +392,11 @@ static void message(char *msg,int output)
 #endif
 	
 	t=time(0);
+#ifndef WIN32
 	tm=*(localtime(&t));
+#else
+	localtime_s(&tm, &t);
+#endif
 	
 	/* time stamp is in format day.month.year hour:minute:second */
 	snprintf(timestamp,64,"%2d.%2d.%d %02d:%02d:%02d  ",tm.tm_mday,tm.tm_mon+1,tm.tm_year+1900,tm.tm_hour,tm.tm_min,tm.tm_sec);
@@ -1892,7 +1903,7 @@ static int dynamic_collision(struct it *obj)
 
 				case T_KILL:
 				if (p->type!=T_PLAYER)break;
-				a=(1-(double)A/100)*KILL_LETHALNESS;
+				a=(int)((1-(double)A/100)*KILL_LETHALNESS);
 				c=KILL_ARMOR_DAMAGE;
 				if (a>=H)  /* player died */
 				{
@@ -1951,8 +1962,8 @@ static int dynamic_collision(struct it *obj)
 					p->xspeed+=obj->xspeed>0?b:-b;
 				sendall_update_object(p,0,4);  /* update speed + status */
 				p->status &= ~S_HIT;
-				a=(1-(double)A/100)*weapon[obj->status].lethalness*(2-double2int(obj->y-p->y)/(double)PLAYER_HEIGHT)*obj->ttl/weapon[obj->status].ttl;
-				c=weapon[obj->status].armor_damage*(2-double2int(obj->y-p->y)/(double)PLAYER_HEIGHT)*obj->ttl/weapon[obj->status].ttl;
+				a=(int)((1-(double)A/100)*weapon[obj->status].lethalness*(2-double2int(obj->y-p->y)/(double)PLAYER_HEIGHT)*obj->ttl/weapon[obj->status].ttl);
+				c=(int)(weapon[obj->status].armor_damage*(2-double2int(obj->y-p->y)/(double)PLAYER_HEIGHT)*obj->ttl/weapon[obj->status].ttl);
 				if (a>=H)  /* player was slain */
 				{
 					o=&(((ol = find_in_table((long)(obj->data))))->member);  /* owner of the bullet */
@@ -2652,7 +2663,7 @@ static void fire_player(struct player *q,int direction)
 			q->current_weapon,
 			add_int(q->obj->x,direction==1?-2:PLAYER_WIDTH),
 			q->obj->y+FIRE_YOFFSET,
-			1.2*q->obj->xspeed+(direction==1?-weapon[q->current_weapon].speed:weapon[q->current_weapon].speed),
+			(int)(1.2*q->obj->xspeed+(direction==1?-weapon[q->current_weapon].speed:weapon[q->current_weapon].speed)),
 			0,
 			(void *)(long)(q->obj->id)); 
 		id++;
@@ -2666,7 +2677,7 @@ static void fire_player(struct player *q,int direction)
 			q->current_weapon,
 			add_int(q->obj->x,direction==1?-2:PLAYER_WIDTH),
 			q->obj->y+FIRE_YOFFSET+int2double(1),
-			1.2*q->obj->xspeed+(direction==1?-weapon[q->current_weapon].speed:weapon[q->current_weapon].speed),
+			(int)(1.2*q->obj->xspeed+(direction==1?-weapon[q->current_weapon].speed:weapon[q->current_weapon].speed)),
 			0,
 			(void *)(long)(q->obj->id)); 
 		id++;
@@ -2865,7 +2876,11 @@ static void parse_command_line(int argc,char **argv)
 					username[sizeof(username)-1]=0;
 					user=username;
 					if ( (pass=strchr(optarg, '/'))==NULL ) {
+#ifndef WIN32
 						strcpy(username, optarg);
+#else
+						strcpy_s(username, sizeof(optarg), optarg);
+#endif
 						memcpy(username, optarg, sizeof(username)-1);
 						password[0]=0;
 					}
@@ -2896,7 +2911,7 @@ static void parse_command_line(int argc,char **argv)
 			EXIT(0);
 
 			case 'p':
-			port=strtoul(optarg,&c,10);
+			port=(unsigned short)strtoul(optarg,&c,10);
 			if (*c){ERROR("Error: Not a number.\n");EXIT(1);}
 			if (errno==ERANGE)
 			{
@@ -3047,7 +3062,7 @@ again:
 		}
 		message("Wakeup\n",2);
 #else
-		WaitForSingleObject(fd, 500); /* wait max. 0.5 seconds, then we must test hServerExitEvent */
+		WaitForSingleObject(&fd, 500); /* wait max. 0.5 seconds, then we must test hServerExitEvent */
 #endif
 	}
 #ifdef WIN32

@@ -1042,7 +1042,7 @@ void parse_command_line(int argc,char **argv)
 			break;
 
 			case 'p':
-			port=strtoul(optarg,&e,10);
+			port=(unsigned short)strtoul(optarg,&e,10);
 			if (*e){ERROR("Error: Decimal number expected.\n");EXIT(1);}
 			break;
                 }
@@ -1099,11 +1099,7 @@ int main(int argc,char **argv)
 	ERROR("Initialization...\n");
 
 	last_obj=&objects;
-#ifndef WIN32
 	srandom(get_time());
-#else
-	srand(get_time());
-#endif
 
 	const1=random()%50;
 	const2=random()%20;

@@ -5,11 +5,14 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdarg.h>
+#ifndef WIN32
 #include <unistd.h>
-
 #include "config.h"
+#endif
+
 #include "cfg.h"
 #include "error.h"
+#include "data.h"
 
 struct memory_list {
 	int n;
@@ -128,12 +131,14 @@ void er(int b, char *m, va_list l)
 	sleep(1);
 }
 
+#ifndef WIN32
 void error(char *m, ...)
 {
 	va_list l;
 	va_start(l, m);
 	er(1, m, l);
 }
+#endif
 
 int errline;
 unsigned char *errfile;

@@ -3,7 +3,6 @@
 #ifndef WIN32
 #include "config.h"
 #endif
-
 #include <stdio.h>
 #include <signal.h>
 #include <math.h>
@@ -242,10 +241,11 @@ int load_cfg(struct config *cfg)
 
 #ifndef WIN32
 	snprintf(txt, sizeof(txt), "%s/%s",getenv("HOME"),CFG_FILE);
-#else
-	snprintf(txt, sizeof(txt), "./%s",CFG_FILE);
-#endif
 	stream=fopen(txt,"r");
+#else
+	snprintf(txt, sizeof(txt), "./%s", CFG_FILE);
+	fopen_s(&stream, txt, "r");
+#endif
 	if (!stream)
 		return load_default_cfg(cfg, 1);
 	
@@ -299,7 +299,11 @@ void save_cfg(struct config *cfg)
 			dcfg.color = cfg->color;
 	}
 
+#ifndef WIN32
 	stream=fopen(txt,"w");
+#else
+	fopen_s(&stream, txt, "w");
+#endif
 	if (!stream)
 		return;
 	fprintf(stream, "%s\n%s\n%d\n%d\n", dcfg.host, dcfg.name,
@@ -1056,9 +1060,9 @@ void change_level(void)
 	reinit_area();
 
 	LEVEL=load_level(level_number);
-	snprintf(txt,256,"%s%s%s",DATA_PATH,LEVEL,LEVEL_SPRITES_SUFFIX);
+	snprintf(txt,sizeof(txt),"%s%s%s",DATA_PATH,LEVEL,LEVEL_SPRITES_SUFFIX);
 	load_sprites(txt);
-	snprintf(txt,256,"%s%s%s",DATA_PATH,LEVEL,STATIC_DATA_SUFFIX);
+	snprintf(txt,sizeof(txt),"%s%s%s",DATA_PATH,LEVEL,STATIC_DATA_SUFFIX);
 	load_data(txt);
 	mem_free(LEVEL);
 }
@@ -1309,8 +1313,7 @@ int process_packet(char *packet,int l)
 			a=get_int(packet+1);
 			if (level_number==a)goto level_changed;
 			level_number=a;
-			snprintf(txt,256, "Trying to change level to number %d",
-				level_number);
+			snprintf(txt, sizeof(txt), "Trying to change level to number %d", level_number);
 			add_message(txt, M_INFO);
 			name=load_level(level_number);
 			if (!name) {
@@ -1617,7 +1620,11 @@ void load_banner(char **banner)
 	char line[1025];
 	int a,b;
 	
+#ifndef WIN32
 	s=fopen(DATA_PATH BANNER_FILE,"r");
+#else
+	fopen_s(&s,DATA_PATH BANNER_FILE,"r");
+#endif
 	if (!s){shut_down(0);ERROR("Error: Can't load file \""DATA_PATH BANNER_FILE"\".\n");EXIT(1);}
 	*banner=mem_alloc(1);
 	**banner=0;
@@ -2243,7 +2250,12 @@ int main(int argc,char **argv)
 	if (!set_size)c_get_size(&SCREEN_X,&SCREEN_Y);
 	init_sprites();
 	init_area();
+#ifndef WIN32
 	load_sprites(DATA_PATH GAME_SPRITES_FILE);
+#else
+	snprintf(txt,sizeof(txt),"%s\\data\\sprites.dat",_getcwd(NULL, 0));
+	load_sprites(txt);
+#endif
 	/* sprites are stored in memory in this order: game sprites (players,
 	 * bullets, corpses, blood, meat...) followed by level sprites 
 	 */
