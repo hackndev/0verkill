@@ -30,6 +30,10 @@ INSTALL=@INSTALL@
 MAIN=0verkill @X0VERKILL@
 HELPER=server @XEDITOR@ editor test_server avi bot @XAVI@
 
+ifdef DATA_PATH
+	CFLAGS+=-DDATA_PATH="\"$(DATA_PATH)"\"
+endif
+
 all: $(HELPER) $(MAIN)
 
 install: all

@@ -153,7 +153,9 @@ extern int tri_d;
 	#define BASE_DIR	"."
 	#define DATA_PATH "data\\"
 #else
+	#ifndef DATA_PATH
 	#define DATA_PATH "data/"
+	#endif
 
 	#define long_long	long long
 	#ifdef CLIENT
