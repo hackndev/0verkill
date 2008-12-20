@@ -146,10 +146,19 @@ struct
 int active_players;
 
 
+#define	KBD_RIGHT	(1 << 0)
+#define	KBD_LEFT	(1 << 1)
+#define	KBD_JUMP	(1 << 2)
+#define	KBD_CREEP	(1 << 3)
+#define	KBD_SPEED	(1 << 4)
+#define	KBD_FIRE	(1 << 5)
+#define	KBD_DOWN_LADDER	(1 << 6)
+#define KBD_JETPACK	(1 << 7)
+
 struct  /* keyboard status */
 {
-	unsigned char right,left,jump,creep,speed,fire,weapon,down_ladder;
-}keyboard_status;
+	unsigned char status, weapon;
+} keyboard_status;
 
 /* message */
 struct msgline_type
@@ -657,28 +666,16 @@ void send_keyboard(void)
 {
 	char packet[3];
 	packet[0]=P_KEYBOARD;
-	packet[1]=	keyboard_status.right|
-			(keyboard_status.left<<1)|
-			(keyboard_status.jump<<2)|
-			(keyboard_status.creep<<3)|
-			(keyboard_status.speed<<4)|
-			(keyboard_status.fire<<5)|
-			(keyboard_status.down_ladder<<6);
-	packet[2]=	keyboard_status.weapon;
+	packet[1]=keyboard_status.status;
+	packet[2]=keyboard_status.weapon;
 	send_packet(packet,3,(struct sockaddr*)(&server),my_id,0);
 }
 
 
 void reset_keyboard(void)
 {
-	keyboard_status.left=0;
-	keyboard_status.right=0;
-	keyboard_status.speed=0;
-	keyboard_status.jump=0;
-	keyboard_status.creep=0;
-	keyboard_status.fire=0;
+	keyboard_status.status=0;
 	keyboard_status.weapon=0;
-	keyboard_status.down_ladder=0;
 }
 
 /* recompute object positions */
@@ -2181,13 +2178,15 @@ void play(void)
 		if (!chat&&c_was_pressed('c'))
 			autocreep^=1;
 		if (c_pressed(K_DOWN)||autocreep)
-			keyboard_status.creep=1;
+			keyboard_status.status |= KBD_CREEP;
 		if (c_pressed(K_UP))
-			keyboard_status.jump=1;
+			keyboard_status.status |= KBD_JUMP;
 		if (c_pressed(K_LEFT_CTRL)||c_pressed(K_RIGHT_CTRL)||(!chat&&c_pressed('z')))
-			keyboard_status.fire=1;
+			keyboard_status.status |= KBD_FIRE;
 		if (!chat && c_pressed('d'))
-				keyboard_status.down_ladder=1;
+			keyboard_status.status |= KBD_DOWN_LADDER;
+		if (!chat && c_pressed('j'))
+			keyboard_status.status |= KBD_JETPACK;
 		if (!chat && c_was_pressed('1'))
 			keyboard_status.weapon=1;
 		if (!chat && c_was_pressed('2'))
@@ -2205,11 +2204,11 @@ void play(void)
 		if (!chat && c_was_pressed('8'))
 			keyboard_status.weapon=8;
 		if (c_pressed(K_LEFT_SHIFT)||c_pressed(K_RIGHT_SHIFT)||autorun)
-		keyboard_status.speed=1;
+			keyboard_status.status |= KBD_SPEED;
 		if (c_pressed(K_LEFT))
-			keyboard_status.left=1;
+			keyboard_status.status |= KBD_LEFT;
 		if (c_pressed(K_RIGHT))
-			keyboard_status.right=1;
+			keyboard_status.status |= KBD_RIGHT;
 
 		send_keyboard();
 		sleep_until(last_time+CLIENT_PERIOD_USEC);

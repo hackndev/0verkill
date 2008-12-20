@@ -555,12 +555,7 @@ static int add_player(unsigned char color, char *name,struct sockaddr_in *addres
 	cp->member.color=color;
 	cp->member.frags=0;
 	cp->member.deaths=0;
-	cp->member.keyboard_status.left=0;
-	cp->member.keyboard_status.right=0;
-	cp->member.keyboard_status.speed=0;
-	cp->member.keyboard_status.fire=0;
-	cp->member.keyboard_status.creep=0;
-	cp->member.keyboard_status.down_ladder=0;
+	cp->member.keyboard_status.status=0;
 	cp->member.keyboard_status.weapon=0;
 	cp->member.id=n_players+1;  /* player numbering starts from 1, 0 is server's ID */
 	cp->member.last_update=get_time();
@@ -1355,13 +1350,7 @@ static void read_data(void)
 			q=find_player(&client,s);
 			if (!q)break;
 			q->member.last_update=get_time();
-			q->member.keyboard_status.right=(packet[1])&1;
-			q->member.keyboard_status.left=((packet[1])>>1)&1;
-			q->member.keyboard_status.jump=((packet[1])>>2)&1;
-			q->member.keyboard_status.creep=((packet[1])>>3)&1;
-			q->member.keyboard_status.speed=((packet[1])>>4)&1;
-			q->member.keyboard_status.fire=((packet[1])>>5)&1;
-			q->member.keyboard_status.down_ladder=((packet[1])>>6)&1;
+			q->member.keyboard_status.status=packet[1];
 			q->member.keyboard_status.weapon=packet[2];
 			break;
 			
@@ -2736,21 +2725,21 @@ static void move_player(struct player *p)
 	if (p->obj->status & S_DEAD)
 		return;   /* dead player */
 
-	if (p->keyboard_status.down_ladder)  /* climb down a ladder */
+	if (p->keyboard_status.status & KBD_DOWN_LADDER)  /* climb down a ladder */
 		p->obj->status |= S_CLIMB_DOWN;
 	else
 		p->obj->status &=~ S_CLIMB_DOWN;
 
-	if (p->keyboard_status.jump)
+	if (p->keyboard_status.status & KBD_JUMP)
 		jump_player(p);
-	if (p->keyboard_status.right)
+	if (p->keyboard_status.status & KBD_RIGHT)
 	{
 		if ((p->obj->status & (S_LOOKLEFT | S_LOOKRIGHT))==S_LOOKRIGHT)   /* walk right */
-			walk_player(p,2,p->keyboard_status.speed,p->keyboard_status.creep);
+			walk_player(p,2,p->keyboard_status.status & KBD_SPEED,p->keyboard_status.status & KBD_CREEP);
 		else
 		{
                         if (p->obj->status & S_WALKING)
-                                walk_player(p,0,p->keyboard_status.speed,p->keyboard_status.creep);   /* stop */
+                                walk_player(p,0,p->keyboard_status.status & KBD_SPEED,p->keyboard_status.status & KBD_CREEP);   /* stop */
                         else
                         {
                                 a=p->obj->status & (S_LOOKLEFT | S_LOOKRIGHT);
@@ -2761,14 +2750,14 @@ static void move_player(struct player *p)
 		}
 	}
 
-	if (p->keyboard_status.left)
+	if (p->keyboard_status.status & KBD_LEFT)
 	{
 		if ((p->obj->status & (S_LOOKLEFT | S_LOOKRIGHT))==S_LOOKLEFT)   /* walk left */
-			walk_player(p,1,p->keyboard_status.speed,p->keyboard_status.creep);
+			walk_player(p,1,p->keyboard_status.status & KBD_SPEED,p->keyboard_status.status & KBD_CREEP);
 		else
 		{
                         if (p->obj->status & S_WALKING)
-                                walk_player(p,0,p->keyboard_status.speed,p->keyboard_status.creep);   /* stop */
+                                walk_player(p,0,p->keyboard_status.status & KBD_SPEED,p->keyboard_status.status & KBD_CREEP);   /* stop */
                         else
                         {
                                 a=p->obj->status & (S_LOOKLEFT | S_LOOKRIGHT);
@@ -2779,7 +2768,7 @@ static void move_player(struct player *p)
 		}
 	}
 	change_weapon_player(p,p->keyboard_status.weapon);
-	if (p->keyboard_status.fire)
+	if (p->keyboard_status.status & KBD_FIRE)
 		fire_player(p,(p->obj->status & (S_LOOKLEFT | S_LOOKRIGHT))>>1);
 }
 

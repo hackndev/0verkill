@@ -10,6 +10,14 @@
 #include "cfg.h"
 #include "data.h"
 
+#define	KBD_RIGHT	(1 << 0)
+#define	KBD_LEFT	(1 << 1)
+#define	KBD_JUMP	(1 << 2)
+#define	KBD_CREEP	(1 << 3)
+#define	KBD_SPEED	(1 << 4)
+#define	KBD_FIRE	(1 << 5)
+#define	KBD_DOWN_LADDER	(1 << 6)
+#define KBD_JETPACK	(1 << 7)
 
 /* item of player list */
 struct player
@@ -26,7 +34,7 @@ struct player
 	unsigned long_long last_update;  /* last time client sent a packet */
 	struct  /* keyboard status */
 	{
-	        unsigned char right,left,jump,creep,speed,fire,weapon,down_ladder;
+	        unsigned char status, weapon;
 	}keyboard_status;
 	int id;
 	struct it* obj;  /* pointer to player's hero */
