@@ -127,12 +127,13 @@ struct it* hero;
 int hit_sprite;
 int title_sprite;
 int bulge_sprite;
-int shrapnel_sprite[N_SHRAPNELS],bfgbit_sprite[N_SHRAPNELS],bloodrain_sprite[N_SHRAPNELS],jetpack_sprite;
+int shrapnel_sprite[N_SHRAPNELS],bfgbit_sprite[N_SHRAPNELS],bloodrain_sprite[N_SHRAPNELS],jetpack_sprite,fire_sprite;
 
 int level_sprites_start;  /* number of first sprite in the level (all other level sprites follow) */
 
 unsigned long_long game_start_offset; /* time difference between game start on this machine and on server */
 
+int gsbi = 0;
 
 /* top players table */
 struct
@@ -785,7 +786,8 @@ void update_game(void)
 		}
 
 		if ((p->next->member.type == T_SHRAPNEL || p->next->member.type == T_BULLET ||
-			p->next->member.type == T_BFGCELL || p->next->member.type == T_CHAIN) &&
+			p->next->member.type == T_BFGCELL || p->next->member.type == T_CHAIN ||
+			p->next->member.type == T_JETFIRE) &&
 			(stop_x || stop_y)) { /* bullet and shrapnel die crashing into wall */
 			p=p->prev;  /* deleting object makes a great mess in for cycle, so we must cheat the cycle */
 			delete_obj(p->next->next->member.id);
@@ -968,6 +970,39 @@ void draw_scene(void)
 					sprites[p->next->member.sprite].positions+sprites[p->next->member.sprite].steps[p->next->member.anim_pos],
 					1
 					);
+
+				if (p->next->member.type == T_PLAYER) {
+					if ((p->next->member.status & S_JETPACK_ON) && !(p->next->member.status & S_CREEP))
+						if (p->next->member.status & S_LOOKRIGHT)
+							put_sprite(
+								double2int(p->next->member.x-hero->x)+SCREEN_XOFFSET-1,
+								double2int(p->next->member.y-hero->y)+SCREEN_YOFFSET+4,
+								sprites[jetpack_sprite].positions+sprites[jetpack_sprite].steps[1], 1);
+						else if (p->next->member.status & S_LOOKLEFT)
+							put_sprite(
+								double2int(p->next->member.x-hero->x)+SCREEN_XOFFSET+PLAYER_WIDTH-4,
+								double2int(p->next->member.y-hero->y)+SCREEN_YOFFSET+4,
+								sprites[jetpack_sprite].positions+sprites[jetpack_sprite].steps[0], 1);
+
+					if (p->next->member.status & S_ONFIRE) {
+						if ((gsbi += 10) > 1000) {
+							gsbi++;
+							gsbi %= 3;
+						}
+						if (p->next->member.status & S_CREEP)
+							put_sprite(
+								double2int(p->next->member.x-hero->x)+SCREEN_XOFFSET-5,
+								double2int(p->next->member.y-hero->y)+SCREEN_YOFFSET-2,
+								sprites[fire_sprite].positions+sprites[fire_sprite].steps[gsbi % 3 + 3], 1);
+						else
+							put_sprite(
+								double2int(p->next->member.x-hero->x)+SCREEN_XOFFSET+3,
+								double2int(p->next->member.y-hero->y)+SCREEN_YOFFSET-3,
+								sprites[fire_sprite].positions+sprites[fire_sprite].steps[gsbi % 3], 1);
+					}
+				}
+		
+
 			}
 			if (p->next->member.type==T_PLAYER&&p->next->member.status & S_HIT) /* hit */
 			{
@@ -1020,7 +1055,7 @@ void draw_scene(void)
 			sprites[hero->sprite].positions+sprites[hero->sprite].steps[hero->anim_pos],
 			1
 			);
-/*--------------*/
+		
 		if ((hero->status & S_JETPACK_ON) && !(hero->status & S_CREEP))
 			if (hero->status & S_LOOKRIGHT)
 				put_sprite(SCREEN_XOFFSET-1, SCREEN_YOFFSET+4,
@@ -1029,7 +1064,19 @@ void draw_scene(void)
 				put_sprite(SCREEN_XOFFSET+PLAYER_WIDTH-4, SCREEN_YOFFSET+4,
 					sprites[jetpack_sprite].positions+sprites[jetpack_sprite].steps[0], 1);
 
-/*--------------*/
+		if (hero->status & S_ONFIRE) {
+			if ((gsbi += 10) > 1000) {
+				gsbi++;
+				gsbi %= 3;
+			}
+			if (hero->status & S_CREEP)
+				put_sprite(SCREEN_XOFFSET-5, SCREEN_YOFFSET-2,
+					sprites[fire_sprite].positions+sprites[fire_sprite].steps[gsbi % 3 + 3], 1);
+			else
+				put_sprite(SCREEN_XOFFSET+3, SCREEN_YOFFSET-3,
+					sprites[fire_sprite].positions+sprites[fire_sprite].steps[gsbi % 3], 1);
+		}
+		
 		if (hero->status & S_HIT) /* hit */
 		{
 			hero->status &= ~S_HIT;
@@ -1470,6 +1517,7 @@ void draw_board(void)
 	int offs=SCREEN_X*(SCREEN_Y-2);
 	int space=(SCREEN_X-60)/5;
 	char txt[16];
+	int offset=0;
 
 	memset(screen_a+offs,4,SCREEN_X);
 	memset(screen+offs,'-',SCREEN_X);
@@ -1506,8 +1554,9 @@ void draw_board(void)
 	print2screen(49+5*space,SCREEN_Y-1,7,"ARMOR");
 	snprintf(txt, sizeof(txt), "% 4d%%",armor);
 	print2screen(49+5+5*space,SCREEN_Y-1,select_color(armor,100),txt);
-	if (hero->status & S_INVISIBLE)print2screen(SCREEN_X-14,SCREEN_Y-2,C_YELLOW,"INVISIBILITY");
-	if (hero->status & S_ILL)print2screen(SCREEN_X-14,SCREEN_Y-2,C_RED,"! INFECTED !");
+	if (hero->status & S_INVISIBLE)print2screen(SCREEN_X-(offset += 14),SCREEN_Y-2,C_YELLOW,"INVISIBILITY");
+	if (hero->status & S_ILL)print2screen(SCREEN_X-(offset += 14),SCREEN_Y-2,C_RED,"! INFECTED !");
+	if (hero->status & S_ONFIRE)print2screen(SCREEN_X-(offset += 9),SCREEN_Y-2,C_RED,"ON FIRE");
 	if (autorun)print2screen(2,SCREEN_Y-2,15,"AUTORUN");
 	if (autocreep)print2screen(10,SCREEN_Y-2,15,"AUTOCREEP");
 }
@@ -2293,6 +2342,11 @@ int main(int argc,char **argv)
 	}
 	snprintf(txt, sizeof(txt), "jetpack");
 	if (find_sprite(txt,&jetpack_sprite)) {
+		fprintf(stderr,"Can't find sprite \"%s\".\n",txt);
+		EXIT(1);
+	}
+	snprintf(txt, sizeof(txt), "fire");
+	if (find_sprite(txt,&fire_sprite)) {
 		fprintf(stderr,"Can't find sprite \"%s\".\n",txt);
 		EXIT(1);
 	}

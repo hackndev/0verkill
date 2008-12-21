@@ -1863,6 +1863,21 @@ static int dynamic_collision(struct it *obj)
 					send_info(0,0);
 					return 0;
 
+				case T_JETFIRE:
+					if (p->type!=T_PLAYER)
+						break;
+					if (((struct player*)(p->data))->obj->id == (long)obj->data || ((struct player*)(p->data))->obj->status & S_ONFIRE)
+						break;
+					((struct player*)(p->data))->obj->status |= S_ONFIRE;
+					o=&(((ol = find_in_table((long)(obj->data))))->member);  /* owner of the flame */
+					snprintf(txt,256,"You caught fire from %s's jetpack", ((struct player*)(o->data))->name);
+					send_message((struct player*)(p->data),0,txt, M_INFO);
+
+					sendall_update_object(p,0,0); /* update everything */
+					send_update_player((struct player*)(p->data));
+					send_info(0,0);
+					return 0;
+
 				case T_PLAYER:	/* illness is spreading :-) */
 					if (p->type!=T_PLAYER || p->data == obj->data ||
 						((struct player*)(p->data))->obj->status & S_ILL)
@@ -2112,24 +2127,32 @@ static void update_game(void)
 		}
 
 		/* decrease life of ill player */
-		if ((p->next->member.type==T_PLAYER)&&(((struct player*)(p->next->member.data))->obj->status & S_ILL))
+		if ((p->next->member.type==T_PLAYER)&&(((struct player*)(p->next->member.data))->obj->status & (S_ILL | S_ONFIRE)))
 		{
 			/* hack - health with extended precision */
 			if (!((struct player*)(p->next->member.data))->health_ep--) {
-				((struct player*)(p->next->member.data))->health_ep=ILLNESS_SPEED;
+				((struct player*)(p->next->member.data))->health_ep=
+				((((struct player*)(p->next->member.data))->obj->status & S_ILL) ? ILLNESS_SPEED : 0) + 
+				((((struct player*)(p->next->member.data))->obj->status & S_ONFIRE) ? BURNING_SPEED : 0);
 				((struct player*)(p->next->member.data))->health--;
 			}
 			send_update_player((struct player*)(p->next->member.data));
 			if (!(((struct player*)(p->next->member.data))->health))
 			{
-				p->next->member.status &= ~S_ILL;	/* idea - maybe we can have infected corpses */
-				p->next->member.status |= S_DEAD;	/* which will make other players ill too ? */
+				p->next->member.status |= S_DEAD;
 				((struct player*)(p->next->member.data))->frags-=!!(((struct player*)(p->next->member.data))->frags);
 
-				send_message((struct player*)(p->next->member.data),0,"You died on illness", M_DEATH);
-				snprintf(txt,256,"%s died on illness",((struct player*)(p->next->member.data))->name);
-				sendall_message(0,txt,(struct player*)(p->next->member.data),0, M_DEATH);
-				snprintf(txt,256,"%s died on illness.\n",((struct player*)(p->next->member.data))->name);
+				if (((struct player*)(p->next->member.data))->obj->status & S_ILL) {
+					send_message((struct player*)(p->next->member.data),0,"You died on illness", M_DEATH);
+					snprintf(txt,256,"%s died on illness",((struct player*)(p->next->member.data))->name);
+					sendall_message(0,txt,(struct player*)(p->next->member.data),0, M_DEATH);
+					snprintf(txt,256,"%s died on illness.\n",((struct player*)(p->next->member.data))->name);
+				} else {
+					send_message((struct player*)(p->next->member.data),0,"You burnt down to ashes", M_DEATH);
+					snprintf(txt,256,"%s burnt down to ashes",((struct player*)(p->next->member.data))->name);
+					sendall_message(0,txt,(struct player*)(p->next->member.data),0, M_DEATH);
+					snprintf(txt,256,"%s burnt down to ashes.\n",((struct player*)(p->next->member.data))->name);
+				}
 				message(txt,2);
 
 				send_update_player((struct player*)(p->next->member.data)); /* dead player */
@@ -2499,7 +2522,7 @@ static void jump_player(struct player *p, char jet, int direction)
 		for (i=0;i<8;i++) {
 			o=new_obj(
 				id,
-				T_SHELL,	/* not really ok, but does it's job */
+				T_JETFIRE,
 				JETFIRE_TTL,
 				jetfire_sprite,
 				0,
@@ -2510,7 +2533,7 @@ static void jump_player(struct player *p, char jet, int direction)
 				p->obj->y+FIRE_YOFFSET+int2double(i%4),
 				mul((double)(8*(i-4)), float2double(36*36)),
 				(4-i),
-				0);
+				(void *)(long)(p->obj->id));
 			if (!o)return;
 			id++;
 			sendall_new_object(o, 0);

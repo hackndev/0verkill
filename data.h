@@ -27,7 +27,7 @@
 #define TYPE_BIRTHPLACE 666
 
 /* object types */
-#define N_TYPES 30
+#define N_TYPES 31
 
 #define T_PLAYER	0
 #define T_BULLET	1
@@ -59,6 +59,7 @@
 #define T_BIOMED	27
 #define T_BLOODRAIN	28
 #define T_JETPACK	29
+#define T_JETFIRE	30
 
 #define E_INCOMPATIBLE_VERSION 0
 #define E_PLAYER_REFUSED 1
@@ -99,6 +100,7 @@
 #define S_BLOODRAIN	0x8000
 #define S_JETPACK	0x10000
 #define S_JETPACK_ON	0x20000
+#define S_ONFIRE	0x40000
 
 #define	M_DEFAULT	0x00
 #define	M_CHAT		0x01

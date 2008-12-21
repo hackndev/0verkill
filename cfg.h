@@ -90,7 +90,7 @@
 #define KILL_ARMOR_DAMAGE 5
 
 #define NOISE_TTL 30
-#define JETFIRE_TTL 5 
+#define JETFIRE_TTL 10
 
 #define HOLD_GUN_AFTER_SHOOT 8
 #define MESS_HEIGHT 2
@@ -98,6 +98,7 @@
 #define GRENADE_FIRE_YOFFSET (int2double(2))
 #define FIRE_IMPACT (float2double((double).3*36))  /* impact of bullet crashing into player */
 #define SHRAPNEL_IMPACT (float2double((double)1.78*36))  /* impact of shrapnel crashing into player */
+#define JETFIRE_IMPACT (float2double((double)2.13*36))  /* impact of flame on player */
 #define GRENADE_DELAY (weapon[WEAPON_GRENADE].cadence>>4)
 
 #define MESSAGE_TTL 10000000  /* in microseconds */
@@ -118,6 +119,7 @@
 #define ARMOR_ADD 50
 #define INVISIBILITY_DURATION 2000
 #define ILLNESS_SPEED 10	/* player's suffering duration */
+#define BURNING_SPEED 15	/* player's juiciness ;-) */
 
 #define INVISIBILITY_RESPAWN_TIME 200000000   /* in microseconds */
 #define ARMOR_RESPAWN_TIME 50000000  /* in microseconds */
