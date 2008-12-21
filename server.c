@@ -67,7 +67,7 @@ unsigned long_long game_start; /* time of game start */
 int grenade_sprite,bullet_sprite,slug_sprite,shell_sprite,shotgun_shell_sprite,
     mess1_sprite,mess2_sprite,mess3_sprite,mess4_sprite,noise_sprite,
     bfgcell_sprite,chain_sprite;
-int shrapnel_sprite[N_SHRAPNELS],bfgbit_sprite[N_SHRAPNELS],bloodrain_sprite[N_SHRAPNELS];
+int shrapnel_sprite[N_SHRAPNELS],bfgbit_sprite[N_SHRAPNELS],bloodrain_sprite[N_SHRAPNELS],jetfire_sprite;
 int nonquitable=0;  /* 1=clients can't abort game pressing F12 (request is ignored) */
 unsigned long_long last_tick;
 unsigned long_long last_player_left=0,last_packet_came=0;
@@ -1757,6 +1757,21 @@ static int dynamic_collision(struct it *obj)
 				}
 				return 2;
 
+				case T_JETPACK:
+				{
+					char txt[256];
+					if (p->type!=T_PLAYER)break;
+					p->status |= S_JETPACK;
+					sendall_update_status(p, 0);
+					send_message((struct player*)(p->data),0,"You got a jetpack", M_ITEM);
+					snprintf(txt,256,"%s got a jetpack.\n",((struct player*)(p->data))->name);
+					message(txt,1);
+					obj->status |= S_INVISIBLE;
+					add_to_timeq(obj->id,T_JETPACK,0,obj->sprite,0,0,obj->x,obj->y,0,0,0,ARMOR_RESPAWN_TIME);
+        				sendall_update_status(obj,0);
+				}
+				return 2;
+
 				case T_TELEPORT:
 				{
 					char txt[256];
@@ -2471,15 +2486,39 @@ static void walk_player(struct player *q,int direction, int speed, int creep)
 
 
 /* jump with given player */
-static void jump_player(struct player *p)
+static void jump_player(struct player *p, char jet, int direction)
 {
-	if (p->obj->status & (S_FALLING | S_CREEP))
+	int i;
+	struct it *o;
+	if (p->obj->status & ((jet ? 0 : S_FALLING) | S_CREEP))
 		return;
 	p->obj->status |= S_FALLING;
 	p->obj->yspeed=-SPEED_JUMP;
+	if (jet) {
+		p->obj->status |= S_JETPACK_ON;
+		for (i=0;i<8;i++) {
+			o=new_obj(
+				id,
+				T_SHELL,	/* not really ok, but does it's job */
+				JETFIRE_TTL,
+				jetfire_sprite,
+				0,
+				0,
+				add_int(p->obj->x, (direction & S_LOOKLEFT) ?
+					PLAYER_WIDTH - 2 - (i%2) : ((direction & S_LOOKRIGHT) ?
+					1 - (i%2) : PLAYER_WIDTH / 2)),
+				p->obj->y+FIRE_YOFFSET+int2double(i%4),
+				mul((double)(8*(i-4)), float2double(36*36)),
+				(4-i),
+				0);
+			if (!o)return;
+			id++;
+			sendall_new_object(o, 0);
+		}
+	}
 	sendall_update_object(p->obj,0,4);   /* update speed + status */
+	p->obj->status &= ~S_JETPACK_ON;
 }
-
 
 /* change weapon of given player (w=new weapon) */
 static void change_weapon_player(struct player *q,int w)
@@ -2731,7 +2770,9 @@ static void move_player(struct player *p)
 		p->obj->status &=~ S_CLIMB_DOWN;
 
 	if (p->keyboard_status.status & KBD_JUMP)
-		jump_player(p);
+		jump_player(p, 0, (p->obj->status & (S_LOOKLEFT | S_LOOKRIGHT)));
+	if ((p->keyboard_status.status & KBD_JETPACK) && (p->obj->status & S_JETPACK))
+		jump_player(p, 1, (p->obj->status & (S_LOOKLEFT | S_LOOKRIGHT)));
 	if (p->keyboard_status.status & KBD_RIGHT)
 	{
 		if ((p->obj->status & (S_LOOKLEFT | S_LOOKRIGHT))==S_LOOKRIGHT)   /* walk right */
@@ -2985,7 +3026,9 @@ static int server(void)
 		snprintf(txt, sizeof(txt), "bloodrain%d",a+1);
 		if (find_sprite(txt,&bloodrain_sprite[a])){char msg[256];snprintf(msg,256,"Can't find sprite \"%s\".\n",txt);ERROR(msg);EXIT(1);}
 	}
-	
+	snprintf(txt, sizeof(txt), "jetfire");
+	if (find_sprite(txt,&jetfire_sprite)){char msg[256];snprintf(msg,256,"Can't find sprite \"%s\".\n",txt);ERROR(msg);EXIT(1);}
+
 	LEVEL=load_level(level_number);
 	level_checksum=md5_level(level_number);
 	if (!LEVEL){char txt[256];snprintf(txt,256,"Can't load level number %d\n",level_number);ERROR(txt);EXIT(1);}

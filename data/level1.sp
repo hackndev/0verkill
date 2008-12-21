@@ -160,3 +160,4 @@ nosmoking	grx/nosmoking.avi
 teleport	grx/teleport.avi
 bfg		grx/bfg.avi
 bfgcell		grx/bfgcell.avi
+jetpack		grx/jetpack_i.avi

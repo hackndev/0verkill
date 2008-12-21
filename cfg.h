@@ -90,6 +90,7 @@
 #define KILL_ARMOR_DAMAGE 5
 
 #define NOISE_TTL 30
+#define JETFIRE_TTL 5 
 
 #define HOLD_GUN_AFTER_SHOOT 8
 #define MESS_HEIGHT 2

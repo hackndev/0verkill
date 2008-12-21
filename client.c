@@ -127,7 +127,7 @@ struct it* hero;
 int hit_sprite;
 int title_sprite;
 int bulge_sprite;
-int shrapnel_sprite[N_SHRAPNELS],bfgbit_sprite[N_SHRAPNELS],bloodrain_sprite[N_SHRAPNELS];
+int shrapnel_sprite[N_SHRAPNELS],bfgbit_sprite[N_SHRAPNELS],bloodrain_sprite[N_SHRAPNELS],jetpack_sprite;
 
 int level_sprites_start;  /* number of first sprite in the level (all other level sprites follow) */
 
@@ -1020,6 +1020,16 @@ void draw_scene(void)
 			sprites[hero->sprite].positions+sprites[hero->sprite].steps[hero->anim_pos],
 			1
 			);
+/*--------------*/
+		if ((hero->status & S_JETPACK_ON) && !(hero->status & S_CREEP))
+			if (hero->status & S_LOOKRIGHT)
+				put_sprite(SCREEN_XOFFSET-1, SCREEN_YOFFSET+4,
+					sprites[jetpack_sprite].positions+sprites[jetpack_sprite].steps[1], 1);
+			else if (hero->status & S_LOOKLEFT)
+				put_sprite(SCREEN_XOFFSET+PLAYER_WIDTH-4, SCREEN_YOFFSET+4,
+					sprites[jetpack_sprite].positions+sprites[jetpack_sprite].steps[0], 1);
+
+/*--------------*/
 		if (hero->status & S_HIT) /* hit */
 		{
 			hero->status &= ~S_HIT;
@@ -2280,6 +2290,11 @@ int main(int argc,char **argv)
 			fprintf(stderr,"Can't find sprite \"%s\".\n",txt);
 			EXIT(1);
 		}
+	}
+	snprintf(txt, sizeof(txt), "jetpack");
+	if (find_sprite(txt,&jetpack_sprite)) {
+		fprintf(stderr,"Can't find sprite \"%s\".\n",txt);
+		EXIT(1);
 	}
 
 	signal(SIGINT,signal_handler);

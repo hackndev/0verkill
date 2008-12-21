@@ -172,6 +172,7 @@ switch(c) {
 	case 'X': return T_BIOSKULL;
 	case 'x': return T_BIOMED;
 	case 'r': return T_BLOODRAIN;
+	case 'J': return T_JETPACK;
 
 /* birthplace */
 	case 'B': return TYPE_BIRTHPLACE;
