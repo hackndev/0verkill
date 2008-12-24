@@ -101,6 +101,7 @@
 #define S_JETPACK	0x10000
 #define S_JETPACK_ON	0x20000
 #define S_ONFIRE	0x40000
+#define S_CHAIN		0x80000
 
 #define	M_DEFAULT	0x00
 #define	M_CHAT		0x01

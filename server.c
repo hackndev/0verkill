@@ -66,7 +66,7 @@ unsigned long_long game_start; /* time of game start */
 /* important sprites */
 int grenade_sprite,bullet_sprite,slug_sprite,shell_sprite,shotgun_shell_sprite,
     mess1_sprite,mess2_sprite,mess3_sprite,mess4_sprite,noise_sprite,
-    bfgcell_sprite,chain_sprite;
+    bfgcell_sprite;
 int shrapnel_sprite[N_SHRAPNELS],bfgbit_sprite[N_SHRAPNELS],bloodrain_sprite[N_SHRAPNELS],jetfire_sprite;
 int nonquitable=0;  /* 1=clients can't abort game pressing F12 (request is ignored) */
 unsigned long_long last_tick;
@@ -2709,7 +2709,7 @@ static void fire_player(struct player *q,int direction)
 			id,
 			T_CHAIN,
 			weapon[q->current_weapon].ttl,
-			chain_sprite,
+			bullet_sprite,
 			0,
 			q->current_weapon,
 			add_int(q->obj->x,direction==1?-2:PLAYER_WIDTH),
@@ -2723,7 +2723,7 @@ static void fire_player(struct player *q,int direction)
 			id,
 			T_CHAIN,
 			weapon[q->current_weapon].ttl,
-			chain_sprite,
+			bullet_sprite,
 			0,
 			q->current_weapon,
 			add_int(q->obj->x,direction==1?-2:PLAYER_WIDTH),
@@ -3039,7 +3039,6 @@ static int server(void)
 	if (find_sprite("mess4",&mess4_sprite)){char msg[256];snprintf(msg,256,"Can't find sprite \"mess4\".\n");ERROR(msg);EXIT(1);}
 	if (find_sprite("noise",&noise_sprite)){char msg[256];snprintf(msg,256,"Can't find sprite \"noise\".\n");ERROR(msg);EXIT(1);}
 	if (find_sprite("bfgcell",&bfgcell_sprite)){char msg[256];snprintf(msg,256,"Can't find sprite \"bfgcell\".\n");ERROR(msg);EXIT(1);}
-	if (find_sprite("sawchain",&chain_sprite)){char msg[256];snprintf(msg,256,"Can't find sprite \"sawchain\".\n");ERROR(msg);EXIT(1);}
 	for (a=0;a<N_SHRAPNELS;a++)
 	{
 		snprintf(txt, sizeof(txt), "shrapnel%d",a+1);

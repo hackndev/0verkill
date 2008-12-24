@@ -127,7 +127,7 @@ struct it* hero;
 int hit_sprite;
 int title_sprite;
 int bulge_sprite;
-int shrapnel_sprite[N_SHRAPNELS],bfgbit_sprite[N_SHRAPNELS],bloodrain_sprite[N_SHRAPNELS],jetpack_sprite,fire_sprite;
+int shrapnel_sprite[N_SHRAPNELS],bfgbit_sprite[N_SHRAPNELS],bloodrain_sprite[N_SHRAPNELS],jetpack_sprite,fire_sprite,chain_sprite;
 
 int level_sprites_start;  /* number of first sprite in the level (all other level sprites follow) */
 
@@ -948,6 +948,7 @@ void draw_scene(void)
 			if (&(p->next->member)==hero)continue;
 			if (p->next->member.type==T_PLAYER)update_anim(&(p->next->member));
 			else {p->next->member.anim_pos++;p->next->member.anim_pos%=sprites[p->next->member.sprite].n_steps;}
+			if (p->next->member.status == WEAPON_CHAINSAW) continue;
 			if (!(p->next->member.status & S_DEAD)&&!(p->next->member.status & S_INVISIBLE))   /* don't draw hidden objects and dead players */
 			{
 #ifdef TRI_D
@@ -972,7 +973,7 @@ void draw_scene(void)
 					);
 
 				if (p->next->member.type == T_PLAYER) {
-					if ((p->next->member.status & S_JETPACK_ON) && !(p->next->member.status & S_CREEP))
+					if ((p->next->member.status & S_JETPACK_ON) && !(p->next->member.status & S_CREEP)) {
 						if (p->next->member.status & S_LOOKRIGHT)
 							put_sprite(
 								double2int(p->next->member.x-hero->x)+SCREEN_XOFFSET-1,
@@ -983,12 +984,12 @@ void draw_scene(void)
 								double2int(p->next->member.x-hero->x)+SCREEN_XOFFSET+PLAYER_WIDTH-4,
 								double2int(p->next->member.y-hero->y)+SCREEN_YOFFSET+4,
 								sprites[jetpack_sprite].positions+sprites[jetpack_sprite].steps[0], 1);
-
+					}
+					if ((gsbi += 10) > 1000) {
+						gsbi++;
+						gsbi %= 3;
+					}
 					if (p->next->member.status & S_ONFIRE) {
-						if ((gsbi += 10) > 1000) {
-							gsbi++;
-							gsbi %= 3;
-						}
 						if (p->next->member.status & S_CREEP)
 							put_sprite(
 								double2int(p->next->member.x-hero->x)+SCREEN_XOFFSET-5,
@@ -1000,9 +1001,19 @@ void draw_scene(void)
 								double2int(p->next->member.y-hero->y)+SCREEN_YOFFSET-3,
 								sprites[fire_sprite].positions+sprites[fire_sprite].steps[gsbi % 3], 1);
 					}
+					if ((p->next->member.status & S_CHAINSAW) && (p->next->member.ttl >= FIRE_SHOOTING) && !(hero->status & S_CREEP)) {
+						if (p->next->member.status & S_LOOKRIGHT)
+							put_sprite(
+								double2int(p->next->member.x-hero->x)+SCREEN_XOFFSET+15,
+								double2int(p->next->member.y-hero->y)+SCREEN_YOFFSET+6,
+								sprites[chain_sprite].positions+sprites[chain_sprite].steps[(gsbi / 10) % 2], 1);
+						else if (p->next->member.status & S_LOOKLEFT)
+							put_sprite(
+								double2int(p->next->member.x-hero->x)+SCREEN_XOFFSET-8,
+								double2int(p->next->member.y-hero->y)+SCREEN_YOFFSET+6,
+								sprites[chain_sprite].positions+sprites[chain_sprite].steps[(gsbi / 10) % 2], 1);
+					}
 				}
-		
-
 			}
 			if (p->next->member.type==T_PLAYER&&p->next->member.status & S_HIT) /* hit */
 			{
@@ -1056,19 +1067,19 @@ void draw_scene(void)
 			1
 			);
 		
-		if ((hero->status & S_JETPACK_ON) && !(hero->status & S_CREEP))
+		if ((hero->status & S_JETPACK_ON) && !(hero->status & S_CREEP)) {
 			if (hero->status & S_LOOKRIGHT)
 				put_sprite(SCREEN_XOFFSET-1, SCREEN_YOFFSET+4,
 					sprites[jetpack_sprite].positions+sprites[jetpack_sprite].steps[1], 1);
 			else if (hero->status & S_LOOKLEFT)
 				put_sprite(SCREEN_XOFFSET+PLAYER_WIDTH-4, SCREEN_YOFFSET+4,
 					sprites[jetpack_sprite].positions+sprites[jetpack_sprite].steps[0], 1);
-
+		}
+		if ((gsbi += 10) > 1000) {
+			gsbi++;
+			gsbi %= 3;
+		}
 		if (hero->status & S_ONFIRE) {
-			if ((gsbi += 10) > 1000) {
-				gsbi++;
-				gsbi %= 3;
-			}
 			if (hero->status & S_CREEP)
 				put_sprite(SCREEN_XOFFSET-5, SCREEN_YOFFSET-2,
 					sprites[fire_sprite].positions+sprites[fire_sprite].steps[gsbi % 3 + 3], 1);
@@ -1076,7 +1087,14 @@ void draw_scene(void)
 				put_sprite(SCREEN_XOFFSET+3, SCREEN_YOFFSET-3,
 					sprites[fire_sprite].positions+sprites[fire_sprite].steps[gsbi % 3], 1);
 		}
-		
+		if ((hero->status & S_CHAINSAW) && (hero->ttl >= FIRE_SHOOTING) && !(hero->status & S_CREEP)) {
+			if (hero->status & S_LOOKRIGHT)
+				put_sprite(SCREEN_XOFFSET+15, SCREEN_YOFFSET+6,
+					sprites[chain_sprite].positions+sprites[chain_sprite].steps[(gsbi / 10) % 2], 1);
+			else if (hero->status & S_LOOKLEFT)
+				put_sprite(SCREEN_XOFFSET-8, SCREEN_YOFFSET+6,
+					sprites[chain_sprite].positions+sprites[chain_sprite].steps[(gsbi / 10) % 2], 1);
+		}
 		if (hero->status & S_HIT) /* hit */
 		{
 			hero->status &= ~S_HIT;
@@ -2347,6 +2365,11 @@ int main(int argc,char **argv)
 	}
 	snprintf(txt, sizeof(txt), "fire");
 	if (find_sprite(txt,&fire_sprite)) {
+		fprintf(stderr,"Can't find sprite \"%s\".\n",txt);
+		EXIT(1);
+	}
+	snprintf(txt, sizeof(txt), "sawchain");
+	if (find_sprite(txt,&chain_sprite)) {
 		fprintf(stderr,"Can't find sprite \"%s\".\n",txt);
 		EXIT(1);
 	}
