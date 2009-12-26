@@ -1737,6 +1737,9 @@ static int dynamic_collision(struct it *obj)
 					send_message((struct player*)(p->data),0,"You charged your Bloodrain", M_WEAPON);
 					snprintf(txt,256,"%s charged his Bloodrain.\n",((struct player*)(p->data))->name);
 					message(txt,1);
+					obj->status |= S_INVISIBLE;
+					add_to_timeq(obj->id,T_BLOODRAIN,0,obj->sprite,0,0,obj->x,obj->y,0,0,0,WEAPON_RESPAWN_TIME);
+        				sendall_update_status(obj,0);
 				}
 				return 2;
 
