@@ -2077,7 +2077,7 @@ static void update_game(void)
 {
 	static char packet[64];
 	char txt[256];
-        struct object_list *p;
+        struct object_list *p, *p2;
 	struct player_list *q;
         int w,h,b,a;
 	unsigned char stop_x,stop_y;
@@ -2357,6 +2357,20 @@ br:					offset = 0;
 			delete_obj(p->next->member.id);
 			if (!(p->next))break;
 			continue;
+		}
+
+		/* Anything crashing into PS makes him into bloody goo */
+		for (p2=&objects;p2->next;p2=p2->next)
+		if ((p2->next->member.type == T_PS) && (!(p2->next->member.status & S_INVISIBLE)) &&
+			((p->next->member.type == T_BULLET) || (p->next->member.type == T_SHRAPNEL) ||
+			(p->next->member.type == T_CHAIN) || (p->next->member.type == T_BFGCELL)) &&
+			collision(
+			double2int(p2->next->member.x),double2int(p2->next->member.y),p2->next->member.type,p2->next->member.status,sprites[p2->next->member.sprite].positions,
+			double2int(p->next->member.x),double2int(p->next->member.y),p->next->member.type,p->next->member.status,sprites[p->next->member.sprite].positions)) {
+			p2->next->member.status |= S_INVISIBLE;
+			create_mess(double2int(p2->next->member.x),double2int(p2->next->member.y)+PLAYER_HEIGHT-MESS_HEIGHT,double2int(p2->next->member.y));
+			add_to_timeq(p2->next->member.id,T_PS,0,p2->next->member.sprite,0,0,p2->next->member.x,p2->next->member.y,0,0,0,PS_RESPAWN_TIME);
+			sendall_update_status(&(p2->next->member),0);
 		}
 dc:
 		/* compute collision with other objects */

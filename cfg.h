@@ -126,6 +126,7 @@
 #define MEDIKIT_RESPAWN_TIME 30000000  /* in microseconds */
 #define WEAPON_RESPAWN_TIME 30000000   /* in microseconds */
 #define AMMO_RESPAWN_TIME 25000000   /* in microseconds */
+#define PS_RESPAWN_TIME 3000000   /* in microseconds */
 
 #define TOP_PLAYERS_N 10
 

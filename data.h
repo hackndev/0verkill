@@ -27,7 +27,7 @@
 #define TYPE_BIRTHPLACE 666
 
 /* object types */
-#define N_TYPES 31
+#define N_TYPES 32
 
 #define T_PLAYER	0
 #define T_BULLET	1
@@ -60,6 +60,7 @@
 #define T_BLOODRAIN	28
 #define T_JETPACK	29
 #define T_JETFIRE	30
+#define T_PS		31
 
 #define E_INCOMPATIBLE_VERSION 0
 #define E_PLAYER_REFUSED 1

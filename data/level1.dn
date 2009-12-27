@@ -1,5 +1,5 @@
 klesani F 727 229
-pivrnec F 354 176
+pivrnec P 354 176
 zarivka N 902 476
 zarivka N 177 192
 zarivka N 49 192
@@ -68,7 +68,7 @@ water F 975 472
 blood r 79 192
 swing_lamp N 539 0
 swing_lamp F 478 0
-smoker F 317 428
+smoker P 317 428
 fan N 809 445
 --BIRTHPLACE-- B 880 479
 --BIRTHPLACE-- B 638 108
