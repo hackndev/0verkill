@@ -1,0 +1,33 @@
+#0
+p-1,0
+l  _________________
+a00fffffffffffffffff0
+l /                 \
+a0fffffffffffffffffff
+l |  /\             |
+a0fffccffffffffffffff
+l | //\\  SOKOLOV   |
+a0ffccccff9999999ffff
+l |  ||             |
+a0fffccffffffffffffff
+l |  ||             |
+a0fffccffffffffffffff
+l \_________________/
+a0fffffffffffffffffff
+#1
+p-1,0
+l  _________________
+a00fffffffffffffffff0
+l /                 \
+a0fffffffffffffffffff
+l |  /\             |
+a0fffccffffffffffffff
+l | //\\  SOKOLOV   |
+a0ffccccffbbbbbbbffff
+l |  ||             |
+a0fffccffffffffffffff
+l |  ||             |
+a0fffccffffffffffffff
+l \_________________/
+a0fffffffffffffffffff
+s0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1

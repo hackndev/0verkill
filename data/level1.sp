@@ -1,4 +1,6 @@
 kadlabova	grx/mar.avi
+sokola		grx/falcona.avi
+sokolov		grx/sign-sokolov.avi
 waltr		grx/waltr.avi
 reno		grx/hajzl.avi
 lada		grx/bus.avi
