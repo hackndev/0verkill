@@ -25,15 +25,15 @@
 #endif
 
 
-int port=DEFAULT_PORT;
-struct sockaddr_in server;
-char *name=NULL;
-int ttime=1;
+static int port=DEFAULT_PORT;
+static struct sockaddr_in server;
+static char *name=NULL;
+static int ttime=1;
 int fd;
 
 
 /* find server address from name and put it into server structure */
-void find_server(void)
+static void find_server(void)
 {
         struct hostent *h;
 
@@ -47,7 +47,7 @@ void find_server(void)
 
 
 /* find a socket and and initialize it */
-void init_socket(void)
+static void init_socket(void)
 {
         fd=socket(PF_INET,SOCK_DGRAM,IPPROTO_UDP);
         if(fd<0){fprintf(stderr,"Can't get socket.\n");exit(1);}
@@ -55,7 +55,7 @@ void init_socket(void)
 
 
 /* contact server, send information request and wait for response */
-int contact_server(void)
+static int contact_server(void)
 {
         static char packet[256];
         int a;
@@ -88,7 +88,7 @@ int contact_server(void)
 
 
 /* write help to stdout */
-void print_help(void)
+static void print_help(void)
 {
 	printf(	"0verkill server testing program.\n"
 		"(c)2000 Brainsoft\n"
@@ -96,7 +96,7 @@ void print_help(void)
 }
 
 
-void parse_command_line(int argc,char **argv)
+static void parse_command_line(int argc,char **argv)
 {
         int a;
 	char *c;
