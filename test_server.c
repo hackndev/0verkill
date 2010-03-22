@@ -38,7 +38,7 @@ static void find_server(void)
         struct hostent *h;
 
         h=gethostbyname(name);
-        if (!h){fprintf(stderr,"Error: Can't resolve server address.");exit(1);}
+        if (!h){fprintf(stderr,"Error: Can't resolve server address.\n");exit(1);}
 
         server.sin_family=AF_INET;
         server.sin_port=htons(port);
@@ -96,10 +96,26 @@ static void print_help(void)
 }
 
 
+static int parse_number (const char * arg)
+{
+	char *c; /* used by strtoul */
+	int n;
+
+	n=strtoul(arg,&c,10);
+	if (*c){fprintf(stderr,"Error: Not a number.\n");exit(1);}
+	if (errno==ERANGE)
+	{
+		if (!port){fprintf(stderr,"Error: Number underflow.\n");exit(1);}
+		else {fprintf(stderr,"Error: Number overflow.\n");exit(1);}
+	}
+
+	return n;
+}
+
+
 static void parse_command_line(int argc,char **argv)
 {
         int a;
-	char *c;
 
         while((a=getopt(argc,argv,"hp:a:t:")) != -1)
         {
@@ -110,23 +126,11 @@ static void parse_command_line(int argc,char **argv)
                     	break;
 
 			case 'p':
-			port=strtoul(optarg,&c,10);
-			if (*c){fprintf(stderr,"Error: Not a number.\n");exit(1);}
-			if (errno==ERANGE)
-			{
-				if (!port){fprintf(stderr,"Error: Number underflow.\n");exit(1);}
-				else {fprintf(stderr,"Error: Number overflow.\n");exit(1);}
-			}
+			port=parse_number(optarg);
 			break;
 
 			case 't':
-			ttime=strtoul(optarg,&c,10);
-			if (*c){fprintf(stderr,"Error: Not a number.\n");exit(1);}
-			if (errno==ERANGE)
-			{
-				if (!ttime){fprintf(stderr,"Error: Number underflow.\n");exit(1);}
-				else {fprintf(stderr,"Error: Number overflow.\n");exit(1);}
-			}
+			ttime=parse_number(optarg);
 			if(ttime<1){fprintf(stderr,"Error: Timeout too low.\n");exit(1);}
 			break;
 
