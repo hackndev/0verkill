@@ -1189,6 +1189,17 @@ static void create_noise(int x,int y,struct player *p)
 }
 
 
+static int is_playername_in_use(const char *name)
+{
+	struct player_list *pl;
+
+	for (pl=&players;pl->next;pl=pl->next) {
+		if (!strcmp(pl->member.name, name))
+			return 1;
+	}
+	return 0;
+}
+
 
 /* read packet from socket */
 static void read_data(void)
