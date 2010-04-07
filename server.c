@@ -1256,6 +1256,14 @@ static void read_data(void)
 					send_packet(packet,2,(struct sockaddr*)(&client),0,last_player->member.id);
 					break;
 				}
+				if (is_playername_in_use(packet+5))
+				{
+					snprintf(txt,256,"Name \"%s\" already in use. Player refused.\n",packet+5);
+					message(txt,2);
+					packet[0]=P_PLAYER_REFUSED;
+					packet[1]=E_NAME_IN_USE;
+					send_packet(packet,2,(struct sockaddr*)(&client),0,last_player->member.id);
+				}
 				find_birthplace(&x,&y);
 				if (add_player(packet[4],packet+5,&client,x,y)) /* failed to add player */
 				{
