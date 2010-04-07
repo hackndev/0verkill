@@ -286,6 +286,9 @@ char * contact_server(int color, char *name)
 			case E_INCOMPATIBLE_VERSION:
 			return "Incompatible client version. Connection refused.\n";
 
+			case E_NAME_IN_USE:
+			return "This name is already in use. Connection refused.\n";
+
 			default:
 			return "Connection refused.\n";
 		}
