@@ -1194,7 +1194,7 @@ static int is_playername_in_use(const char *name)
 	struct player_list *pl;
 
 	for (pl=&players;pl->next;pl=pl->next) {
-		if (!strcmp(pl->member.name, name))
+		if (!strcmp(pl->next->member.name, name))
 			return 1;
 	}
 	return 0;
@@ -1263,6 +1263,8 @@ static void read_data(void)
 					packet[0]=P_PLAYER_REFUSED;
 					packet[1]=E_NAME_IN_USE;
 					send_packet(packet,2,(struct sockaddr*)(&client),0,last_player->member.id);
+
+					break;
 				}
 				find_birthplace(&x,&y);
 				if (add_player(packet[4],packet+5,&client,x,y)) /* failed to add player */
