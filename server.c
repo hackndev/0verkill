@@ -1189,6 +1189,17 @@ static void create_noise(int x,int y,struct player *p)
 }
 
 
+static int is_playername_in_use(const char *name)
+{
+	struct player_list *pl;
+
+	for (pl=&players;pl->next;pl=pl->next) {
+		if (!strcmp(pl->next->member.name, name))
+			return 1;
+	}
+	return 0;
+}
+
 
 /* read packet from socket */
 static void read_data(void)
@@ -1243,6 +1254,16 @@ static void read_data(void)
 					packet[0]=P_PLAYER_REFUSED;
 					packet[1]=E_INCOMPATIBLE_VERSION;
 					send_packet(packet,2,(struct sockaddr*)(&client),0,last_player->member.id);
+					break;
+				}
+				if (is_playername_in_use(packet+5))
+				{
+					snprintf(txt,256,"Name \"%s\" already in use. Player refused.\n",packet+5);
+					message(txt,2);
+					packet[0]=P_PLAYER_REFUSED;
+					packet[1]=E_NAME_IN_USE;
+					send_packet(packet,2,(struct sockaddr*)(&client),0,last_player->member.id);
+
 					break;
 				}
 				find_birthplace(&x,&y);

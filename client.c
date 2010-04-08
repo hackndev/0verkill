@@ -559,6 +559,8 @@ int contact_server(struct config *cfg)
 				server_error("Incompatible client version. Connection refused. Press Enter.", E_CONN);
 				return 1;
 
+			case E_NAME_IN_USE:
+				server_error("Another player on this server uses the same name. Press Enter.", E_CONN);
 			default:
 				server_error("Connection refused. Press ENTER.", E_CONN);
 				return 1;
