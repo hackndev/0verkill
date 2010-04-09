@@ -81,42 +81,42 @@ unsigned char *screen2,*screen2_a;
 #endif
 
 
-int in_signal_handler=0;
-int level_sprites_start;
-int level_number=-1;
+static int in_signal_handler=0;
+static int level_sprites_start;
+static int level_number=-1;
 
 /* my health, armor, frags, deaths, ammo, ... and ID */
-unsigned char health,armor;
-unsigned int frags,deaths;
-unsigned short ammo[ARMS];
-unsigned char current_weapon;
-unsigned char weapons;
-int my_id;
+static unsigned char health,armor;
+static unsigned int frags,deaths;
+static unsigned short ammo[ARMS];
+static unsigned char current_weapon;
+static unsigned char weapons;
+static int my_id;
 
 /* connection with server */
-int connected=0;
+static int connected=0;
 
 int console_ok=1;
 
 /* networking */
 int fd;  /* socket */
-struct sockaddr_in server;  /* server address */
+static struct sockaddr_in server;  /* server address */
 
 /* objects */
-struct object_list objects;
+static struct object_list objects;
 struct object_list *last_obj;
-struct it* hero;
+static struct it* hero;
 
-unsigned long_long game_start_offset; /* time difference between game start on this machine and on server */
+static unsigned long_long game_start_offset; /* time difference between game start on this machine and on server */
 
 
-struct  /* keyboard status */
+static struct  /* keyboard status */
 {
 	unsigned char right,left,jump,creep,speed,fire,weapon,down_ladder;
 }keyboard_status;
 
 
-char *names[N_NAMES]={
+static char *names[N_NAMES]={
 	"Terminator",
 	"Jack The Ripper",
 	"Rambo",
@@ -137,11 +137,11 @@ char *names[N_NAMES]={
 	"Eraser"
 };
 
-int direction=0;  /* 0=stop, 1=left, 2=right */
-int const1,const2,const3,const4;
-unsigned short port=DEFAULT_PORT;
-char *host;
-int priority;   
+static int direction=0;  /* 0=stop, 1=left, 2=right */
+static int const1,const2,const3,const4;
+static unsigned short port=DEFAULT_PORT;
+static char *host;
+static int priority;
 /* 	0=nothing
  *	1=kill player
  *	2=find rifle
@@ -161,14 +161,14 @@ int priority;
 #define  can_see(a,b)	(a<add_int(hero->x,CAN_SEE_X)&&a>sub_int(hero->x,CAN_SEE_X)&&b>sub_int(hero->y,CAN_SEE_Y)&&b<add_int(hero->y,CAN_SEE_Y))
 
 
-int odds(int p)
+static int odds(int p)
 {
 	return (random()%1000)<p;
 }
 
 
 /* free all before exit */
-void clear_memory(void)
+static void clear_memory(void)
 {
 	struct object_list *o;
 
@@ -181,7 +181,7 @@ void clear_memory(void)
 
 
 /* shut down the client */
-void shut_down(int a)
+static void shut_down(int a)
 {
 	if (a)
 	{
@@ -194,7 +194,7 @@ void shut_down(int a)
 
 
 /* find address of server and fill the server address structure */
-char * find_server(char *name,unsigned short port)
+static char * find_server(char *name,unsigned short port)
 {
 	struct hostent *h;
 	
@@ -209,7 +209,7 @@ char * find_server(char *name,unsigned short port)
 
 
 /* initialize socket */
-char * init_socket(void)
+static char * init_socket(void)
 {
 	fd=socket(PF_INET,SOCK_DGRAM,IPPROTO_UDP);
 	if(fd<0)return "Can't get socket.\n";
@@ -220,7 +220,7 @@ char * init_socket(void)
 #define MAX_COUNT 32
 
 /* send quit request to server */
-void send_quit(void)
+static void send_quit(void)
 {
 	char p;
 	fd_set rfds;
@@ -246,7 +246,7 @@ send_again:
 
 
 /* initiate connection with server */
-char * contact_server(int color, char *name)
+static char * contact_server(int color, char *name)
 {
 	static char packet[256];
 	int l=strlen(name)+1;
@@ -336,7 +336,7 @@ char * contact_server(int color, char *name)
 
 
 /* I want to be born again */
-void send_reenter_game(void)
+static void send_reenter_game(void)
 {
 	char packet;
 	packet=P_REENTER_GAME;
@@ -345,7 +345,7 @@ void send_reenter_game(void)
 
 
 /* send chat message */
-void send_message(char *msg)
+static void send_message(char *msg)
 {
 	static char packet[MAX_MESSAGE_LENGTH + 2];
 	int len;
@@ -359,7 +359,7 @@ void send_message(char *msg)
 
 
 /* send end of game to server */
-void send_keyboard(void)
+static void send_keyboard(void)
 {
 	char packet[3];
 	packet[0]=P_KEYBOARD;
@@ -375,7 +375,7 @@ void send_keyboard(void)
 }
 
 
-void reset_keyboard(void)
+static void reset_keyboard(void)
 {
 	keyboard_status.left=0;
 	keyboard_status.right=0;
@@ -388,7 +388,7 @@ void reset_keyboard(void)
 }
 
 
-void test_object(struct it *obj)
+static void test_object(struct it *obj)
 {
 	if (obj==hero)return;
 	if (!can_see(obj->x,obj->y))return;
@@ -491,7 +491,7 @@ void test_object(struct it *obj)
 
 
 /* destroys all objects except hero (before level change) */
-void clean_memory(void)
+static void clean_memory(void)
 {
 	struct object_list *o;
 	
@@ -502,7 +502,7 @@ void clean_memory(void)
 }
 
 
-void change_level(void)
+static void change_level(void)
 {
 	char *LEVEL;
 	char txt[256];
@@ -523,7 +523,7 @@ void change_level(void)
 
 
 /* recompute object positions */
-void update_game(void)
+static void update_game(void)
 {
 	struct object_list *p;
 	int w,h;
@@ -640,7 +640,7 @@ void update_game(void)
 
 
 /* returns number of read bytes */
-int process_packet(char *packet,int l)
+static int process_packet(char *packet,int l)
 {
 	int a,n=l;
 
@@ -964,7 +964,7 @@ level_changed:
 
 
 /* read packet from socket */
-void read_data(void)
+static void read_data(void)
 {
         fd_set rfds;
         struct timeval tv;
@@ -988,7 +988,7 @@ void read_data(void)
 
 
 /* handle fatal signal (sigabrt, sigsegv, ...) */
-void signal_handler(int signum)
+static void signal_handler(int signum)
 {
 	
 	if (connected)send_quit();
@@ -1007,7 +1007,7 @@ void signal_handler(int signum)
 
 
 /* print command line help */
-void print_help(void)
+static void print_help(void)
 {
         printf( 
 		"0verkill bot"
@@ -1019,7 +1019,7 @@ void print_help(void)
 }
 
 
-void parse_command_line(int argc,char **argv)
+static void parse_command_line(int argc,char **argv)
 {
         int a;
 	char *e;
@@ -1053,13 +1053,13 @@ void parse_command_line(int argc,char **argv)
 }
 
 
-char * select_name(void)
+static char * select_name(void)
 {
 	return names[(random())%N_NAMES];
 }
 
 
-void where2go(void)
+static void where2go(void)
 {
 	if (!direction)
 	{
@@ -1076,7 +1076,7 @@ void where2go(void)
 }
 
 
-void action(void)
+static void action(void)
 {
 	if (hero->status & S_DEAD)
 		send_reenter_game();  /* respawn */
