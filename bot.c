@@ -92,6 +92,8 @@ static unsigned short ammo[ARMS];
 static unsigned char current_weapon;
 static unsigned char weapons;
 static int my_id;
+/* for use with the -n option */
+static char *static_name=NULL;
 
 /* connection with server */
 static int connected=0;
@@ -1013,7 +1015,7 @@ static void print_help(void)
 		"0verkill bot"
 		".\n"
                 "(c)2000 Brainsoft\n"
-                "Usage: bot [-h] -a <server address> [-p <port>]"
+                "Usage: bot [-h] -a <server address> [-p <port>] [-n <name>]"
 		"\n"
 	);
 }
@@ -1026,7 +1028,7 @@ static void parse_command_line(int argc,char **argv)
 
         while(1)
         {
-                a=getopt(argc,argv,"hp:a:");
+                a=getopt(argc,argv,"hp:a:n:");
                 switch(a)
                 {
                         case EOF:
@@ -1044,6 +1046,10 @@ static void parse_command_line(int argc,char **argv)
 			host=optarg;
 			break;
 
+			case 'n':
+			static_name=optarg;
+			break;
+
 			case 'p':
 			port=(unsigned short)strtoul(optarg,&e,10);
 			if (*e){ERROR("Error: Decimal number expected.\n");EXIT(1);}
@@ -1055,7 +1061,7 @@ static void parse_command_line(int argc,char **argv)
 
 static char * select_name(void)
 {
-	return names[(random())%N_NAMES];
+	return static_name? static_name:names[(random())%N_NAMES];
 }
 
 
