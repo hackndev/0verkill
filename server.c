@@ -1256,6 +1256,12 @@ static void read_data(void)
 					send_packet(packet,2,(struct sockaddr*)(&client),0,last_player->member.id);
 					break;
 				}
+				if (strlen(packet+5) > MAX_NAME_LEN)
+				{
+					snprintf(txt,256,"Name too long, shortening it to %i characters\n",MAX_NAME_LEN);
+					message(txt,2);
+					packet[5+MAX_NAME_LEN]='\0';
+				}
 				if (is_playername_in_use(packet+5))
 				{
 					snprintf(txt,256,"Name \"%s\" already in use. Player refused.\n",packet+5);
