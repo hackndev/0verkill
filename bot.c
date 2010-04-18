@@ -267,6 +267,7 @@ static char * contact_server(int color, char *name)
 	packet[2]=VERSION_MAJOR;
 	packet[3]=VERSION_MINOR;
 	packet[4]=color;
+	if (l>MAX_NAME_LEN) {l=MAX_NAME_LEN; packet[5+MAX_NAME_LEN]='\0';}
 	memcpy(packet+5,name,l);
 
 	printf("Using name \"%s\".\n", packet+5);
