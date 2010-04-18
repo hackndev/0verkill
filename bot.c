@@ -269,6 +269,8 @@ static char * contact_server(int color, char *name)
 	packet[4]=color;
 	memcpy(packet+5,name,l);
 
+	printf("Using name \"%s\".\n", packet+5);
+
 	send_packet(packet,l+5,(struct sockaddr*)(&server),my_id,0);
 
 
