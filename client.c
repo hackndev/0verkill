@@ -561,6 +561,7 @@ int contact_server(struct config *cfg)
 
 			case E_NAME_IN_USE:
 				server_error("Another player on this server uses the same name. Press Enter.", E_CONN);
+				return 1;
 			default:
 				server_error("Connection refused. Press ENTER.", E_CONN);
 				return 1;
