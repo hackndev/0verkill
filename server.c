@@ -1240,7 +1240,7 @@ static void read_data(void)
 					message("Incompatible client version.\n",2);
 					packet[0]=P_PLAYER_REFUSED;
 					packet[1]=E_PLAYER_REFUSED;
-					send_packet(packet,2,(struct sockaddr*)(&client),0,last_player->member.id);
+					send_packet(packet,2,(struct sockaddr*)(&client),0,0);
 					break;
 				}
 				maj=packet[2];
@@ -1253,7 +1253,7 @@ static void read_data(void)
 					message("Incompatible client version. Player refused.\n",2);
 					packet[0]=P_PLAYER_REFUSED;
 					packet[1]=E_INCOMPATIBLE_VERSION;
-					send_packet(packet,2,(struct sockaddr*)(&client),0,last_player->member.id);
+					send_packet(packet,2,(struct sockaddr*)(&client),0,0);
 					break;
 				}
 				if (strlen(packet+5) > MAX_NAME_LEN)
@@ -1268,7 +1268,7 @@ static void read_data(void)
 					message(txt,2);
 					packet[0]=P_PLAYER_REFUSED;
 					packet[1]=E_NAME_IN_USE;
-					send_packet(packet,2,(struct sockaddr*)(&client),0,last_player->member.id);
+					send_packet(packet,2,(struct sockaddr*)(&client),0,0);
 
 					break;
 				}
@@ -1278,7 +1278,7 @@ static void read_data(void)
 					message("Player refused.\n",2);
 					packet[0]=P_PLAYER_REFUSED;
 					packet[1]=E_PLAYER_REFUSED;
-					send_packet(packet,2,(struct sockaddr*)(&client),0,last_player->member.id);
+					send_packet(packet,2,(struct sockaddr*)(&client),0,0);
 					break;
 				}
 				snprintf(txt,256,"Player #%d accepted, name \"%s\", address %s.\n",n_players,packet+5,txt1);
