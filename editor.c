@@ -179,8 +179,8 @@ void draw_scene(void)
 struct it * find_object(void)
 {
 	struct object_list *p;
-#define O p->next->member
 	
+#define O p->next->member
 	for(p=&objects;p->next;p=p->next)
 	{
 		if (
@@ -191,6 +191,8 @@ struct it * find_object(void)
 			)
 			return &(p->next->member);
 	}
+#undef O
+
 	return 0;
 }
 
@@ -290,7 +292,6 @@ void save_data(void)
 	}
 	
 #define O p->next->member
-	
 	for(p=&objects;p->next;p=p->next)
 	{
 		snprintf(txt,sizeof(txt),"%s %c %d %d\n",sprite_names[O.sprite],O.type,O.x,O.y);
@@ -309,6 +310,8 @@ void save_data(void)
 			break;
 		}
 	}
+#undef O
+
 	fclose(data);
 	fclose(dynamic);
 }
