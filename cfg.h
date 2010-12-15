@@ -167,6 +167,8 @@ extern int tri_d;
 	#else
 		#define ERROR(a)	{fprintf(stderr,a);}
 	#endif
+
+	#include <stdlib.h>
 	#define EXIT(a)		exit(a);
 #endif
 
