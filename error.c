@@ -69,8 +69,8 @@ struct alloc_header {
 	int magic;
 	int size;
 	int line;
-	unsigned char *file;
-	unsigned char *comment;
+	char *file;
+	char *comment;
 };
 #endif
 
@@ -141,7 +141,7 @@ void error(char *m, ...)
 #endif
 
 int errline;
-unsigned char *errfile;
+char *errfile;
 
 char errbuf[4096];
 
@@ -166,7 +166,7 @@ void debug_msg(char *m, ...)
 
 #ifdef LEAK_DEBUG
 
-void *debug_mem_alloc(unsigned char *file, int line, size_t size)
+void *debug_mem_alloc(char *file, int line, size_t size)
 {
 	void *p;
 #ifdef LEAK_DEBUG
@@ -197,7 +197,7 @@ void *debug_mem_alloc(unsigned char *file, int line, size_t size)
 	return p;
 }
 
-void *debug_mem_calloc(unsigned char *file, int line, size_t size)
+void *debug_mem_calloc(char *file, int line, size_t size)
 {
 	void *p;
 #ifdef LEAK_DEBUG
@@ -227,7 +227,7 @@ void *debug_mem_calloc(unsigned char *file, int line, size_t size)
 	return p;
 }
 
-void debug_mem_free(unsigned char *file, int line, void *p)
+void debug_mem_free(char *file, int line, void *p)
 {
 #ifdef LEAK_DEBUG
 	struct alloc_header *ah;
@@ -254,7 +254,7 @@ void debug_mem_free(unsigned char *file, int line, void *p)
 	free(p);
 }
 
-void *debug_mem_realloc(unsigned char *file, int line, void *p, size_t size)
+void *debug_mem_realloc(char *file, int line, void *p, size_t size)
 {
 #ifdef LEAK_DEBUG
 	struct alloc_header *ah;
@@ -294,7 +294,7 @@ void *debug_mem_realloc(unsigned char *file, int line, void *p, size_t size)
 	return (char *)p + L_D_S;
 }
 
-void set_mem_comment(void *p, unsigned char *c, int l)
+void set_mem_comment(void *p, char *c, int l)
 {
 #ifdef LEAK_DEBUG_LIST
 	struct alloc_header *ah = (struct alloc_header *)((char *)p - L_D_S);

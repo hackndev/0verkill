@@ -24,7 +24,7 @@ void error(char *, ...);
 void debug_msg(char *, ...);
 void int_error(char *, ...);
 extern int errline;
-extern unsigned char *errfile;
+extern char *errfile;
 
 #ifdef HAVE_CALLOC
 #define x_calloc(x) calloc((x), 1)
@@ -43,11 +43,11 @@ static inline void *x_calloc(size_t x)
 
 #ifdef LEAK_DEBUG
 
-void *debug_mem_alloc(unsigned char *, int, size_t);
-void *debug_mem_calloc(unsigned char *, int, size_t);
-void debug_mem_free(unsigned char *, int, void *);
-void *debug_mem_realloc(unsigned char *, int, void *, size_t);
-void set_mem_comment(void *, unsigned char *, int);
+extern void *debug_mem_alloc(char *, int, size_t);
+extern void *debug_mem_calloc(char *, int, size_t);
+extern void debug_mem_free(char *, int, void *);
+extern void *debug_mem_realloc(char *, int, void *, size_t);
+extern void set_mem_comment(void *, char *, int);
 
 #define mem_alloc(x) debug_mem_alloc(__FILE__, __LINE__, x)
 #define mem_calloc(x) debug_mem_calloc(__FILE__, __LINE__, x)
@@ -82,7 +82,7 @@ static inline void mem_free(void *p)
 {
 	if (p == DUMMY) return;
 	if (!p) {
-//		internal((unsigned char *)"mem_free(NULL)");
+//		internal("mem_free(NULL)");
 		return;
 	}
 	free(p);
@@ -92,7 +92,7 @@ static inline void *mem_realloc(void *p, size_t size)
 {
 	if (p == DUMMY) return mem_alloc(size);
 	if (!p) {
-//		internal((unsigned char *)"mem_realloc(NULL, %d)", size);
+//		internal("mem_realloc(NULL, %d)", size);
 		return NULL;
 	}
 	if (!size) {
@@ -106,11 +106,11 @@ static inline void *mem_realloc(void *p, size_t size)
 	return p;
 }
 
-static inline void *debug_mem_alloc(unsigned char *f, int l, size_t s) { f=f; l=l; return mem_alloc(s); }
-static inline void *debug_mem_calloc(unsigned char *f, int l, size_t s) { f=f; l=l; return mem_calloc(s); }
-static inline void debug_mem_free(unsigned char *f, int l, void *p) { f=f; l=l; mem_free(p); }
-static inline void *debug_mem_realloc(unsigned char *f, int l, void *p, size_t s) { f=f; l=l; return mem_realloc(p, s); }
-static inline void set_mem_comment(void *p, unsigned char *c, int l) {p=p; c=c; l=l;}
+static inline void *debug_mem_alloc(char *f, int l, size_t s) { f=f; l=l; return mem_alloc(s); }
+static inline void *debug_mem_calloc(char *f, int l, size_t s) { f=f; l=l; return mem_calloc(s); }
+static inline void debug_mem_free(char *f, int l, void *p) { f=f; l=l; mem_free(p); }
+static inline void *debug_mem_realloc(char *f, int l, void *p, size_t s) { f=f; l=l; return mem_realloc(p, s); }
+static inline void set_mem_comment(void *p, char *c, int l) {p=p; c=c; l=l;}
 
 #endif
 
