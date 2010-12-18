@@ -1785,7 +1785,7 @@ cycle:
 	put_sprite((SCREEN_X-TITLE_WIDTH)>>1,0,sprites[title_sprite].positions+sprites[title_sprite].steps[title_anim],0);
 	put_sprite(SCREEN_XOFFSET+PLAYER_WIDTH+((SCREEN_X-SCREEN_XOFFSET-PLAYER_WIDTH-BULGE_WIDTH)>>1),TITLE_HEIGHT+((SCREEN_Y-3-BULGE_HEIGHT-TITLE_HEIGHT)>>1),sprites[bulge_sprite].positions+sprites[bulge_sprite].steps[bulge_anim],0);
 	put_sprite(SCREEN_XOFFSET,TITLE_HEIGHT+((SCREEN_Y-3-PLAYER_HEIGHT-TITLE_HEIGHT)>>1),sprites[sprite].positions+sprites[sprite].steps[(anim<2?48:39)+(anim&7)],0);
-	print2screen(0,TITLE_HEIGHT+4,11,"N:");
+	print2screen(0,TITLE_HEIGHT+4,11,"N");
 	print2screen(1,TITLE_HEIGHT+4,2,"AME:");
 	print2screen(6,TITLE_HEIGHT+4,7,cfg->name);
 	print2screen(0,TITLE_HEIGHT+6,2,"COLOR:");
