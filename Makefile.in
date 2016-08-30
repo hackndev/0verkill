@@ -47,7 +47,12 @@ install: all
 	$(INSTALL) -d -m 755 "$(DESTDIR)$(BASEDIR)"/grx
 	$(INSTALL) -m 644 data/* "$(DESTDIR)$(BASEDIR)"/data
 	$(INSTALL) -m 644 grx/* "$(DESTDIR)$(BASEDIR)"/grx
-
+	$(INSTALL) -d -m 755 "$(DESTDIR)$(datadir)/appdata"
+	$(INSTALL) -m 644 *.appdata.xml "$(DESTDIR)$(datadir)/appdata"
+	$(INSTALL) -d -m 755 "$(DESTDIR)$(datadir)/pixmaps"
+	$(INSTALL) -m 644 0verkill.png "$(DESTDIR)$(datadir)/pixmaps/0verkill.png"
+	$(INSTALL) -d -m 755 "$(DESTDIR)$(datadir)/applications"
+	$(INSTALL) -m 644 *.desktop "$(DESTDIR)$(datadir)/applications"
 
 clean:
 	rm -f *.o server 0verkill editor test_server x0verkill xeditor avi xavi bot core
