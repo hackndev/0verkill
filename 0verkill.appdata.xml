@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2016 Ferdinand Thiessen <rpm@fthiessen.de> -->
+<component type="desktop">
+ <id>0verkill.desktop</id>
+ <metadata_license>CC0-1.0</metadata_license>
+ <project_license>GPL-2.0+</project_license>
+ <name>0verkill</name>
+ <summary>Bloody hell in ASCII art</summary>
+ <description>
+  <p>
+   2D ASCII art deathmatch jump'n'kill'n'smile_insane.
+  </p>
+  <p>
+   You were born to DIE - you will enjoy your death!
+   Your eyes gonna BULGE with horror...
+   IT is the game you always wanted to die playing !!!
+   This game will be your worst NIGHTMARE you ever had!
+   Power Statistics is a program used to view historical and current battery
+   information and will show programs running on your computer using power.
+  </p>
+ </description>
+ <screenshots>
+  <screenshot type="default">
+   <image>https://artax.karlin.mff.cuni.cz/~brain/0verkill/images/grab1.png</image>
+  </screenshot>
+  <screenshot>
+   <image>https://artax.karlin.mff.cuni.cz/~brain/0verkill/images/grab6.png</image>
+  </screenshot>
+  <screenshot>
+    <image>https://artax.karlin.mff.cuni.cz/~brain/0verkill/images/grab11.png</image>
+  </screenshot>
+ </screenshots>
+ <url type="homepage">https://github.com/hackndev/0verkill</url>
+</component>
